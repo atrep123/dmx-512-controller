@@ -1,6 +1,6 @@
 # Planning Guide
 
-A mobile-first DMX 512 lighting controller application that allows users to control stage lighting fixtures, create scenes, and manage multiple DMX universes through an intuitive touch interface.
+A mobile-first DMX 512 lighting controller web application optimized for Android and iOS devices that allows users to control stage lighting fixtures, create scenes, and manage multiple DMX universes through an intuitive touch interface. Works as a Progressive Web App (PWA) that can be installed on mobile devices for an app-like experience.
 
 **Experience Qualities**:
 1. **Tactile** - Controls should feel responsive and physical, like operating a real lighting console with immediate visual feedback
@@ -11,6 +11,13 @@ A mobile-first DMX 512 lighting controller application that allows users to cont
   - The app provides multiple interconnected features (fixture control, scene management, universe setup) with persistent state, but doesn't require accounts or server synchronization.
 
 ## Essential Features
+
+### Progressive Web App Support
+- **Functionality**: PWA manifest and meta tags for mobile installation
+- **Purpose**: Enable "Add to Home Screen" functionality on Android/iOS for app-like experience
+- **Trigger**: User opens app in mobile browser and receives install prompt
+- **Progression**: Access web app → Browser shows install prompt → Add to home screen → App launches full-screen like native app
+- **Success criteria**: App installable on Android/iOS, launches without browser chrome, works offline with cached assets
 
 ### Fixture Channel Control
 - **Functionality**: Individual DMX channel faders (0-255 values) for controlling fixture parameters
