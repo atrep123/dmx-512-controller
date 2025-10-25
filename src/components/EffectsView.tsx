@@ -263,6 +263,30 @@ export default function EffectsView({
             case 'sweep':
                 applySweepEffect(effect, time, speed)
                 break
+            case 'sparkle':
+                applySparkleEffect(effect, time, speed)
+                break
+            case 'wipe':
+                applyWipeEffect(effect, time, speed)
+                break
+            case 'bounce':
+                applyBounceEffect(effect, time, speed)
+                break
+            case 'theater-chase':
+                applyTheaterChaseEffect(effect, time, speed)
+                break
+            case 'fire':
+                applyFireEffect(effect, time, speed)
+                break
+            case 'wave':
+                applyWaveEffect(effect, time, speed)
+                break
+            case 'pulse':
+                applyPulseEffect(effect, time, speed)
+                break
+            case 'color-fade':
+                applyColorFadeEffect(effect, time, speed)
+                break
         }
     }
 
@@ -366,6 +390,202 @@ export default function EffectsView({
                     channels: fixture.channels.map((ch) => {
                         if (ch.name === 'Pan') return { ...ch, value: panValue }
                         if (ch.name === 'Intensity') return { ...ch, value: Math.floor(effect.intensity * 2.55) }
+                        return ch
+                    }),
+                }
+            })
+        )
+    }
+
+    const applySparkleEffect = (effect: Effect, time: number, speed: number) => {
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                
+                const shouldSparkle = Math.random() < (speed * 0.02)
+                const value = shouldSparkle ? Math.floor(effect.intensity * 2.55) : 0
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyWipeEffect = (effect: Effect, time: number, speed: number) => {
+        const fixtureCount = effect.fixtureIds.length
+        if (fixtureCount === 0) return
+
+        const cycleTime = 3000 / speed
+        const progress = (time % cycleTime) / cycleTime
+        const activeCount = Math.floor(progress * fixtureCount)
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                const fixtureIndex = effect.fixtureIds.indexOf(fixture.id)
+                const isActive = fixtureIndex <= activeCount
+                const value = isActive ? Math.floor(effect.intensity * 2.55) : 0
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyBounceEffect = (effect: Effect, time: number, speed: number) => {
+        const fixtureCount = effect.fixtureIds.length
+        if (fixtureCount === 0) return
+
+        const cycleTime = 2000 / speed
+        const progress = (time % cycleTime) / cycleTime
+        const bounce = Math.abs(Math.sin(progress * Math.PI))
+        const activeIndex = Math.floor(bounce * (fixtureCount - 1))
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                const isActive = effect.fixtureIds.indexOf(fixture.id) === activeIndex
+                const value = isActive ? Math.floor(effect.intensity * 2.55) : 0
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyTheaterChaseEffect = (effect: Effect, time: number, speed: number) => {
+        const cycleTime = 1000 / speed
+        const step = Math.floor((time / cycleTime) % 3)
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                const fixtureIndex = effect.fixtureIds.indexOf(fixture.id)
+                const isActive = fixtureIndex % 3 === step
+                const value = isActive ? Math.floor(effect.intensity * 2.55) : 0
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyFireEffect = (effect: Effect, time: number, speed: number) => {
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                if (fixture.fixtureType !== 'rgb' && fixture.fixtureType !== 'rgbw')
+                    return fixture
+
+                const flicker = 0.7 + Math.random() * 0.3
+                const red = Math.floor(255 * flicker * effect.intensity / 100)
+                const green = Math.floor((100 + Math.random() * 50) * flicker * effect.intensity / 100)
+                const blue = 0
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) => {
+                        if (idx === 0) return { ...ch, value: red }
+                        if (idx === 1) return { ...ch, value: green }
+                        if (idx === 2) return { ...ch, value: blue }
+                        return ch
+                    }),
+                }
+            })
+        )
+    }
+
+    const applyWaveEffect = (effect: Effect, time: number, speed: number) => {
+        const fixtureCount = effect.fixtureIds.length
+        if (fixtureCount === 0) return
+
+        const cycleTime = 3000 / speed
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                const fixtureIndex = effect.fixtureIds.indexOf(fixture.id)
+                const offset = (fixtureIndex / fixtureCount) * Math.PI * 2
+                const progress = ((time % cycleTime) / cycleTime) * Math.PI * 2
+                const wave = (Math.sin(progress + offset) + 1) / 2
+                const value = Math.floor(wave * effect.intensity * 2.55)
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyPulseEffect = (effect: Effect, time: number, speed: number) => {
+        const cycleTime = 2000 / speed
+        const progress = (time % cycleTime) / cycleTime
+        const pulse = Math.pow(Math.sin(progress * Math.PI), 2)
+        const value = Math.floor(pulse * effect.intensity * 2.55)
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) =>
+                        idx === 0 ? { ...ch, value } : ch
+                    ),
+                }
+            })
+        )
+    }
+
+    const applyColorFadeEffect = (effect: Effect, time: number, speed: number) => {
+        const cycleTime = 5000 / speed
+        const progress = (time % cycleTime) / cycleTime
+
+        setFixtures((current) =>
+            current.map((fixture) => {
+                if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                if (fixture.fixtureType !== 'rgb' && fixture.fixtureType !== 'rgbw')
+                    return fixture
+
+                let r = 0, g = 0, b = 0
+                if (progress < 0.33) {
+                    const p = progress / 0.33
+                    r = Math.floor(255 * (1 - p))
+                    g = Math.floor(255 * p)
+                } else if (progress < 0.66) {
+                    const p = (progress - 0.33) / 0.33
+                    g = Math.floor(255 * (1 - p))
+                    b = Math.floor(255 * p)
+                } else {
+                    const p = (progress - 0.66) / 0.34
+                    b = Math.floor(255 * (1 - p))
+                    r = Math.floor(255 * p)
+                }
+
+                return {
+                    ...fixture,
+                    channels: fixture.channels.map((ch, idx) => {
+                        if (idx === 0) return { ...ch, value: Math.floor(r * effect.intensity / 100) }
+                        if (idx === 1) return { ...ch, value: Math.floor(g * effect.intensity / 100) }
+                        if (idx === 2) return { ...ch, value: Math.floor(b * effect.intensity / 100) }
                         return ch
                     }),
                 }
@@ -559,6 +779,22 @@ export default function EffectsView({
                 return <Lightning />
             case 'block-program':
                 return <Code />
+            case 'sparkle':
+                return <Sparkle />
+            case 'wipe':
+                return <Lightning />
+            case 'bounce':
+                return <Lightning />
+            case 'theater-chase':
+                return <Lightning />
+            case 'fire':
+                return <Sparkle />
+            case 'wave':
+                return <Lightning />
+            case 'pulse':
+                return <Sparkle />
+            case 'color-fade':
+                return <Sparkle />
         }
     }
 
@@ -576,6 +812,22 @@ export default function EffectsView({
                 return 'Pan movement sweep'
             case 'block-program':
                 return 'Custom block program'
+            case 'sparkle':
+                return 'Random twinkling lights'
+            case 'wipe':
+                return 'Progressive wipe across fixtures'
+            case 'bounce':
+                return 'Bouncing light effect'
+            case 'theater-chase':
+                return 'Theater-style chase pattern'
+            case 'fire':
+                return 'Flickering fire simulation'
+            case 'wave':
+                return 'Wave pattern across fixtures'
+            case 'pulse':
+                return 'Smooth pulsing effect'
+            case 'color-fade':
+                return 'Smooth RGB color transitions'
         }
     }
 
@@ -612,13 +864,21 @@ export default function EffectsView({
                             <div className="space-y-3">
                                 <Label>Effect Type</Label>
                                 <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
-                                    <TabsList className="grid w-full grid-cols-6">
-                                        <TabsTrigger value="chase">Chase</TabsTrigger>
-                                        <TabsTrigger value="strobe">Strobe</TabsTrigger>
-                                        <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
-                                        <TabsTrigger value="fade">Fade</TabsTrigger>
-                                        <TabsTrigger value="sweep">Sweep</TabsTrigger>
-                                        <TabsTrigger value="block-program">Blocks</TabsTrigger>
+                                    <TabsList className="grid w-full grid-cols-3 gap-2 h-auto">
+                                        <TabsTrigger value="chase" className="text-xs">Chase</TabsTrigger>
+                                        <TabsTrigger value="strobe" className="text-xs">Strobe</TabsTrigger>
+                                        <TabsTrigger value="rainbow" className="text-xs">Rainbow</TabsTrigger>
+                                        <TabsTrigger value="fade" className="text-xs">Fade</TabsTrigger>
+                                        <TabsTrigger value="sweep" className="text-xs">Sweep</TabsTrigger>
+                                        <TabsTrigger value="sparkle" className="text-xs">Sparkle</TabsTrigger>
+                                        <TabsTrigger value="wipe" className="text-xs">Wipe</TabsTrigger>
+                                        <TabsTrigger value="bounce" className="text-xs">Bounce</TabsTrigger>
+                                        <TabsTrigger value="theater-chase" className="text-xs">Theater</TabsTrigger>
+                                        <TabsTrigger value="fire" className="text-xs">Fire</TabsTrigger>
+                                        <TabsTrigger value="wave" className="text-xs">Wave</TabsTrigger>
+                                        <TabsTrigger value="pulse" className="text-xs">Pulse</TabsTrigger>
+                                        <TabsTrigger value="color-fade" className="text-xs">Color Fade</TabsTrigger>
+                                        <TabsTrigger value="block-program" className="text-xs">Blocks</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="chase" className="mt-3">
                                         <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
@@ -634,6 +894,30 @@ export default function EffectsView({
                                     </TabsContent>
                                     <TabsContent value="sweep" className="mt-3">
                                         <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                    </TabsContent>
+                                    <TabsContent value="sparkle" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Random twinkling lights effect</p>
+                                    </TabsContent>
+                                    <TabsContent value="wipe" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Progressive wipe across all fixtures</p>
+                                    </TabsContent>
+                                    <TabsContent value="bounce" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Bouncing light back and forth</p>
+                                    </TabsContent>
+                                    <TabsContent value="theater-chase" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Theater-style chase with groups of 3</p>
+                                    </TabsContent>
+                                    <TabsContent value="fire" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Flickering fire simulation (RGB only)</p>
+                                    </TabsContent>
+                                    <TabsContent value="wave" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Sine wave pattern across fixtures</p>
+                                    </TabsContent>
+                                    <TabsContent value="pulse" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Smooth pulsing intensity effect</p>
+                                    </TabsContent>
+                                    <TabsContent value="color-fade" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Smooth RGB color transitions (RGB only)</p>
                                     </TabsContent>
                                     <TabsContent value="block-program" className="mt-3">
                                         <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>
@@ -749,13 +1033,21 @@ export default function EffectsView({
                         <div className="space-y-3">
                             <Label>Effect Type</Label>
                             <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
-                                <TabsList className="grid w-full grid-cols-6">
-                                    <TabsTrigger value="chase">Chase</TabsTrigger>
-                                    <TabsTrigger value="strobe">Strobe</TabsTrigger>
-                                    <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
-                                    <TabsTrigger value="fade">Fade</TabsTrigger>
-                                    <TabsTrigger value="sweep">Sweep</TabsTrigger>
-                                    <TabsTrigger value="block-program">Blocks</TabsTrigger>
+                                <TabsList className="grid w-full grid-cols-3 gap-2 h-auto">
+                                    <TabsTrigger value="chase" className="text-xs">Chase</TabsTrigger>
+                                    <TabsTrigger value="strobe" className="text-xs">Strobe</TabsTrigger>
+                                    <TabsTrigger value="rainbow" className="text-xs">Rainbow</TabsTrigger>
+                                    <TabsTrigger value="fade" className="text-xs">Fade</TabsTrigger>
+                                    <TabsTrigger value="sweep" className="text-xs">Sweep</TabsTrigger>
+                                    <TabsTrigger value="sparkle" className="text-xs">Sparkle</TabsTrigger>
+                                    <TabsTrigger value="wipe" className="text-xs">Wipe</TabsTrigger>
+                                    <TabsTrigger value="bounce" className="text-xs">Bounce</TabsTrigger>
+                                    <TabsTrigger value="theater-chase" className="text-xs">Theater</TabsTrigger>
+                                    <TabsTrigger value="fire" className="text-xs">Fire</TabsTrigger>
+                                    <TabsTrigger value="wave" className="text-xs">Wave</TabsTrigger>
+                                    <TabsTrigger value="pulse" className="text-xs">Pulse</TabsTrigger>
+                                    <TabsTrigger value="color-fade" className="text-xs">Color Fade</TabsTrigger>
+                                    <TabsTrigger value="block-program" className="text-xs">Blocks</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="chase" className="mt-3">
                                     <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
@@ -771,6 +1063,30 @@ export default function EffectsView({
                                 </TabsContent>
                                 <TabsContent value="sweep" className="mt-3">
                                     <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                </TabsContent>
+                                <TabsContent value="sparkle" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Random twinkling lights effect</p>
+                                </TabsContent>
+                                <TabsContent value="wipe" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Progressive wipe across all fixtures</p>
+                                </TabsContent>
+                                <TabsContent value="bounce" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Bouncing light back and forth</p>
+                                </TabsContent>
+                                <TabsContent value="theater-chase" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Theater-style chase with groups of 3</p>
+                                </TabsContent>
+                                <TabsContent value="fire" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Flickering fire simulation (RGB only)</p>
+                                </TabsContent>
+                                <TabsContent value="wave" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Sine wave pattern across fixtures</p>
+                                </TabsContent>
+                                <TabsContent value="pulse" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Smooth pulsing intensity effect</p>
+                                </TabsContent>
+                                <TabsContent value="color-fade" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Smooth RGB color transitions (RGB only)</p>
                                 </TabsContent>
                                 <TabsContent value="block-program" className="mt-3">
                                     <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>

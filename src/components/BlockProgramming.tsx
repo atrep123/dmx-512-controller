@@ -184,322 +184,346 @@ export default function BlockProgramming({ blocks, onBlocksChange }: BlockProgra
         const Icon = blockInfo?.icon || Play
 
         return (
-            <Card className="p-4">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <Icon className="text-primary" />
-                        <h3 className="font-semibold">{blockInfo?.name}</h3>
-                    </div>
-
-                    {editingBlock.type === 'set-color' && (
-                        <>
-                            <div className="space-y-2">
-                                <Label>Red: {editingBlock.parameters.red}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.red || 0]}
-                                    onValueChange={(v) => updateParameter('red', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Green: {editingBlock.parameters.green}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.green || 0]}
-                                    onValueChange={(v) => updateParameter('green', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Blue: {editingBlock.parameters.blue}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.blue || 0]}
-                                    onValueChange={(v) => updateParameter('blue', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>White: {editingBlock.parameters.white}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.white || 0]}
-                                    onValueChange={(v) => updateParameter('white', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                            <div 
-                                className="w-full h-12 rounded border-2"
-                                style={{
-                                    backgroundColor: `rgb(${editingBlock.parameters.red}, ${editingBlock.parameters.green}, ${editingBlock.parameters.blue})`
-                                }}
-                            />
-                        </>
-                    )}
-
-                    {editingBlock.type === 'set-intensity' && (
-                        <div className="space-y-2">
-                            <Label>Intensity: {editingBlock.parameters.intensity}%</Label>
-                            <Slider
-                                value={[editingBlock.parameters.intensity || 0]}
-                                onValueChange={(v) => updateParameter('intensity', v[0])}
-                                max={100}
-                                step={1}
-                            />
-                        </div>
-                    )}
-
-                    {editingBlock.type === 'fade' && (
-                        <div className="space-y-2">
-                            <Label>Duration (ms)</Label>
-                            <Input
-                                type="number"
-                                value={editingBlock.parameters.duration || 0}
-                                onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
-                                min={0}
-                                step={50}
-                            />
-                        </div>
-                    )}
-
-                    {editingBlock.type === 'wait' && (
-                        <div className="space-y-2">
-                            <Label>Wait Time (ms)</Label>
-                            <Input
-                                type="number"
-                                value={editingBlock.parameters.waitTime || 0}
-                                onChange={(e) => updateParameter('waitTime', parseInt(e.target.value) || 0)}
-                                min={0}
-                                step={50}
-                            />
-                        </div>
-                    )}
-
-                    {editingBlock.type === 'chase-step' && (
-                        <>
-                            <div className="space-y-2">
-                                <Label>Fixture Index</Label>
-                                <Input
-                                    type="number"
-                                    value={editingBlock.parameters.fixtureIndex || 0}
-                                    onChange={(e) => updateParameter('fixtureIndex', parseInt(e.target.value) || 0)}
-                                    min={0}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Duration (ms)</Label>
-                                <Input
-                                    type="number"
-                                    value={editingBlock.parameters.duration || 0}
-                                    onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
-                                    min={0}
-                                    step={50}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    {editingBlock.type === 'strobe-pulse' && (
-                        <div className="space-y-2">
-                            <Label>Pulse Duration (ms)</Label>
-                            <Input
-                                type="number"
-                                value={editingBlock.parameters.duration || 0}
-                                onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
-                                min={10}
-                                step={10}
-                            />
-                        </div>
-                    )}
-
-                    {editingBlock.type === 'rainbow-shift' && (
-                        <>
-                            <div className="space-y-2">
-                                <Label>Hue Shift (degrees): {editingBlock.parameters.hueShift}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.hueShift || 0]}
-                                    onValueChange={(v) => updateParameter('hueShift', v[0])}
-                                    max={360}
-                                    step={1}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Duration (ms)</Label>
-                                <Input
-                                    type="number"
-                                    value={editingBlock.parameters.duration || 0}
-                                    onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
-                                    min={0}
-                                    step={50}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    {editingBlock.type === 'pan-tilt' && (
-                        <>
-                            <div className="space-y-2">
-                                <Label>Pan: {editingBlock.parameters.pan}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.pan || 0]}
-                                    onValueChange={(v) => updateParameter('pan', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Tilt: {editingBlock.parameters.tilt}</Label>
-                                <Slider
-                                    value={[editingBlock.parameters.tilt || 0]}
-                                    onValueChange={(v) => updateParameter('tilt', v[0])}
-                                    max={255}
-                                    step={1}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    {editingBlock.type === 'loop-start' && (
-                        <div className="space-y-2">
-                            <Label>Loop Count</Label>
-                            <Input
-                                type="number"
-                                value={editingBlock.parameters.loopCount || 1}
-                                onChange={(e) => updateParameter('loopCount', parseInt(e.target.value) || 1)}
-                                min={1}
-                            />
-                        </div>
-                    )}
+            <div className="space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                    <Icon className="text-primary" size={20} />
+                    <h4 className="font-semibold text-sm">{blockInfo?.name}</h4>
                 </div>
-            </Card>
+
+                {editingBlock.type === 'set-color' && (
+                    <>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Red: {editingBlock.parameters.red}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.red || 0]}
+                                onValueChange={(v) => updateParameter('red', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Green: {editingBlock.parameters.green}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.green || 0]}
+                                onValueChange={(v) => updateParameter('green', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Blue: {editingBlock.parameters.blue}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.blue || 0]}
+                                onValueChange={(v) => updateParameter('blue', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">White: {editingBlock.parameters.white}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.white || 0]}
+                                onValueChange={(v) => updateParameter('white', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div 
+                            className="w-full h-10 rounded border-2 mt-2"
+                            style={{
+                                backgroundColor: `rgb(${editingBlock.parameters.red}, ${editingBlock.parameters.green}, ${editingBlock.parameters.blue})`
+                            }}
+                        />
+                    </>
+                )}
+
+                {editingBlock.type === 'set-intensity' && (
+                    <div className="space-y-2">
+                        <Label className="text-xs">Intensity: {editingBlock.parameters.intensity}%</Label>
+                        <Slider
+                            value={[editingBlock.parameters.intensity || 0]}
+                            onValueChange={(v) => updateParameter('intensity', v[0])}
+                            max={100}
+                            step={1}
+                            className="cursor-pointer"
+                        />
+                    </div>
+                )}
+
+                {editingBlock.type === 'fade' && (
+                    <div className="space-y-2">
+                        <Label className="text-xs">Duration (ms)</Label>
+                        <Input
+                            type="number"
+                            value={editingBlock.parameters.duration || 0}
+                            onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
+                            min={0}
+                            step={50}
+                            className="text-sm"
+                        />
+                    </div>
+                )}
+
+                {editingBlock.type === 'wait' && (
+                    <div className="space-y-2">
+                        <Label className="text-xs">Wait Time (ms)</Label>
+                        <Input
+                            type="number"
+                            value={editingBlock.parameters.waitTime || 0}
+                            onChange={(e) => updateParameter('waitTime', parseInt(e.target.value) || 0)}
+                            min={0}
+                            step={50}
+                            className="text-sm"
+                        />
+                    </div>
+                )}
+
+                {editingBlock.type === 'chase-step' && (
+                    <>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Fixture Index</Label>
+                            <Input
+                                type="number"
+                                value={editingBlock.parameters.fixtureIndex || 0}
+                                onChange={(e) => updateParameter('fixtureIndex', parseInt(e.target.value) || 0)}
+                                min={0}
+                                className="text-sm"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Duration (ms)</Label>
+                            <Input
+                                type="number"
+                                value={editingBlock.parameters.duration || 0}
+                                onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
+                                min={0}
+                                step={50}
+                                className="text-sm"
+                            />
+                        </div>
+                    </>
+                )}
+
+                {editingBlock.type === 'strobe-pulse' && (
+                    <div className="space-y-2">
+                        <Label className="text-xs">Pulse Duration (ms)</Label>
+                        <Input
+                            type="number"
+                            value={editingBlock.parameters.duration || 0}
+                            onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
+                            min={10}
+                            step={10}
+                            className="text-sm"
+                        />
+                    </div>
+                )}
+
+                {editingBlock.type === 'rainbow-shift' && (
+                    <>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Hue Shift (degrees): {editingBlock.parameters.hueShift}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.hueShift || 0]}
+                                onValueChange={(v) => updateParameter('hueShift', v[0])}
+                                max={360}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Duration (ms)</Label>
+                            <Input
+                                type="number"
+                                value={editingBlock.parameters.duration || 0}
+                                onChange={(e) => updateParameter('duration', parseInt(e.target.value) || 0)}
+                                min={0}
+                                step={50}
+                                className="text-sm"
+                            />
+                        </div>
+                    </>
+                )}
+
+                {editingBlock.type === 'pan-tilt' && (
+                    <>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Pan: {editingBlock.parameters.pan}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.pan || 0]}
+                                onValueChange={(v) => updateParameter('pan', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Tilt: {editingBlock.parameters.tilt}</Label>
+                            <Slider
+                                value={[editingBlock.parameters.tilt || 0]}
+                                onValueChange={(v) => updateParameter('tilt', v[0])}
+                                max={255}
+                                step={1}
+                                className="cursor-pointer"
+                            />
+                        </div>
+                    </>
+                )}
+
+                {editingBlock.type === 'loop-start' && (
+                    <div className="space-y-2">
+                        <Label className="text-xs">Loop Count</Label>
+                        <Input
+                            type="number"
+                            value={editingBlock.parameters.loopCount || 1}
+                            onChange={(e) => updateParameter('loopCount', parseInt(e.target.value) || 1)}
+                            min={1}
+                            className="text-sm"
+                        />
+                    </div>
+                )}
+
+                {editingBlock.type === 'loop-end' && (
+                    <p className="text-xs text-muted-foreground italic">No parameters for Loop End block</p>
+                )}
+
+                {editingBlock.type === 'random-color' && (
+                    <p className="text-xs text-muted-foreground italic">No parameters - generates random RGB values</p>
+                )}
+            </div>
         )
     }
 
     return (
-        <div className="grid md:grid-cols-[300px_1fr_300px] gap-4">
-            <Card className="p-4">
-                <h3 className="font-semibold mb-4">Block Library</h3>
-                <ScrollArea className="h-[500px]">
-                    <div className="space-y-2">
-                        {BLOCK_TYPES.map((blockType) => {
-                            const Icon = blockType.icon
-                            return (
-                                <button
-                                    key={blockType.type}
-                                    onClick={() => addBlock(blockType.type)}
-                                    className={`w-full p-3 rounded border-2 text-left transition-all hover:scale-105 ${blockType.color}`}
-                                >
-                                    <div className="flex items-start gap-2">
-                                        <Icon size={20} className="mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <div className="font-semibold text-sm">{blockType.name}</div>
-                                            <div className="text-xs text-muted-foreground">{blockType.description}</div>
-                                        </div>
-                                    </div>
-                                </button>
-                            )
-                        })}
-                    </div>
-                </ScrollArea>
-            </Card>
-
-            <Card className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold">Program</h3>
-                    <Badge variant="secondary">{blocks.length} blocks</Badge>
-                </div>
-                <ScrollArea className="h-[500px]">
-                    {blocks.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground">
-                            <Plus size={48} className="mx-auto mb-2 opacity-50" />
-                            <p>Add blocks from library</p>
-                        </div>
-                    ) : (
+        <div className="space-y-4">
+            <div className="grid lg:grid-cols-[280px_1fr] gap-4">
+                <Card className="p-4 h-fit">
+                    <h3 className="font-semibold mb-3 text-sm">Block Library</h3>
+                    <ScrollArea className="h-[400px] pr-3">
                         <div className="space-y-2">
-                            {blocks.map((block, index) => {
-                                const blockInfo = getBlockInfo(block.type)
-                                const Icon = blockInfo?.icon || Play
-                                const isSelected = selectedBlockId === block.id
-
+                            {BLOCK_TYPES.map((blockType) => {
+                                const Icon = blockType.icon
                                 return (
-                                    <div
-                                        key={block.id}
-                                        onClick={() => selectBlock(block)}
-                                        className={`p-3 rounded border-2 cursor-pointer transition-all ${
-                                            isSelected 
-                                                ? 'ring-2 ring-primary border-primary' 
-                                                : 'hover:border-accent'
-                                        } ${blockInfo?.color || 'bg-card'}`}
+                                    <button
+                                        key={blockType.type}
+                                        onClick={() => addBlock(blockType.type)}
+                                        className={`w-full p-2.5 rounded border-2 text-left transition-all hover:scale-[1.02] active:scale-95 ${blockType.color}`}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Badge variant="outline" className="font-mono text-xs">
-                                                    {index + 1}
-                                                </Badge>
-                                                <Icon size={18} />
-                                                <span className="font-semibold text-sm">{blockInfo?.name}</span>
-                                            </div>
-                                            <div className="flex gap-1">
-                                                <Button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        moveBlock(block.id, 'up')
-                                                    }}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-7 w-7"
-                                                    disabled={index === 0}
-                                                >
-                                                    <ArrowUp size={14} />
-                                                </Button>
-                                                <Button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        moveBlock(block.id, 'down')
-                                                    }}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-7 w-7"
-                                                    disabled={index === blocks.length - 1}
-                                                >
-                                                    <ArrowDown size={14} />
-                                                </Button>
-                                                <Button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        deleteBlock(block.id)
-                                                    }}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-7 w-7"
-                                                >
-                                                    <Trash size={14} className="text-destructive" />
-                                                </Button>
+                                        <div className="flex items-start gap-2">
+                                            <Icon size={18} className="mt-0.5 flex-shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <div className="font-semibold text-xs truncate">{blockType.name}</div>
+                                                <div className="text-[10px] text-muted-foreground leading-tight">{blockType.description}</div>
                                             </div>
                                         </div>
-                                        <div className="mt-2 text-xs text-muted-foreground font-mono">
-                                            {JSON.stringify(block.parameters)}
-                                        </div>
-                                    </div>
+                                    </button>
                                 )
                             })}
                         </div>
-                    )}
-                </ScrollArea>
-            </Card>
+                    </ScrollArea>
+                </Card>
 
-            <div>
-                <h3 className="font-semibold mb-4">Block Editor</h3>
-                {editingBlock ? (
-                    renderBlockEditor()
-                ) : (
-                    <Card className="p-12 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Select a block to edit
-                        </p>
+                <div className="space-y-4">
+                    <Card className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-sm">Program Sequence</h3>
+                            <Badge variant="secondary" className="text-xs">{blocks.length} blocks</Badge>
+                        </div>
+                        <ScrollArea className="h-[400px] pr-3">
+                            {blocks.length === 0 ? (
+                                <div className="text-center py-16 text-muted-foreground">
+                                    <Plus size={40} className="mx-auto mb-2 opacity-30" />
+                                    <p className="text-sm">Click blocks from the library to add them</p>
+                                    <p className="text-xs mt-1 opacity-70">Build your custom effect sequence</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    {blocks.map((block, index) => {
+                                        const blockInfo = getBlockInfo(block.type)
+                                        const Icon = blockInfo?.icon || Play
+                                        const isSelected = selectedBlockId === block.id
+
+                                        return (
+                                            <div
+                                                key={block.id}
+                                                onClick={() => selectBlock(block)}
+                                                className={`p-2.5 rounded border-2 cursor-pointer transition-all ${
+                                                    isSelected 
+                                                        ? 'ring-2 ring-primary border-primary shadow-md' 
+                                                        : 'hover:border-accent hover:shadow-sm'
+                                                } ${blockInfo?.color || 'bg-card'}`}
+                                            >
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                        <Badge variant="outline" className="font-mono text-[10px] px-1.5 py-0 h-5 flex-shrink-0">
+                                                            {index + 1}
+                                                        </Badge>
+                                                        <Icon size={16} className="flex-shrink-0" />
+                                                        <span className="font-semibold text-xs truncate">{blockInfo?.name}</span>
+                                                    </div>
+                                                    <div className="flex gap-0.5 flex-shrink-0">
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                moveBlock(block.id, 'up')
+                                                            }}
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-6 w-6"
+                                                            disabled={index === 0}
+                                                        >
+                                                            <ArrowUp size={12} />
+                                                        </Button>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                moveBlock(block.id, 'down')
+                                                            }}
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-6 w-6"
+                                                            disabled={index === blocks.length - 1}
+                                                        >
+                                                            <ArrowDown size={12} />
+                                                        </Button>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                deleteBlock(block.id)
+                                                            }}
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-6 w-6"
+                                                        >
+                                                            <Trash size={12} className="text-destructive" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-1.5 text-[10px] text-muted-foreground font-mono pl-7 truncate">
+                                                    {Object.entries(block.parameters).length > 0 
+                                                        ? Object.entries(block.parameters)
+                                                            .map(([key, value]) => `${key}: ${value}`)
+                                                            .join(', ')
+                                                        : 'No parameters'}
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )}
+                        </ScrollArea>
                     </Card>
-                )}
+
+                    {editingBlock && (
+                        <Card className="p-4">
+                            <h3 className="font-semibold mb-3 text-sm">Edit Block</h3>
+                            {renderBlockEditor()}
+                        </Card>
+                    )}
+                </div>
             </div>
         </div>
     )

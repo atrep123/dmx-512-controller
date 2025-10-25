@@ -66,7 +66,7 @@ export interface EffectBlock {
 export interface Effect {
   id: string
   name: string
-  type: 'chase' | 'strobe' | 'rainbow' | 'fade' | 'sweep' | 'block-program'
+  type: 'chase' | 'strobe' | 'rainbow' | 'fade' | 'sweep' | 'block-program' | 'sparkle' | 'wipe' | 'bounce' | 'theater-chase' | 'fire' | 'wave' | 'pulse' | 'color-fade'
   fixtureIds: string[]
   speed: number
   intensity: number
