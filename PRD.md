@@ -62,11 +62,11 @@ A mobile-first DMX 512 lighting and motion controller web application optimized 
 - **Success criteria**: Angle accurately maps to DMX values, intuitive degree-based control
 
 ### Automated Effects
-- **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with visual type selection, speed/intensity control, quick fixture selection (All/Clear buttons), effect editing, and duplication
-- **Purpose**: Create dynamic lighting sequences without manual programming, with simplified creation workflow
-- **Trigger**: User creates effect with tabbed interface for type selection, edits existing effects, or duplicates effects for quick variations
-- **Progression**: Create effect → Choose type via tabs with descriptions → Set initial speed/intensity → Select fixtures (All/Clear shortcuts) → Start/stop effect → Edit anytime → Duplicate for variations → Effects run in real-time
-- **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly, editing is intuitive, duplication creates independent copies
+- **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with visual type selection, speed/intensity control, quick fixture selection (All/Clear buttons), effect editing, and duplication. Advanced visual block programming for custom effects with drag-and-drop block composition, parameter editing, and loop controls.
+- **Purpose**: Create dynamic lighting sequences without manual programming, with simplified creation workflow and powerful visual programming for complex custom effects
+- **Trigger**: User creates effect with tabbed interface for type selection OR uses visual block programming, edits existing effects, or duplicates effects for quick variations
+- **Progression**: Create effect → Choose preset type via tabs OR select "Blocks" for visual programming → For blocks: drag blocks from library → arrange in sequence → configure each block's parameters → add loops/conditions → preview → save → Set initial speed/intensity → Select fixtures (All/Clear shortcuts) → Start/stop effect → Edit anytime → Duplicate for variations → Effects run in real-time
+- **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly, editing is intuitive, duplication creates independent copies, block programs execute sequentially with proper timing and loops
 
 ### Network Connection
 - **Functionality**: Configure and connect to DMX networks via Art-Net, sACN, or USB DMX interfaces with connection profiles, real-time status monitoring, packet counting, and visual connection states
@@ -87,6 +87,8 @@ A mobile-first DMX 512 lighting and motion controller web application optimized 
 - **Empty Fixture Selection**: Prevent creating effects with no fixtures selected
 - **Profile Management**: Handle deletion of connection profiles gracefully, prevent saving without name
 - **Effect Duplication**: Create independent copies that can be edited separately without affecting original
+- **Block Program Validation**: Ensure loop-start has matching loop-end, warn if blocks reference fixture indices out of range
+- **Block Execution**: Handle empty block programs gracefully, prevent infinite loops with reasonable loop count limits
 
 ## Design Direction
 The design should feel professional and precise like pro-grade lighting equipment, while remaining accessible and modern. Think sleek lighting console meets modern mobile UI - dark interface to preserve night vision during shows, with vibrant accent colors for active controls. Minimal interface that prioritizes the actual control surfaces over chrome.
@@ -130,10 +132,11 @@ Animations should feel precise and mechanical like physical lighting equipment, 
   - Dialog for fixture setup and scene naming
   - Button variants for actions (primary for scenes, secondary for settings)
   - Badge components for DMX address display and connection status
-  - ScrollArea for long fixture lists
+  - ScrollArea for long fixture lists and block library
   - Input/Label for DMX values and names
   - Switch for toggling effects and auto-connect
   - Select for protocol and fixture type selection
+  - Visual block programming interface with three-panel layout (library, program, editor)
   
 - **Customizations**: 
   - Custom vertical fader component styled like professional lighting console
@@ -141,6 +144,8 @@ Animations should feel precise and mechanical like physical lighting equipment, 
   - DMX value display overlay on sliders showing 0-255 range
   - Connection status indicators with animated pulse effects
   - Effect visualization cards with real-time status
+  - Visual block programming system with drag-reorder, color-coded blocks, and parameter editors
+  - Block library with categorized effect blocks (color, movement, timing, control flow)
   
 - **States**: 
   - Faders: Active (bright accent), inactive (muted), dragging (highlighted with value popup)
@@ -148,14 +153,17 @@ Animations should feel precise and mechanical like physical lighting equipment, 
   - Fixtures: Collapsed/expanded states for channel visibility
   - Effects: Running (accent ring), stopped (default), editing (dialog open)
   - Connection: Connected (green accent), disconnected (muted), connecting (pulse animation)
+  - Blocks: Selected (primary ring), default (type-specific color), dragging (elevated shadow)
   
 - **Icon Selection**: 
-  - Lightbulb for fixtures, Palette for scenes, Faders for channel control
+  - Lightbulb for fixtures, Palette for scenes/color blocks, Faders for channel control
   - GearSix for stepper motors, ArrowsOutCardinal for servos
-  - Lightning/Sparkle for effects, Plugs for connection
+  - Lightning/Sparkle for effects, Plugs for connection, Code for block programming
   - Plus for add actions, Gear for settings, Play/Pause for effect/scene control
   - Eye for visibility toggles, Trash for deletions, Target for positioning
   - WifiHigh/WifiSlash for connection status
+  - Clock for wait blocks, ArrowsClockwise for loops, Shuffle for random
+  - CrosshairSimple for pan/tilt, ArrowUp/ArrowDown for block reordering
   
 - **Spacing**: 
   - Consistent 4px base unit, 16px card padding, 8px between related elements

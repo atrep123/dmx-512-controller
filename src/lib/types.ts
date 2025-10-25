@@ -42,15 +42,37 @@ export interface Servo {
   speed: number
 }
 
+export interface EffectBlock {
+  id: string
+  type: 'set-color' | 'fade' | 'wait' | 'chase-step' | 'strobe-pulse' | 'loop-start' | 'loop-end' | 'set-intensity' | 'rainbow-shift' | 'random-color' | 'pan-tilt'
+  parameters: {
+    color?: string
+    red?: number
+    green?: number
+    blue?: number
+    white?: number
+    intensity?: number
+    duration?: number
+    waitTime?: number
+    fixtureIndex?: number
+    loopCount?: number
+    hueShift?: number
+    pan?: number
+    tilt?: number
+  }
+  order: number
+}
+
 export interface Effect {
   id: string
   name: string
-  type: 'chase' | 'strobe' | 'rainbow' | 'fade' | 'sweep'
+  type: 'chase' | 'strobe' | 'rainbow' | 'fade' | 'sweep' | 'block-program'
   fixtureIds: string[]
   speed: number
   intensity: number
   isActive: boolean
   parameters: Record<string, number>
+  blocks?: EffectBlock[]
 }
 
 export interface Universe {

@@ -1,4 +1,4 @@
-import { Effect, Fixture } from '@/lib/types'
+import { Effect, Fixture, EffectBlock } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,10 +7,25 @@ import { Slider } from '@/components/ui/slider'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Trash, Lightning, Play, Pause, Sparkle, PencilSimple, Copy } from '@phosphor-icons/react'
-import { useState, useEffect } from 'react'
+import { Plus, Trash, Lightning, Play, Pause, Sparkle, PencilSimple, Copy, Code } from '@phosphor-icons/react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import BlockProgramming from '@/components/BlockProgramming'
+
+const BLOCK_TYPES_MAP: Record<EffectBlock['type'], string> = {
+    'set-color': 'Set Color',
+    'set-intensity': 'Set Intensity',
+    'fade': 'Fade',
+    'wait': 'Wait',
+    'chase-step': 'Chase Step',
+    'strobe-pulse': 'Strobe',
+    'rainbow-shift': 'Rainbow',
+    'random-color': 'Random Color',
+    'pan-tilt': 'Pan/Tilt',
+    'loop-start': 'Loop Start',
+    'loop-end': 'Loop End',
+}
 
 interface EffectsViewProps {
     effects: Effect[]
@@ -33,6 +48,8 @@ export default function EffectsView({
     const [selectedFixtures, setSelectedFixtures] = useState<string[]>([])
     const [quickSpeed, setQuickSpeed] = useState(50)
     const [quickIntensity, setQuickIntensity] = useState(100)
+    const [editingBlocks, setEditingBlocks] = useState<EffectBlock[]>([])
+    const blockExecutionRefs = useRef<Map<string, { currentIndex: number, loopStack: Array<{ startIndex: number, remainingLoops: number }> }>>(new Map())
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -40,12 +57,191 @@ export default function EffectsView({
             if (activeEffects.length === 0) return
 
             activeEffects.forEach((effect) => {
-                applyEffect(effect)
+                if (effect.type === 'block-program' && effect.blocks && effect.blocks.length > 0) {
+                    executeBlockProgram(effect)
+                } else {
+                    applyEffect(effect)
+                }
             })
         }, 100)
 
         return () => clearInterval(interval)
     }, [effects])
+
+    const executeBlockProgram = (effect: Effect) => {
+        if (!effect.blocks || effect.blocks.length === 0) return
+
+        let state = blockExecutionRefs.current.get(effect.id)
+        if (!state) {
+            state = { currentIndex: 0, loopStack: [] }
+            blockExecutionRefs.current.set(effect.id, state)
+        }
+
+        if (state.currentIndex >= effect.blocks.length) {
+            state.currentIndex = 0
+            state.loopStack = []
+        }
+
+        const block = effect.blocks[state.currentIndex]
+        executeBlock(effect, block, state)
+        
+        state.currentIndex++
+    }
+
+    const executeBlock = (effect: Effect, block: EffectBlock, state: { currentIndex: number, loopStack: Array<{ startIndex: number, remainingLoops: number }> }) => {
+        const params = block.parameters
+
+        switch (block.type) {
+            case 'set-color':
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        if (fixture.fixtureType !== 'rgb' && fixture.fixtureType !== 'rgbw') return fixture
+                        
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) => {
+                                if (idx === 0) return { ...ch, value: params.red || 0 }
+                                if (idx === 1) return { ...ch, value: params.green || 0 }
+                                if (idx === 2) return { ...ch, value: params.blue || 0 }
+                                if (idx === 3 && fixture.fixtureType === 'rgbw') return { ...ch, value: params.white || 0 }
+                                return ch
+                            }),
+                        }
+                    })
+                )
+                break
+
+            case 'set-intensity':
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        const value = Math.floor((params.intensity || 0) * 2.55)
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) =>
+                                idx === 0 ? { ...ch, value } : ch
+                            ),
+                        }
+                    })
+                )
+                break
+
+            case 'chase-step':
+                const fixtureIndex = params.fixtureIndex || 0
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        const isActive = effect.fixtureIds.indexOf(fixture.id) === fixtureIndex
+                        const value = isActive ? 255 : 0
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) =>
+                                idx === 0 ? { ...ch, value } : ch
+                            ),
+                        }
+                    })
+                )
+                break
+
+            case 'strobe-pulse':
+                const strobeValue = Math.random() > 0.5 ? 255 : 0
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) =>
+                                idx === 0 ? { ...ch, value: strobeValue } : ch
+                            ),
+                        }
+                    })
+                )
+                break
+
+            case 'rainbow-shift':
+                const hue = ((Date.now() / 10) % 360)
+                const rgb = hslToRgb(hue / 360, 1, 0.5)
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        if (fixture.fixtureType !== 'rgb' && fixture.fixtureType !== 'rgbw') return fixture
+                        
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) => {
+                                if (idx === 0) return { ...ch, value: rgb.r }
+                                if (idx === 1) return { ...ch, value: rgb.g }
+                                if (idx === 2) return { ...ch, value: rgb.b }
+                                return ch
+                            }),
+                        }
+                    })
+                )
+                break
+
+            case 'random-color':
+                const randomRgb = {
+                    r: Math.floor(Math.random() * 256),
+                    g: Math.floor(Math.random() * 256),
+                    b: Math.floor(Math.random() * 256),
+                }
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        if (fixture.fixtureType !== 'rgb' && fixture.fixtureType !== 'rgbw') return fixture
+                        
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch, idx) => {
+                                if (idx === 0) return { ...ch, value: randomRgb.r }
+                                if (idx === 1) return { ...ch, value: randomRgb.g }
+                                if (idx === 2) return { ...ch, value: randomRgb.b }
+                                return ch
+                            }),
+                        }
+                    })
+                )
+                break
+
+            case 'pan-tilt':
+                setFixtures((current) =>
+                    current.map((fixture) => {
+                        if (!effect.fixtureIds.includes(fixture.id)) return fixture
+                        if (fixture.fixtureType !== 'moving-head') return fixture
+                        
+                        return {
+                            ...fixture,
+                            channels: fixture.channels.map((ch) => {
+                                if (ch.name === 'Pan') return { ...ch, value: params.pan || 128 }
+                                if (ch.name === 'Tilt') return { ...ch, value: params.tilt || 128 }
+                                return ch
+                            }),
+                        }
+                    })
+                )
+                break
+
+            case 'loop-start':
+                state.loopStack.push({
+                    startIndex: state.currentIndex,
+                    remainingLoops: (params.loopCount || 1) - 1
+                })
+                break
+
+            case 'loop-end':
+                if (state.loopStack.length > 0) {
+                    const loop = state.loopStack[state.loopStack.length - 1]
+                    if (loop.remainingLoops > 0) {
+                        loop.remainingLoops--
+                        state.currentIndex = loop.startIndex
+                    } else {
+                        state.loopStack.pop()
+                    }
+                }
+                break
+        }
+    }
 
     const applyEffect = (effect: Effect) => {
         const time = Date.now()
@@ -222,6 +418,7 @@ export default function EffectsView({
             intensity: quickIntensity,
             isActive: false,
             parameters: {},
+            blocks: effectType === 'block-program' ? editingBlocks : undefined,
         }
 
         setEffects((current) => [...current, newEffect])
@@ -235,6 +432,7 @@ export default function EffectsView({
         setSelectedFixtures([])
         setQuickSpeed(50)
         setQuickIntensity(100)
+        setEditingBlocks([])
         setIsCreateDialogOpen(false)
     }
 
@@ -245,6 +443,7 @@ export default function EffectsView({
         setSelectedFixtures(effect.fixtureIds)
         setQuickSpeed(effect.speed)
         setQuickIntensity(effect.intensity)
+        setEditingBlocks(effect.blocks || [])
         setIsEditDialogOpen(true)
     }
 
@@ -271,6 +470,7 @@ export default function EffectsView({
                           fixtureIds: selectedFixtures,
                           speed: quickSpeed,
                           intensity: quickIntensity,
+                          blocks: effectType === 'block-program' ? editingBlocks : undefined,
                       }
                     : effect
             )
@@ -286,6 +486,7 @@ export default function EffectsView({
         setSelectedFixtures([])
         setQuickSpeed(50)
         setQuickIntensity(100)
+        setEditingBlocks([])
         setIsEditDialogOpen(false)
     }
 
@@ -356,6 +557,8 @@ export default function EffectsView({
                 return <Lightning />
             case 'sweep':
                 return <Lightning />
+            case 'block-program':
+                return <Code />
         }
     }
 
@@ -371,6 +574,8 @@ export default function EffectsView({
                 return 'Smooth intensity fade'
             case 'sweep':
                 return 'Pan movement sweep'
+            case 'block-program':
+                return 'Custom block program'
         }
     }
 
@@ -407,12 +612,13 @@ export default function EffectsView({
                             <div className="space-y-3">
                                 <Label>Effect Type</Label>
                                 <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
-                                    <TabsList className="grid w-full grid-cols-5">
+                                    <TabsList className="grid w-full grid-cols-6">
                                         <TabsTrigger value="chase">Chase</TabsTrigger>
                                         <TabsTrigger value="strobe">Strobe</TabsTrigger>
                                         <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
                                         <TabsTrigger value="fade">Fade</TabsTrigger>
                                         <TabsTrigger value="sweep">Sweep</TabsTrigger>
+                                        <TabsTrigger value="block-program">Blocks</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="chase" className="mt-3">
                                         <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
@@ -428,6 +634,10 @@ export default function EffectsView({
                                     </TabsContent>
                                     <TabsContent value="sweep" className="mt-3">
                                         <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                    </TabsContent>
+                                    <TabsContent value="block-program" className="mt-3">
+                                        <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>
+                                        <BlockProgramming blocks={editingBlocks} onBlocksChange={setEditingBlocks} />
                                     </TabsContent>
                                 </Tabs>
                             </div>
@@ -539,12 +749,13 @@ export default function EffectsView({
                         <div className="space-y-3">
                             <Label>Effect Type</Label>
                             <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
-                                <TabsList className="grid w-full grid-cols-5">
+                                <TabsList className="grid w-full grid-cols-6">
                                     <TabsTrigger value="chase">Chase</TabsTrigger>
                                     <TabsTrigger value="strobe">Strobe</TabsTrigger>
                                     <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
                                     <TabsTrigger value="fade">Fade</TabsTrigger>
                                     <TabsTrigger value="sweep">Sweep</TabsTrigger>
+                                    <TabsTrigger value="block-program">Blocks</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="chase" className="mt-3">
                                     <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
@@ -560,6 +771,10 @@ export default function EffectsView({
                                 </TabsContent>
                                 <TabsContent value="sweep" className="mt-3">
                                     <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                </TabsContent>
+                                <TabsContent value="block-program" className="mt-3">
+                                    <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>
+                                    <BlockProgramming blocks={editingBlocks} onBlocksChange={setEditingBlocks} />
                                 </TabsContent>
                             </Tabs>
                         </div>
@@ -712,44 +927,69 @@ export default function EffectsView({
                                 <div className="flex gap-2 flex-wrap">
                                     <Badge variant="secondary">{effect.type}</Badge>
                                     <Badge variant="outline">{effect.fixtureIds.length} fixtures</Badge>
+                                    {effect.type === 'block-program' && effect.blocks && (
+                                        <Badge variant="outline" className="gap-1">
+                                            <Code size={12} />
+                                            {effect.blocks.length} blocks
+                                        </Badge>
+                                    )}
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <label className="text-muted-foreground">Speed</label>
-                                            <span className="font-mono text-primary font-semibold">
-                                                {effect.speed}%
-                                            </span>
-                                        </div>
-                                        <Slider
-                                            value={[effect.speed]}
-                                            onValueChange={(values) =>
-                                                updateEffectSpeed(effect.id, values[0])
-                                            }
-                                            max={100}
-                                            step={1}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
+                                    {effect.type !== 'block-program' && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <label className="text-muted-foreground">Speed</label>
+                                                    <span className="font-mono text-primary font-semibold">
+                                                        {effect.speed}%
+                                                    </span>
+                                                </div>
+                                                <Slider
+                                                    value={[effect.speed]}
+                                                    onValueChange={(values) =>
+                                                        updateEffectSpeed(effect.id, values[0])
+                                                    }
+                                                    max={100}
+                                                    step={1}
+                                                    className="cursor-pointer"
+                                                />
+                                            </div>
 
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <label className="text-muted-foreground">Intensity</label>
-                                            <span className="font-mono text-primary font-semibold">
-                                                {effect.intensity}%
-                                            </span>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <label className="text-muted-foreground">Intensity</label>
+                                                    <span className="font-mono text-primary font-semibold">
+                                                        {effect.intensity}%
+                                                    </span>
+                                                </div>
+                                                <Slider
+                                                    value={[effect.intensity]}
+                                                    onValueChange={(values) =>
+                                                        updateEffectIntensity(effect.id, values[0])
+                                                    }
+                                                    max={100}
+                                                    step={1}
+                                                    className="cursor-pointer"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                    {effect.type === 'block-program' && effect.blocks && (
+                                        <div className="text-xs text-muted-foreground">
+                                            <p className="font-semibold mb-1">Program blocks:</p>
+                                            <ul className="space-y-0.5">
+                                                {effect.blocks.slice(0, 3).map((block, idx) => (
+                                                    <li key={block.id}>
+                                                        {idx + 1}. {BLOCK_TYPES_MAP[block.type] || block.type}
+                                                    </li>
+                                                ))}
+                                                {effect.blocks.length > 3 && (
+                                                    <li>... and {effect.blocks.length - 3} more</li>
+                                                )}
+                                            </ul>
                                         </div>
-                                        <Slider
-                                            value={[effect.intensity]}
-                                            onValueChange={(values) =>
-                                                updateEffectIntensity(effect.id, values[0])
-                                            }
-                                            max={100}
-                                            step={1}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
+                                    )}
                                 </div>
 
                                 <Button
