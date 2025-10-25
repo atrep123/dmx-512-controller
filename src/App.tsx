@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs } from '@phosphor-icons/react'
+import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
 import FixturesView from '@/components/FixturesView'
 import ScenesView from '@/components/ScenesView'
@@ -9,6 +9,7 @@ import SetupView from '@/components/SetupView'
 import MotorsView from '@/components/MotorsView'
 import EffectsView from '@/components/EffectsView'
 import ConnectionView from '@/components/ConnectionView'
+import LiveControlView from '@/components/LiveControlView'
 import { Toaster } from '@/components/ui/sonner'
 
 function App() {
@@ -30,8 +31,12 @@ function App() {
                     <p className="text-sm text-muted-foreground mt-1">Profesionální řízení osvětlení a motorů</p>
                 </header>
 
-                <Tabs defaultValue="fixtures" className="w-full">
-                    <TabsList className="grid w-full grid-cols-6 mb-6 h-auto">
+                <Tabs defaultValue="live" className="w-full">
+                    <TabsList className="grid w-full grid-cols-7 mb-6 h-auto">
+                        <TabsTrigger value="live" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
+                            <Play weight="fill" />
+                            <span className="text-xs sm:text-sm">Kontrola</span>
+                        </TabsTrigger>
                         <TabsTrigger value="fixtures" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Lightbulb />
                             <span className="text-xs sm:text-sm">Světla</span>
@@ -57,6 +62,16 @@ function App() {
                             <span className="text-xs sm:text-sm">Nastavení</span>
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="live" className="mt-0">
+                        <LiveControlView
+                            fixtures={fixtures || []}
+                            setFixtures={setFixtures}
+                            effects={effects || []}
+                            setEffects={setEffects}
+                            universes={universes || []}
+                        />
+                    </TabsContent>
 
                     <TabsContent value="fixtures" className="mt-0">
                         <FixturesView
