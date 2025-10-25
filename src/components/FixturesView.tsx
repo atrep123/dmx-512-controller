@@ -33,9 +33,9 @@ export default function FixturesView({ fixtures, setFixtures, universes }: Fixtu
                 <div className="rounded-full bg-muted p-6 mb-4">
                     <Faders size={48} className="text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">No Fixtures Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">Žádná světla</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
-                    Add your first fixture in the Setup tab to start controlling DMX channels
+                    Přidejte první světlo v záložce Nastavení pro ovládání DMX kanálů
                 </p>
             </div>
         )

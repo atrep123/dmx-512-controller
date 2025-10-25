@@ -66,13 +66,13 @@ export default function ConnectionView() {
             setConnectionStatus('disconnected')
             setIsConnected(false)
             setPacketsSent(0)
-            toast.info('Disconnected from DMX network')
+            toast.info('Odpojeno od DMX sítě')
         } else {
             setConnectionStatus('connecting')
             setTimeout(() => {
                 setConnectionStatus('connected')
                 setIsConnected(true)
-                toast.success(`Connected via ${connectionSettings.protocol.toUpperCase()}`)
+                toast.success(`Připojeno přes ${connectionSettings.protocol.toUpperCase()}`)
             }, 500)
         }
     }
@@ -82,12 +82,12 @@ export default function ConnectionView() {
         setEditIp(profile.settings.ipAddress)
         setEditPort(profile.settings.port.toString())
         setEditUniverse(profile.settings.universe.toString())
-        toast.success(`Loaded profile "${profile.name}"`)
+        toast.success(`Profil "${profile.name}" načten`)
     }
 
     const handleSaveProfile = () => {
         if (!profileName.trim()) {
-            toast.error('Enter profile name')
+            toast.error('Zadejte název profilu')
             return
         }
 
@@ -99,14 +99,14 @@ export default function ConnectionView() {
 
         setConnectionProfiles((current) => [...(current || []), newProfile])
         setProfileName('')
-        toast.success(`Profile "${newProfile.name}" saved`)
+        toast.success(`Profil "${newProfile.name}" uložen`)
     }
 
     const handleDeleteProfile = (profileId: string) => {
         const profile = connectionProfiles?.find(p => p.id === profileId)
         setConnectionProfiles((current) => (current || []).filter(p => p.id !== profileId))
         if (profile) {
-            toast.success(`Profile "${profile.name}" deleted`)
+            toast.success(`Profil "${profile.name}" smazán`)
         }
     }
 
@@ -115,18 +115,18 @@ export default function ConnectionView() {
         const universe = parseInt(editUniverse)
 
         if (isNaN(port) || port < 1 || port > 65535) {
-            toast.error('Port must be between 1 and 65535')
+            toast.error('Port musí být mezi 1 a 65535')
             return
         }
 
         if (isNaN(universe) || universe < 0 || universe > 32767) {
-            toast.error('Universe must be between 0 and 32767')
+            toast.error('Univerzum musí být mezi 0 a 32767')
             return
         }
 
         const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/
         if (!ipPattern.test(editIp)) {
-            toast.error('Invalid IP address format')
+            toast.error('Neplatný formát IP adresy')
             return
         }
 
@@ -137,7 +137,7 @@ export default function ConnectionView() {
             universe,
         }))
 
-        toast.success('Connection settings saved')
+        toast.success('Nastavení připojení uloženo')
     }
 
     const handleProtocolChange = (protocol: ConnectionSettings['protocol']) => {
@@ -166,11 +166,11 @@ export default function ConnectionView() {
     const getProtocolDescription = (protocol: string) => {
         switch (protocol) {
             case 'artnet':
-                return 'Art-Net protocol for Ethernet DMX'
+                return 'Art-Net protokol pro Ethernet DMX'
             case 'sacn':
-                return 'sACN (E1.31) streaming ACN protocol'
+                return 'sACN (E1.31) streaming ACN protokol'
             case 'usb':
-                return 'Direct USB DMX interface'
+                return 'Přímé USB DMX rozhraní'
             default:
                 return ''
         }
@@ -192,13 +192,13 @@ export default function ConnectionView() {
     const getStatusText = () => {
         switch (connectionStatus) {
             case 'connected':
-                return 'Connected'
+                return 'Připojeno'
             case 'connecting':
-                return 'Connecting...'
+                return 'Připojování...'
             case 'error':
-                return 'Connection Error'
+                return 'Chyba připojení'
             default:
-                return 'Disconnected'
+                return 'Odpojeno'
         }
     }
 
@@ -218,8 +218,8 @@ export default function ConnectionView() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold mb-1">Connection</h2>
-                <p className="text-sm text-muted-foreground">Configure and manage DMX connections</p>
+                <h2 className="text-xl font-semibold mb-1">Připojení</h2>
+                <p className="text-sm text-muted-foreground">Konfigurace a správa DMX připojení</p>
             </div>
 
             <Card className="p-6">
@@ -234,7 +234,7 @@ export default function ConnectionView() {
                                 <p className="text-sm text-muted-foreground">
                                     {isConnected
                                         ? `${connectionSettings?.protocol.toUpperCase()} - ${connectionSettings?.ipAddress}:${connectionSettings?.port}`
-                                        : 'Not connected to DMX network'}
+                                        : 'Nepřipojeno k DMX síti'}
                                 </p>
                             </div>
                         </div>
@@ -242,7 +242,7 @@ export default function ConnectionView() {
                             variant={isConnected ? 'default' : 'outline'}
                             className={isConnected ? getStatusColor() : ''}
                         >
-                            {isConnected ? 'Active' : 'Inactive'}
+                            {isConnected ? 'Aktivní' : 'Neaktivní'}
                         </Badge>
                     </div>
 
@@ -253,7 +253,7 @@ export default function ConnectionView() {
                         disabled={connectionStatus === 'connecting'}
                     >
                         <Plugs weight="bold" />
-                        {connectionStatus === 'connecting' ? 'Connecting...' : (isConnected ? 'Disconnect' : 'Connect')}
+                        {connectionStatus === 'connecting' ? 'Připojování...' : (isConnected ? 'Odpojit' : 'Připojit')}
                     </Button>
 
                     {isConnected && (
@@ -261,21 +261,21 @@ export default function ConnectionView() {
                             <div className="rounded-lg bg-muted p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <CloudArrowUp size={14} className="text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">Packets</span>
+                                    <span className="text-xs text-muted-foreground">Pakety</span>
                                 </div>
                                 <p className="text-xl font-bold">{packetsSent.toLocaleString()}</p>
                             </div>
                             <div className="rounded-lg bg-muted p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <CloudArrowDown size={14} className="text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">Rate</span>
+                                    <span className="text-xs text-muted-foreground">Frekvence</span>
                                 </div>
                                 <p className="text-xl font-bold">{connectionSettings?.sendRate || 40}Hz</p>
                             </div>
                             <div className="rounded-lg bg-muted p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <CheckCircle size={14} className="text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">Channels</span>
+                                    <span className="text-xs text-muted-foreground">Kanály</span>
                                 </div>
                                 <p className="text-xl font-bold">512</p>
                             </div>
@@ -286,23 +286,23 @@ export default function ConnectionView() {
 
             <Tabs defaultValue="settings" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="settings">Settings</TabsTrigger>
-                    <TabsTrigger value="profiles">Profiles</TabsTrigger>
+                    <TabsTrigger value="settings">Nastavení</TabsTrigger>
+                    <TabsTrigger value="profiles">Profily</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="settings" className="space-y-4 mt-4">
                     <Card className="p-6">
                         <div className="space-y-6">
                             <div>
-                                <h3 className="font-semibold mb-1">Network Settings</h3>
+                                <h3 className="font-semibold mb-1">Nastavení sítě</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Configure protocol and network parameters
+                                    Konfigurace protokolu a síťových parametrů
                                 </p>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="protocol">Protocol</Label>
+                                    <Label htmlFor="protocol">Protokol</Label>
                                     <Select
                                         value={connectionSettings?.protocol}
                                         onValueChange={handleProtocolChange}
@@ -324,7 +324,7 @@ export default function ConnectionView() {
                                 {connectionSettings?.protocol !== 'usb' && (
                                     <>
                                         <div className="space-y-2">
-                                            <Label htmlFor="ip-address">IP Address</Label>
+                                            <Label htmlFor="ip-address">IP Adresa</Label>
                                             <Input
                                                 id="ip-address"
                                                 value={editIp}
@@ -345,7 +345,7 @@ export default function ConnectionView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="universe">Universe</Label>
+                                                <Label htmlFor="universe">Univerzum</Label>
                                                 <Input
                                                     id="universe"
                                                     type="number"
@@ -359,7 +359,7 @@ export default function ConnectionView() {
                                 )}
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="send-rate">Send Rate: {connectionSettings?.sendRate || 40}Hz</Label>
+                                    <Label htmlFor="send-rate">Frekvence odesílání: {connectionSettings?.sendRate || 40}Hz</Label>
                                     <input
                                         id="send-rate"
                                         type="range"
@@ -373,17 +373,17 @@ export default function ConnectionView() {
                                         className="w-full cursor-pointer"
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        Higher rates = smoother but more network traffic
+                                        Vyšší frekvence = plynulejší ale větší síťový provoz
                                     </p>
                                 </div>
 
                                 <div className="flex items-center justify-between rounded-lg border p-3">
                                     <div>
                                         <Label htmlFor="auto-connect" className="cursor-pointer">
-                                            Auto-connect on startup
+                                            Automatické připojení při startu
                                         </Label>
                                         <p className="text-xs text-muted-foreground">
-                                            Automatically connect when app opens
+                                            Automaticky připojit při otevření aplikace
                                         </p>
                                     </div>
                                     <Switch
@@ -399,7 +399,7 @@ export default function ConnectionView() {
                                     className="w-full gap-2"
                                 >
                                     <CloudArrowUp weight="bold" />
-                                    Save Settings
+                                    Uložit nastavení
                                 </Button>
                             </div>
                         </div>
@@ -410,34 +410,34 @@ export default function ConnectionView() {
                     <Card className="p-6">
                         <div className="space-y-4">
                             <div>
-                                <h3 className="font-semibold mb-1">Connection Profiles</h3>
+                                <h3 className="font-semibold mb-1">Profily připojení</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Save and load connection presets
+                                    Ukládání a načítání přednastavení připojení
                                 </p>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="profile-name">Save Current as Profile</Label>
+                                <Label htmlFor="profile-name">Uložit aktuální jako profil</Label>
                                 <div className="flex gap-2">
                                     <Input
                                         id="profile-name"
                                         value={profileName}
                                         onChange={(e) => setProfileName(e.target.value)}
-                                        placeholder="e.g., Venue A, Home Setup"
+                                        placeholder="např. Místo A, Domácí nastavení"
                                     />
                                     <Button onClick={handleSaveProfile} disabled={!profileName.trim()}>
-                                        Save
+                                        Uložit
                                     </Button>
                                 </div>
                             </div>
 
                             {(connectionProfiles || []).length === 0 ? (
                                 <div className="text-center py-8 text-muted-foreground text-sm">
-                                    No saved profiles yet
+                                    Zatím žádné uložené profily
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <Label>Saved Profiles</Label>
+                                    <Label>Uložené profily</Label>
                                     {(connectionProfiles || []).map((profile) => (
                                         <div
                                             key={profile.id}
@@ -455,7 +455,7 @@ export default function ConnectionView() {
                                                     size="sm"
                                                     onClick={() => handleQuickConnect(profile)}
                                                 >
-                                                    Load
+                                                    Načíst
                                                 </Button>
                                                 <Button
                                                     variant="ghost"

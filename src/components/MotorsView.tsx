@@ -40,11 +40,11 @@ export default function MotorsView({
 
     const addStepperMotor = () => {
         if (!motorName.trim()) {
-            toast.error('Please enter a motor name')
+            toast.error('Zadejte název motoru')
             return
         }
         if (!selectedUniverseId) {
-            toast.error('Please select a universe')
+            toast.error('Vyberte univerzum')
             return
         }
 
@@ -52,7 +52,7 @@ export default function MotorsView({
         const maxSteps = parseInt(motorMaxSteps)
 
         if (dmxAddress < 1 || dmxAddress > 510) {
-            toast.error('DMX address must be between 1 and 510')
+            toast.error('DMX adresa musí být mezi 1 a 510')
             return
         }
 
@@ -60,19 +60,19 @@ export default function MotorsView({
             {
                 id: `${Date.now()}-position-high`,
                 number: dmxAddress,
-                name: 'Position High',
+                name: 'Pozice horní',
                 value: 0,
             },
             {
                 id: `${Date.now()}-position-low`,
                 number: dmxAddress + 1,
-                name: 'Position Low',
+                name: 'Pozice dolní',
                 value: 0,
             },
             {
                 id: `${Date.now()}-speed`,
                 number: dmxAddress + 2,
-                name: 'Speed',
+                name: 'Rychlost',
                 value: 128,
             },
         ]
@@ -96,16 +96,16 @@ export default function MotorsView({
         setMotorDmxAddress('1')
         setMotorMaxSteps('10000')
         setIsMotorDialogOpen(false)
-        toast.success(`Stepper motor "${newMotor.name}" added`)
+        toast.success(`Krokový motor "${newMotor.name}" přidán`)
     }
 
     const addServo = () => {
         if (!servoName.trim()) {
-            toast.error('Please enter a servo name')
+            toast.error('Zadejte název serva')
             return
         }
         if (!selectedUniverseId) {
-            toast.error('Please select a universe')
+            toast.error('Vyberte univerzum')
             return
         }
 
@@ -114,7 +114,7 @@ export default function MotorsView({
         const maxAngle = parseInt(servoMaxAngle)
 
         if (dmxAddress < 1 || dmxAddress > 512) {
-            toast.error('DMX address must be between 1 and 512')
+            toast.error('DMX adresa musí být mezi 1 a 512')
             return
         }
 
@@ -137,7 +137,7 @@ export default function MotorsView({
         setServoMinAngle('0')
         setServoMaxAngle('180')
         setIsServoDialogOpen(false)
-        toast.success(`Servo "${newServo.name}" added`)
+        toast.success(`Servo "${newServo.name}" přidáno`)
     }
 
     const updateMotorPosition = (motorId: string, position: number) => {
@@ -150,8 +150,8 @@ export default function MotorsView({
                         ...motor,
                         targetPosition: position,
                         channels: motor.channels.map((ch) => {
-                            if (ch.name === 'Position High') return { ...ch, value: positionHigh }
-                            if (ch.name === 'Position Low') return { ...ch, value: positionLow }
+                            if (ch.name === 'Pozice horní') return { ...ch, value: positionHigh }
+                            if (ch.name === 'Pozice dolní') return { ...ch, value: positionLow }
                             return ch
                         }),
                     }
@@ -169,7 +169,7 @@ export default function MotorsView({
                           ...motor,
                           speed,
                           channels: motor.channels.map((ch) =>
-                              ch.name === 'Speed' ? { ...ch, value: speed } : ch
+                              ch.name === 'Rychlost' ? { ...ch, value: speed } : ch
                           ),
                       }
                     : motor
@@ -195,7 +195,7 @@ export default function MotorsView({
         const motor = stepperMotors.find((m) => m.id === motorId)
         setStepperMotors((current) => current.filter((m) => m.id !== motorId))
         if (motor) {
-            toast.success(`Motor "${motor.name}" deleted`)
+            toast.success(`Motor "${motor.name}" smazán`)
         }
     }
 
@@ -203,7 +203,7 @@ export default function MotorsView({
         const servo = servos.find((s) => s.id === servoId)
         setServos((current) => current.filter((s) => s.id !== servoId))
         if (servo) {
-            toast.success(`Servo "${servo.name}" deleted`)
+            toast.success(`Servo "${servo.name}" smazáno`)
         }
     }
 
@@ -212,46 +212,46 @@ export default function MotorsView({
             <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="steppers" className="flex items-center gap-2">
                     <GearSix />
-                    Stepper Motors
+                    Krokové motory
                 </TabsTrigger>
                 <TabsTrigger value="servos" className="flex items-center gap-2">
                     <ArrowsOutCardinal />
-                    Servos
+                    Serva
                 </TabsTrigger>
             </TabsList>
 
             <TabsContent value="steppers">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h2 className="text-xl font-semibold">Stepper Motors</h2>
-                        <p className="text-sm text-muted-foreground">Control stepper motor position and speed</p>
+                        <h2 className="text-xl font-semibold">Krokové motory</h2>
+                        <p className="text-sm text-muted-foreground">Ovládání pozice a rychlosti krokových motorů</p>
                     </div>
                     <Dialog open={isMotorDialogOpen} onOpenChange={setIsMotorDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2" disabled={universes.length === 0}>
                                 <Plus weight="bold" />
-                                Add Motor
+                                Přidat motor
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Add Stepper Motor</DialogTitle>
+                                <DialogTitle>Přidat krokový motor</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="motor-name">Motor Name</Label>
+                                    <Label htmlFor="motor-name">Název motoru</Label>
                                     <Input
                                         id="motor-name"
                                         value={motorName}
                                         onChange={(e) => setMotorName(e.target.value)}
-                                        placeholder="e.g., Pan Motor, Tilt Motor"
+                                        placeholder="např. Pan motor, Tilt motor"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="motor-universe">Universe</Label>
+                                    <Label htmlFor="motor-universe">Univerzum</Label>
                                     <Select value={selectedUniverseId} onValueChange={setSelectedUniverseId}>
                                         <SelectTrigger id="motor-universe">
-                                            <SelectValue placeholder="Select universe" />
+                                            <SelectValue placeholder="Vyberte univerzum" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {universes.map((universe) => (
@@ -264,7 +264,7 @@ export default function MotorsView({
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="motor-dmx">DMX Address</Label>
+                                        <Label htmlFor="motor-dmx">DMX Adresa</Label>
                                         <Input
                                             id="motor-dmx"
                                             type="number"
@@ -275,7 +275,7 @@ export default function MotorsView({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="motor-steps">Max Steps</Label>
+                                        <Label htmlFor="motor-steps">Max kroků</Label>
                                         <Input
                                             id="motor-steps"
                                             type="number"
@@ -287,7 +287,7 @@ export default function MotorsView({
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addStepperMotor}>Add Motor</Button>
+                                <Button onClick={addStepperMotor}>Přidat motor</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -299,9 +299,9 @@ export default function MotorsView({
                             <div className="rounded-full bg-muted p-6 mb-4">
                                 <GearSix size={48} className="text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">No Stepper Motors</h3>
+                            <h3 className="text-lg font-semibold mb-2">Žádné krokové motory</h3>
                             <p className="text-sm text-muted-foreground max-w-md">
-                                Add stepper motors to control precise positioning via DMX
+                                Přidejte krokové motory pro přesné polohování přes DMX
                             </p>
                         </div>
                     </Card>
@@ -337,7 +337,7 @@ export default function MotorsView({
                                             <div className="flex items-center justify-between text-sm">
                                                 <label className="text-muted-foreground flex items-center gap-2">
                                                     <Target size={16} />
-                                                    Position
+                                                    Pozice
                                                 </label>
                                                 <span className="font-mono text-primary font-semibold">
                                                     {motor.targetPosition} / {motor.maxSteps}
@@ -358,7 +358,7 @@ export default function MotorsView({
                                             <div className="flex items-center justify-between text-sm">
                                                 <label className="text-muted-foreground flex items-center gap-2">
                                                     <GearSix size={16} />
-                                                    Speed
+                                                    Rychlost
                                                 </label>
                                                 <span className="font-mono text-primary font-semibold">
                                                     {motor.speed}
@@ -385,35 +385,35 @@ export default function MotorsView({
             <TabsContent value="servos">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h2 className="text-xl font-semibold">Servos</h2>
-                        <p className="text-sm text-muted-foreground">Control servo positions (0-180°)</p>
+                        <h2 className="text-xl font-semibold">Serva</h2>
+                        <p className="text-sm text-muted-foreground">Ovládání pozic serv (0-180°)</p>
                     </div>
                     <Dialog open={isServoDialogOpen} onOpenChange={setIsServoDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2" disabled={universes.length === 0}>
                                 <Plus weight="bold" />
-                                Add Servo
+                                Přidat servo
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Add Servo</DialogTitle>
+                                <DialogTitle>Přidat servo</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="servo-name">Servo Name</Label>
+                                    <Label htmlFor="servo-name">Název serva</Label>
                                     <Input
                                         id="servo-name"
                                         value={servoName}
                                         onChange={(e) => setServoName(e.target.value)}
-                                        placeholder="e.g., Spot 1, Mirror 2"
+                                        placeholder="např. Spot 1, Zrcadlo 2"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="servo-universe">Universe</Label>
+                                    <Label htmlFor="servo-universe">Univerzum</Label>
                                     <Select value={selectedUniverseId} onValueChange={setSelectedUniverseId}>
                                         <SelectTrigger id="servo-universe">
-                                            <SelectValue placeholder="Select universe" />
+                                            <SelectValue placeholder="Vyberte univerzum" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {universes.map((universe) => (
@@ -425,7 +425,7 @@ export default function MotorsView({
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="servo-dmx">DMX Address</Label>
+                                    <Label htmlFor="servo-dmx">DMX Adresa</Label>
                                     <Input
                                         id="servo-dmx"
                                         type="number"
@@ -437,7 +437,7 @@ export default function MotorsView({
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="servo-min">Min Angle (°)</Label>
+                                        <Label htmlFor="servo-min">Min úhel (°)</Label>
                                         <Input
                                             id="servo-min"
                                             type="number"
@@ -448,7 +448,7 @@ export default function MotorsView({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="servo-max">Max Angle (°)</Label>
+                                        <Label htmlFor="servo-max">Max úhel (°)</Label>
                                         <Input
                                             id="servo-max"
                                             type="number"
@@ -461,7 +461,7 @@ export default function MotorsView({
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addServo}>Add Servo</Button>
+                                <Button onClick={addServo}>Přidat servo</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -473,9 +473,9 @@ export default function MotorsView({
                             <div className="rounded-full bg-muted p-6 mb-4">
                                 <ArrowsOutCardinal size={48} className="text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">No Servos</h3>
+                            <h3 className="text-lg font-semibold mb-2">Žádná serva</h3>
                             <p className="text-sm text-muted-foreground max-w-md">
-                                Add servos to control angular positioning via DMX
+                                Přidejte serva pro úhlové polohování přes DMX
                             </p>
                         </div>
                     </Card>
@@ -509,7 +509,7 @@ export default function MotorsView({
 
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between text-sm">
-                                                <label className="text-muted-foreground">Angle</label>
+                                                <label className="text-muted-foreground">Úhel</label>
                                                 <span className="font-mono text-primary font-semibold">
                                                     {servo.targetAngle}°
                                                 </span>

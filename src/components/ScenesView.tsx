@@ -30,7 +30,7 @@ export default function ScenesView({
 
     const saveCurrentScene = () => {
         if (!sceneName.trim()) {
-            toast.error('Please enter a scene name')
+            toast.error('Zadejte název scény')
             return
         }
 
@@ -51,7 +51,7 @@ export default function ScenesView({
         setScenes((currentScenes) => [...currentScenes, newScene])
         setSceneName('')
         setIsDialogOpen(false)
-        toast.success(`Scene "${newScene.name}" saved`)
+        toast.success(`Scéna "${newScene.name}" uložena`)
     }
 
     const recallScene = (scene: Scene) => {
@@ -65,7 +65,7 @@ export default function ScenesView({
             }))
         )
         setActiveScene(scene.id)
-        toast.success(`Scene "${scene.name}" recalled`)
+        toast.success(`Scéna "${scene.name}" obnovena`)
     }
 
     const deleteScene = (sceneId: string) => {
@@ -75,7 +75,7 @@ export default function ScenesView({
             setActiveScene(null)
         }
         if (scene) {
-            toast.success(`Scene "${scene.name}" deleted`)
+            toast.success(`Scéna "${scene.name}" smazána`)
         }
     }
 
@@ -83,28 +83,28 @@ export default function ScenesView({
         <div>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-semibold">Scenes</h2>
-                    <p className="text-sm text-muted-foreground">Save and recall lighting states</p>
+                    <h2 className="text-xl font-semibold">Scény</h2>
+                    <p className="text-sm text-muted-foreground">Uložení a obnovení stavů osvětlení</p>
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="gap-2">
                             <Plus weight="bold" />
-                            Save Scene
+                            Uložit scénu
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Save Current Scene</DialogTitle>
+                            <DialogTitle>Uložit aktuální scénu</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                                <Label htmlFor="scene-name">Scene Name</Label>
+                                <Label htmlFor="scene-name">Název scény</Label>
                                 <Input
                                     id="scene-name"
                                     value={sceneName}
                                     onChange={(e) => setSceneName(e.target.value)}
-                                    placeholder="e.g., Opening Look, Full Intensity"
+                                    placeholder="např. Úvodní pohled, Plná intenzita"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             saveCurrentScene()
@@ -116,7 +116,7 @@ export default function ScenesView({
                         <DialogFooter>
                             <Button onClick={saveCurrentScene} className="gap-2">
                                 <FloppyDisk weight="bold" />
-                                Save Scene
+                                Uložit scénu
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -129,9 +129,9 @@ export default function ScenesView({
                         <div className="rounded-full bg-muted p-6 mb-4">
                             <FloppyDisk size={48} className="text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">No Scenes Saved</h3>
+                        <h3 className="text-lg font-semibold mb-2">Žádné uložené scény</h3>
                         <p className="text-sm text-muted-foreground max-w-md mb-4">
-                            Set your fixture channels to desired values and save them as a scene for instant recall
+                            Nastavte kanály světel na požadované hodnoty a uložte je jako scénu pro okamžité obnovení
                         </p>
                     </div>
                 </Card>
@@ -146,8 +146,8 @@ export default function ScenesView({
                                 <div>
                                     <h3 className="font-semibold text-lg">{scene.name}</h3>
                                     <p className="text-xs text-muted-foreground">
-                                        {new Date(scene.timestamp).toLocaleDateString()} at{' '}
-                                        {new Date(scene.timestamp).toLocaleTimeString()}
+                                        {new Date(scene.timestamp).toLocaleDateString('cs-CZ')} v{' '}
+                                        {new Date(scene.timestamp).toLocaleTimeString('cs-CZ')}
                                     </p>
                                 </div>
                                 <div className="flex gap-2">
@@ -157,7 +157,7 @@ export default function ScenesView({
                                         className="flex-1 gap-2"
                                     >
                                         <Play weight="fill" />
-                                        Recall
+                                        Obnovit
                                     </Button>
                                     <Button
                                         onClick={() => deleteScene(scene.id)}
