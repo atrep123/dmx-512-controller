@@ -19,80 +19,80 @@ interface BlockProgrammingProps {
 const BLOCK_TYPES = [
     { 
         type: 'set-color' as const, 
-        name: 'Set Color', 
+        name: 'Nastavit barvu', 
         icon: Palette, 
         color: 'bg-blue-500/20 border-blue-500',
-        description: 'Set RGB/RGBW color'
+        description: 'Nastavit RGB/RGBW barvu'
     },
     { 
         type: 'set-intensity' as const, 
-        name: 'Set Intensity', 
+        name: 'Nastavit intenzitu', 
         icon: Lightning, 
         color: 'bg-yellow-500/20 border-yellow-500',
-        description: 'Set brightness level'
+        description: 'Nastavit jas'
     },
     { 
         type: 'fade' as const, 
-        name: 'Fade', 
+        name: 'Přechod', 
         icon: Sparkle, 
         color: 'bg-purple-500/20 border-purple-500',
-        description: 'Smooth fade transition'
+        description: 'Plynulý přechod'
     },
     { 
         type: 'wait' as const, 
-        name: 'Wait', 
+        name: 'Čekat', 
         icon: Clock, 
         color: 'bg-gray-500/20 border-gray-500',
-        description: 'Pause execution'
+        description: 'Pozastavit provádění'
     },
     { 
         type: 'chase-step' as const, 
-        name: 'Chase Step', 
+        name: 'Krok Chase', 
         icon: ArrowsClockwise, 
         color: 'bg-green-500/20 border-green-500',
-        description: 'Activate one fixture'
+        description: 'Aktivovat jedno světlo'
     },
     { 
         type: 'strobe-pulse' as const, 
-        name: 'Strobe', 
+        name: 'Stroboskop', 
         icon: Lightning, 
         color: 'bg-red-500/20 border-red-500',
-        description: 'Quick flash'
+        description: 'Rychlý záblesk'
     },
     { 
         type: 'rainbow-shift' as const, 
-        name: 'Rainbow', 
+        name: 'Duha', 
         icon: Palette, 
         color: 'bg-pink-500/20 border-pink-500',
-        description: 'Shift hue'
+        description: 'Posunutí odstínu'
     },
     { 
         type: 'random-color' as const, 
-        name: 'Random Color', 
+        name: 'Náhodná barva', 
         icon: Shuffle, 
         color: 'bg-orange-500/20 border-orange-500',
-        description: 'Random RGB'
+        description: 'Náhodná RGB'
     },
     { 
         type: 'pan-tilt' as const, 
         name: 'Pan/Tilt', 
         icon: CrosshairSimple, 
         color: 'bg-cyan-500/20 border-cyan-500',
-        description: 'Moving head position'
+        description: 'Pozice moving head'
     },
     { 
         type: 'loop-start' as const, 
-        name: 'Loop Start', 
+        name: 'Začátek smyčky', 
         icon: ArrowsClockwise, 
         color: 'bg-indigo-500/20 border-indigo-500',
-        description: 'Begin loop'
+        description: 'Začít smyčku'
     },
     { 
         type: 'loop-end' as const, 
-        name: 'Loop End', 
+        name: 'Konec smyčky', 
         icon: ArrowsClockwise, 
         color: 'bg-indigo-500/20 border-indigo-500',
-        description: 'End loop'
+        description: 'Ukončit smyčku'
     },
 ]
 

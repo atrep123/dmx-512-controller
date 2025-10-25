@@ -26,35 +26,35 @@ function App() {
             
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <header className="mb-6">
-                    <h1 className="text-2xl font-bold tracking-tight">DMX 512 Controller</h1>
-                    <p className="text-sm text-muted-foreground mt-1">Professional Lighting & Motion Control</p>
+                    <h1 className="text-2xl font-bold tracking-tight">DMX 512 Kontrolér</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Profesionální řízení osvětlení a motorů</p>
                 </header>
 
                 <Tabs defaultValue="fixtures" className="w-full">
                     <TabsList className="grid w-full grid-cols-6 mb-6 h-auto">
                         <TabsTrigger value="fixtures" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Lightbulb />
-                            <span className="text-xs sm:text-sm">Fixtures</span>
+                            <span className="text-xs sm:text-sm">Světla</span>
                         </TabsTrigger>
                         <TabsTrigger value="motors" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <GearSix />
-                            <span className="text-xs sm:text-sm">Motors</span>
+                            <span className="text-xs sm:text-sm">Motory</span>
                         </TabsTrigger>
                         <TabsTrigger value="effects" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Lightning />
-                            <span className="text-xs sm:text-sm">Effects</span>
+                            <span className="text-xs sm:text-sm">Efekty</span>
                         </TabsTrigger>
                         <TabsTrigger value="scenes" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Palette />
-                            <span className="text-xs sm:text-sm">Scenes</span>
+                            <span className="text-xs sm:text-sm">Scény</span>
                         </TabsTrigger>
                         <TabsTrigger value="connection" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Plugs />
-                            <span className="text-xs sm:text-sm">Connect</span>
+                            <span className="text-xs sm:text-sm">Připojení</span>
                         </TabsTrigger>
                         <TabsTrigger value="setup" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Gear />
-                            <span className="text-xs sm:text-sm">Setup</span>
+                            <span className="text-xs sm:text-sm">Nastavení</span>
                         </TabsTrigger>
                     </TabsList>
 

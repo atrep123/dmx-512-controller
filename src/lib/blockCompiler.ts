@@ -24,8 +24,8 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
   let estimatedDuration = 0
   let loopCount = 0
 
-  codeLines.push('// Compiled Effect Program')
-  codeLines.push('// Auto-generated from block programming\n')
+  codeLines.push('// Zkompilovaný efektový program')
+  codeLines.push('// Automaticky vygenerováno z blokového programování\n')
 
   const loopStarts: number[] = []
 
@@ -160,7 +160,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
   })
 
   codeLines.push('')
-  codeLines.push(`// Stats: ${blocks.length} blocks, ${loopCount} loops, ~${estimatedDuration}ms`)
+  codeLines.push(`// Statistiky: ${blocks.length} bloků, ${loopCount} smyček, ~${estimatedDuration}ms`)
 
   return {
     instructions,
@@ -175,5 +175,5 @@ export function getEffectSummary(compiled: CompiledEffect): string {
   const { blockCount, loopCount, estimatedDuration } = compiled
   const durationSeconds = (estimatedDuration / 1000).toFixed(1)
   
-  return `${blockCount} blocks · ${loopCount} loops · ~${durationSeconds}s cycle`
+  return `${blockCount} bloků · ${loopCount} smyček · ~${durationSeconds}s cyklus`
 }

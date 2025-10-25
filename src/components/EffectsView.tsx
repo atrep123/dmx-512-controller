@@ -15,17 +15,17 @@ import BlockProgramming from '@/components/BlockProgramming'
 import { compileBlocks, getEffectSummary } from '@/lib/blockCompiler'
 
 const BLOCK_TYPES_MAP: Record<EffectBlock['type'], string> = {
-    'set-color': 'Set Color',
-    'set-intensity': 'Set Intensity',
-    'fade': 'Fade',
-    'wait': 'Wait',
-    'chase-step': 'Chase Step',
-    'strobe-pulse': 'Strobe',
-    'rainbow-shift': 'Rainbow',
-    'random-color': 'Random Color',
+    'set-color': 'Nastavit barvu',
+    'set-intensity': 'Nastavit intenzitu',
+    'fade': 'Přechod',
+    'wait': 'Čekat',
+    'chase-step': 'Krok chase',
+    'strobe-pulse': 'Stroboskop',
+    'rainbow-shift': 'Duha',
+    'random-color': 'Náhodná barva',
     'pan-tilt': 'Pan/Tilt',
-    'loop-start': 'Loop Start',
-    'loop-end': 'Loop End',
+    'loop-start': 'Začátek smyčky',
+    'loop-end': 'Konec smyčky',
 }
 
 interface EffectsViewProps {
@@ -43,6 +43,8 @@ export default function EffectsView({
 }: EffectsViewProps) {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+    const [isCodeDialogOpen, setIsCodeDialogOpen] = useState(false)
+    const [selectedEffectForCode, setSelectedEffectForCode] = useState<Effect | null>(null)
     const [editingEffect, setEditingEffect] = useState<Effect | null>(null)
     const [effectName, setEffectName] = useState('')
     const [effectType, setEffectType] = useState<Effect['type']>('chase')
@@ -621,12 +623,12 @@ export default function EffectsView({
 
     const addEffect = () => {
         if (!effectName.trim()) {
-            toast.error('Enter effect name')
+            toast.error('Zadejte název efektu')
             return
         }
 
         if (selectedFixtures.length === 0) {
-            toast.error('Select at least one fixture')
+            toast.error('Vyberte alespoň jedno světlo')
             return
         }
 
@@ -644,7 +646,7 @@ export default function EffectsView({
 
         setEffects((current) => [...current, newEffect])
         resetCreateDialog()
-        toast.success(`Effect "${newEffect.name}" created`)
+        toast.success(`Efekt "${newEffect.name}" vytvořen`)
     }
 
     const resetCreateDialog = () => {
@@ -672,12 +674,12 @@ export default function EffectsView({
         if (!editingEffect) return
         
         if (!effectName.trim()) {
-            toast.error('Enter effect name')
+            toast.error('Zadejte název efektu')
             return
         }
 
         if (selectedFixtures.length === 0) {
-            toast.error('Select at least one fixture')
+            toast.error('Vyberte alespoň jedno světlo')
             return
         }
 
@@ -697,7 +699,7 @@ export default function EffectsView({
             )
         )
         resetEditDialog()
-        toast.success(`Effect updated`)
+        toast.success(`Efekt aktualizován`)
     }
 
     const resetEditDialog = () => {
@@ -715,18 +717,18 @@ export default function EffectsView({
         const newEffect: Effect = {
             ...effect,
             id: Date.now().toString(),
-            name: `${effect.name} (Copy)`,
+            name: `${effect.name} (Kopie)`,
             isActive: false,
         }
         setEffects((current) => [...current, newEffect])
-        toast.success(`Effect duplicated`)
+        toast.success(`Efekt zduplikován`)
     }
 
     const deleteEffect = (effectId: string) => {
         const effect = effects.find((e) => e.id === effectId)
         setEffects((current) => current.filter((e) => e.id !== effectId))
         if (effect) {
-            toast.success(`Effect "${effect.name}" deleted`)
+            toast.success(`Efekt "${effect.name}" smazán`)
         }
     }
 
@@ -802,33 +804,33 @@ export default function EffectsView({
     const getEffectDescription = (type: Effect['type']) => {
         switch (type) {
             case 'chase':
-                return 'Sequential fixture activation'
+                return 'Postupná aktivace světel'
             case 'strobe':
-                return 'Rapid on/off flashing'
+                return 'Rychlé blikání'
             case 'rainbow':
-                return 'RGB color cycling'
+                return 'Barevný cyklus RGB'
             case 'fade':
-                return 'Smooth intensity fade'
+                return 'Plynulý přechod intenzity'
             case 'sweep':
-                return 'Pan movement sweep'
+                return 'Sweep pan pohybu'
             case 'block-program':
-                return 'Custom block program'
+                return 'Vlastní blokový program'
             case 'sparkle':
-                return 'Random twinkling lights'
+                return 'Náhodné blikání'
             case 'wipe':
-                return 'Progressive wipe across fixtures'
+                return 'Postupné rozsvěcování'
             case 'bounce':
-                return 'Bouncing light effect'
+                return 'Odrážející se světlo'
             case 'theater-chase':
-                return 'Theater-style chase pattern'
+                return 'Divadelní chase vzor'
             case 'fire':
-                return 'Flickering fire simulation'
+                return 'Simulace ohně'
             case 'wave':
-                return 'Wave pattern across fixtures'
+                return 'Vlnový vzor'
             case 'pulse':
-                return 'Smooth pulsing effect'
+                return 'Pulzující efekt'
             case 'color-fade':
-                return 'Smooth RGB color transitions'
+                return 'Plynulé přechody barev RGB'
         }
     }
 
@@ -836,92 +838,92 @@ export default function EffectsView({
         <div>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-semibold">Effects</h2>
-                    <p className="text-sm text-muted-foreground">Create and control lighting effects</p>
+                    <h2 className="text-xl font-semibold">Efekty</h2>
+                    <p className="text-sm text-muted-foreground">Vytváření a ovládání světelných efektů</p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="gap-2" disabled={fixtures.length === 0}>
                             <Plus weight="bold" />
-                            Create Effect
+                            Vytvořit efekt
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                            <DialogTitle>Create New Effect</DialogTitle>
-                            <DialogDescription>Choose effect type and settings</DialogDescription>
+                            <DialogTitle>Vytvořit nový efekt</DialogTitle>
+                            <DialogDescription>Zvolte typ a nastavení efektu</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-6 py-4">
                             <div className="space-y-2">
-                                <Label htmlFor="effect-name">Effect Name</Label>
+                                <Label htmlFor="effect-name">Název efektu</Label>
                                 <Input
                                     id="effect-name"
                                     value={effectName}
                                     onChange={(e) => setEffectName(e.target.value)}
-                                    placeholder="e.g., Main Chase, Rainbow Loop"
+                                    placeholder="např. Hlavní chase, Duhová smyčka"
                                 />
                             </div>
 
                             <div className="space-y-3">
-                                <Label>Effect Type</Label>
+                                <Label>Typ efektu</Label>
                                 <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
                                     <TabsList className="grid w-full grid-cols-3 gap-2 h-auto">
                                         <TabsTrigger value="chase" className="text-xs">Chase</TabsTrigger>
-                                        <TabsTrigger value="strobe" className="text-xs">Strobe</TabsTrigger>
-                                        <TabsTrigger value="rainbow" className="text-xs">Rainbow</TabsTrigger>
-                                        <TabsTrigger value="fade" className="text-xs">Fade</TabsTrigger>
+                                        <TabsTrigger value="strobe" className="text-xs">Stroboskop</TabsTrigger>
+                                        <TabsTrigger value="rainbow" className="text-xs">Duha</TabsTrigger>
+                                        <TabsTrigger value="fade" className="text-xs">Přechod</TabsTrigger>
                                         <TabsTrigger value="sweep" className="text-xs">Sweep</TabsTrigger>
-                                        <TabsTrigger value="sparkle" className="text-xs">Sparkle</TabsTrigger>
+                                        <TabsTrigger value="sparkle" className="text-xs">Jiskření</TabsTrigger>
                                         <TabsTrigger value="wipe" className="text-xs">Wipe</TabsTrigger>
-                                        <TabsTrigger value="bounce" className="text-xs">Bounce</TabsTrigger>
-                                        <TabsTrigger value="theater-chase" className="text-xs">Theater</TabsTrigger>
-                                        <TabsTrigger value="fire" className="text-xs">Fire</TabsTrigger>
-                                        <TabsTrigger value="wave" className="text-xs">Wave</TabsTrigger>
-                                        <TabsTrigger value="pulse" className="text-xs">Pulse</TabsTrigger>
-                                        <TabsTrigger value="color-fade" className="text-xs">Color Fade</TabsTrigger>
-                                        <TabsTrigger value="block-program" className="text-xs">Blocks</TabsTrigger>
+                                        <TabsTrigger value="bounce" className="text-xs">Odraz</TabsTrigger>
+                                        <TabsTrigger value="theater-chase" className="text-xs">Divadlo</TabsTrigger>
+                                        <TabsTrigger value="fire" className="text-xs">Oheň</TabsTrigger>
+                                        <TabsTrigger value="wave" className="text-xs">Vlna</TabsTrigger>
+                                        <TabsTrigger value="pulse" className="text-xs">Pulz</TabsTrigger>
+                                        <TabsTrigger value="color-fade" className="text-xs">Barvy</TabsTrigger>
+                                        <TabsTrigger value="block-program" className="text-xs">Bloky</TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="chase" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
+                                        <p className="text-sm text-muted-foreground">Aktivuje světla jeden po druhém</p>
                                     </TabsContent>
                                     <TabsContent value="strobe" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Rapid on/off flashing for all fixtures</p>
+                                        <p className="text-sm text-muted-foreground">Rychlé blikání všech světel</p>
                                     </TabsContent>
                                     <TabsContent value="rainbow" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Smooth color cycling through RGB spectrum</p>
+                                        <p className="text-sm text-muted-foreground">Plynulé cyklování barevného spektra RGB</p>
                                     </TabsContent>
                                     <TabsContent value="fade" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Smooth sine wave intensity fading</p>
+                                        <p className="text-sm text-muted-foreground">Plynulý sinusový přechod intenzity</p>
                                     </TabsContent>
                                     <TabsContent value="sweep" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                        <p className="text-sm text-muted-foreground">Pan sweep pohyb pro moving head</p>
                                     </TabsContent>
                                     <TabsContent value="sparkle" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Random twinkling lights effect</p>
+                                        <p className="text-sm text-muted-foreground">Náhodně blikající světla</p>
                                     </TabsContent>
                                     <TabsContent value="wipe" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Progressive wipe across all fixtures</p>
+                                        <p className="text-sm text-muted-foreground">Postupné rozsvěcování světel</p>
                                     </TabsContent>
                                     <TabsContent value="bounce" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Bouncing light back and forth</p>
+                                        <p className="text-sm text-muted-foreground">Odrážející se světlo tam a zpět</p>
                                     </TabsContent>
-                                    <TabsContent value="theater-chase" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Theater-style chase with groups of 3</p>
+                                    <TabsContent value="theater-chase" className="text-xs">
+                                        <p className="text-sm text-muted-foreground">Divadelní chase ve skupinách po 3</p>
                                     </TabsContent>
                                     <TabsContent value="fire" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Flickering fire simulation (RGB only)</p>
+                                        <p className="text-sm text-muted-foreground">Simulace plamene (pouze RGB)</p>
                                     </TabsContent>
                                     <TabsContent value="wave" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Sine wave pattern across fixtures</p>
+                                        <p className="text-sm text-muted-foreground">Sinusová vlna napříč světly</p>
                                     </TabsContent>
                                     <TabsContent value="pulse" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Smooth pulsing intensity effect</p>
+                                        <p className="text-sm text-muted-foreground">Plynulý pulzující efekt</p>
                                     </TabsContent>
                                     <TabsContent value="color-fade" className="mt-3">
-                                        <p className="text-sm text-muted-foreground">Smooth RGB color transitions (RGB only)</p>
+                                        <p className="text-sm text-muted-foreground">Plynulé barevné přechody RGB (pouze RGB)</p>
                                     </TabsContent>
                                     <TabsContent value="block-program" className="mt-3">
-                                        <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>
+                                        <p className="text-sm text-muted-foreground mb-4">Vytvořte vlastní efekt pomocí vizuálních bloků</p>
                                         <BlockProgramming blocks={editingBlocks} onBlocksChange={setEditingBlocks} />
                                     </TabsContent>
                                 </Tabs>
@@ -929,7 +931,7 @@ export default function EffectsView({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>Speed: {quickSpeed}%</Label>
+                                    <Label>Rychlost: {quickSpeed}%</Label>
                                     <Slider
                                         value={[quickSpeed]}
                                         onValueChange={(v) => setQuickSpeed(v[0])}
@@ -938,7 +940,7 @@ export default function EffectsView({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Intensity: {quickIntensity}%</Label>
+                                    <Label>Intenzita: {quickIntensity}%</Label>
                                     <Slider
                                         value={[quickIntensity]}
                                         onValueChange={(v) => setQuickIntensity(v[0])}
@@ -950,7 +952,7 @@ export default function EffectsView({
 
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <Label>Select Fixtures ({selectedFixtures.length} selected)</Label>
+                                    <Label>Vybrat světla ({selectedFixtures.length} vybráno)</Label>
                                     <div className="flex gap-2">
                                         <Button
                                             type="button"
@@ -958,7 +960,7 @@ export default function EffectsView({
                                             size="sm"
                                             onClick={selectAllFixtures}
                                         >
-                                            All
+                                            Vše
                                         </Button>
                                         <Button
                                             type="button"
@@ -966,14 +968,14 @@ export default function EffectsView({
                                             size="sm"
                                             onClick={clearFixtureSelection}
                                         >
-                                            Clear
+                                            Vymazat
                                         </Button>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
                                     {fixtures.length === 0 ? (
                                         <p className="text-sm text-muted-foreground col-span-2">
-                                            No fixtures available
+                                            Žádná světla k dispozici
                                         </p>
                                     ) : (
                                         fixtures.map((fixture) => (
@@ -1005,9 +1007,9 @@ export default function EffectsView({
                         </div>
                         <DialogFooter>
                             <Button variant="outline" onClick={resetCreateDialog}>
-                                Cancel
+                                Zrušit
                             </Button>
-                            <Button onClick={addEffect}>Create Effect</Button>
+                            <Button onClick={addEffect}>Vytvořit efekt</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -1017,80 +1019,80 @@ export default function EffectsView({
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Effect</DialogTitle>
-                        <DialogDescription>Modify effect settings</DialogDescription>
+                        <DialogTitle>Upravit efekt</DialogTitle>
+                        <DialogDescription>Změnit nastavení efektu</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-6 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="edit-effect-name">Effect Name</Label>
+                            <Label htmlFor="edit-effect-name">Název efektu</Label>
                             <Input
                                 id="edit-effect-name"
                                 value={effectName}
                                 onChange={(e) => setEffectName(e.target.value)}
-                                placeholder="e.g., Main Chase, Rainbow Loop"
+                                placeholder="např. Hlavní chase, Duhová smyčka"
                             />
                         </div>
 
                         <div className="space-y-3">
-                            <Label>Effect Type</Label>
+                            <Label>Typ efektu</Label>
                             <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
                                 <TabsList className="grid w-full grid-cols-3 gap-2 h-auto">
                                     <TabsTrigger value="chase" className="text-xs">Chase</TabsTrigger>
-                                    <TabsTrigger value="strobe" className="text-xs">Strobe</TabsTrigger>
-                                    <TabsTrigger value="rainbow" className="text-xs">Rainbow</TabsTrigger>
-                                    <TabsTrigger value="fade" className="text-xs">Fade</TabsTrigger>
+                                    <TabsTrigger value="strobe" className="text-xs">Stroboskop</TabsTrigger>
+                                    <TabsTrigger value="rainbow" className="text-xs">Duha</TabsTrigger>
+                                    <TabsTrigger value="fade" className="text-xs">Přechod</TabsTrigger>
                                     <TabsTrigger value="sweep" className="text-xs">Sweep</TabsTrigger>
-                                    <TabsTrigger value="sparkle" className="text-xs">Sparkle</TabsTrigger>
+                                    <TabsTrigger value="sparkle" className="text-xs">Jiskření</TabsTrigger>
                                     <TabsTrigger value="wipe" className="text-xs">Wipe</TabsTrigger>
-                                    <TabsTrigger value="bounce" className="text-xs">Bounce</TabsTrigger>
-                                    <TabsTrigger value="theater-chase" className="text-xs">Theater</TabsTrigger>
-                                    <TabsTrigger value="fire" className="text-xs">Fire</TabsTrigger>
-                                    <TabsTrigger value="wave" className="text-xs">Wave</TabsTrigger>
-                                    <TabsTrigger value="pulse" className="text-xs">Pulse</TabsTrigger>
-                                    <TabsTrigger value="color-fade" className="text-xs">Color Fade</TabsTrigger>
-                                    <TabsTrigger value="block-program" className="text-xs">Blocks</TabsTrigger>
+                                    <TabsTrigger value="bounce" className="text-xs">Odraz</TabsTrigger>
+                                    <TabsTrigger value="theater-chase" className="text-xs">Divadlo</TabsTrigger>
+                                    <TabsTrigger value="fire" className="text-xs">Oheň</TabsTrigger>
+                                    <TabsTrigger value="wave" className="text-xs">Vlna</TabsTrigger>
+                                    <TabsTrigger value="pulse" className="text-xs">Pulz</TabsTrigger>
+                                    <TabsTrigger value="color-fade" className="text-xs">Barvy</TabsTrigger>
+                                    <TabsTrigger value="block-program" className="text-xs">Bloky</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="chase" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
+                                    <p className="text-sm text-muted-foreground">Aktivuje světla jeden po druhém</p>
                                 </TabsContent>
                                 <TabsContent value="strobe" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Rapid on/off flashing for all fixtures</p>
+                                    <p className="text-sm text-muted-foreground">Rychlé blikání všech světel</p>
                                 </TabsContent>
                                 <TabsContent value="rainbow" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Smooth color cycling through RGB spectrum</p>
+                                    <p className="text-sm text-muted-foreground">Plynulé cyklování barevného spektra RGB</p>
                                 </TabsContent>
                                 <TabsContent value="fade" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Smooth sine wave intensity fading</p>
+                                    <p className="text-sm text-muted-foreground">Plynulý sinusový přechod intenzity</p>
                                 </TabsContent>
                                 <TabsContent value="sweep" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                    <p className="text-sm text-muted-foreground">Pan sweep pohyb pro moving head</p>
                                 </TabsContent>
                                 <TabsContent value="sparkle" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Random twinkling lights effect</p>
+                                    <p className="text-sm text-muted-foreground">Náhodně blikající světla</p>
                                 </TabsContent>
                                 <TabsContent value="wipe" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Progressive wipe across all fixtures</p>
+                                    <p className="text-sm text-muted-foreground">Postupné rozsvěcování světel</p>
                                 </TabsContent>
                                 <TabsContent value="bounce" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Bouncing light back and forth</p>
+                                    <p className="text-sm text-muted-foreground">Odrážející se světlo tam a zpět</p>
                                 </TabsContent>
                                 <TabsContent value="theater-chase" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Theater-style chase with groups of 3</p>
+                                    <p className="text-sm text-muted-foreground">Divadelní chase ve skupinách po 3</p>
                                 </TabsContent>
                                 <TabsContent value="fire" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Flickering fire simulation (RGB only)</p>
+                                    <p className="text-sm text-muted-foreground">Simulace plamene (pouze RGB)</p>
                                 </TabsContent>
                                 <TabsContent value="wave" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Sine wave pattern across fixtures</p>
+                                    <p className="text-sm text-muted-foreground">Sinusová vlna napříč světly</p>
                                 </TabsContent>
                                 <TabsContent value="pulse" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Smooth pulsing intensity effect</p>
+                                    <p className="text-sm text-muted-foreground">Plynulý pulzující efekt</p>
                                 </TabsContent>
                                 <TabsContent value="color-fade" className="mt-3">
-                                    <p className="text-sm text-muted-foreground">Smooth RGB color transitions (RGB only)</p>
+                                    <p className="text-sm text-muted-foreground">Plynulé barevné přechody RGB (pouze RGB)</p>
                                 </TabsContent>
                                 <TabsContent value="block-program" className="mt-3">
-                                    <p className="text-sm text-muted-foreground mb-4">Create custom effect using visual blocks</p>
+                                    <p className="text-sm text-muted-foreground mb-4">Vytvořte vlastní efekt pomocí vizuálních bloků</p>
                                     <BlockProgramming blocks={editingBlocks} onBlocksChange={setEditingBlocks} />
                                 </TabsContent>
                             </Tabs>
@@ -1098,7 +1100,7 @@ export default function EffectsView({
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Speed: {quickSpeed}%</Label>
+                                <Label>Rychlost: {quickSpeed}%</Label>
                                 <Slider
                                     value={[quickSpeed]}
                                     onValueChange={(v) => setQuickSpeed(v[0])}
@@ -1107,7 +1109,7 @@ export default function EffectsView({
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Intensity: {quickIntensity}%</Label>
+                                <Label>Intenzita: {quickIntensity}%</Label>
                                 <Slider
                                     value={[quickIntensity]}
                                     onValueChange={(v) => setQuickIntensity(v[0])}
@@ -1119,7 +1121,7 @@ export default function EffectsView({
 
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <Label>Select Fixtures ({selectedFixtures.length} selected)</Label>
+                                <Label>Vybrat světla ({selectedFixtures.length} vybráno)</Label>
                                 <div className="flex gap-2">
                                     <Button
                                         type="button"
@@ -1127,7 +1129,7 @@ export default function EffectsView({
                                         size="sm"
                                         onClick={selectAllFixtures}
                                     >
-                                        All
+                                        Vše
                                     </Button>
                                     <Button
                                         type="button"
@@ -1135,14 +1137,14 @@ export default function EffectsView({
                                         size="sm"
                                         onClick={clearFixtureSelection}
                                     >
-                                        Clear
+                                        Vymazat
                                     </Button>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
                                 {fixtures.length === 0 ? (
                                     <p className="text-sm text-muted-foreground col-span-2">
-                                        No fixtures available
+                                        Žádná světla k dispozici
                                     </p>
                                 ) : (
                                     fixtures.map((fixture) => (
@@ -1174,9 +1176,9 @@ export default function EffectsView({
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={resetEditDialog}>
-                            Cancel
+                            Zrušit
                         </Button>
-                        <Button onClick={saveEditEffect}>Save Changes</Button>
+                        <Button onClick={saveEditEffect}>Uložit změny</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -1187,11 +1189,11 @@ export default function EffectsView({
                         <div className="rounded-full bg-muted p-6 mb-4">
                             <Lightning size={48} className="text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">No Effects Created</h3>
+                        <h3 className="text-lg font-semibold mb-2">Žádné vytvořené efekty</h3>
                         <p className="text-sm text-muted-foreground max-w-md">
                             {fixtures.length === 0
-                                ? 'Add fixtures first, then create automated effects'
-                                : 'Create effects to automate your lighting sequences'}
+                                ? 'Nejprve přidejte světla, pak vytvořte automatizované efekty'
+                                : 'Vytvořte efekty pro automatizaci světelných sekvencí'}
                         </p>
                     </div>
                 </Card>
@@ -1243,11 +1245,11 @@ export default function EffectsView({
 
                                 <div className="flex gap-2 flex-wrap">
                                     <Badge variant="secondary">{effect.type}</Badge>
-                                    <Badge variant="outline">{effect.fixtureIds.length} fixtures</Badge>
+                                    <Badge variant="outline">{effect.fixtureIds.length} světel</Badge>
                                     {effect.type === 'block-program' && effect.blocks && (
                                         <Badge variant="outline" className="gap-1">
                                             <Code size={12} />
-                                            {effect.blocks.length} blocks
+                                            {effect.blocks.length} bloků
                                         </Badge>
                                     )}
                                 </div>
@@ -1257,7 +1259,7 @@ export default function EffectsView({
                                         <>
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between text-sm">
-                                                    <label className="text-muted-foreground">Speed</label>
+                                                    <label className="text-muted-foreground">Rychlost</label>
                                                     <span className="font-mono text-primary font-semibold">
                                                         {effect.speed}%
                                                     </span>
@@ -1275,7 +1277,7 @@ export default function EffectsView({
 
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between text-sm">
-                                                    <label className="text-muted-foreground">Intensity</label>
+                                                    <label className="text-muted-foreground">Intenzita</label>
                                                     <span className="font-mono text-primary font-semibold">
                                                         {effect.intensity}%
                                                     </span>
@@ -1295,7 +1297,7 @@ export default function EffectsView({
                                     {effect.type === 'block-program' && effect.blocks && effect.blocks.length > 0 && (
                                         <div className="space-y-2">
                                             <div className="text-xs text-muted-foreground">
-                                                <p className="font-semibold mb-1">Program blocks:</p>
+                                                <p className="font-semibold mb-1">Bloky programu:</p>
                                                 <ul className="space-y-0.5">
                                                     {effect.blocks.slice(0, 3).map((block, idx) => (
                                                         <li key={block.id}>
@@ -1303,7 +1305,7 @@ export default function EffectsView({
                                                         </li>
                                                     ))}
                                                     {effect.blocks.length > 3 && (
-                                                        <li>... and {effect.blocks.length - 3} more</li>
+                                                        <li>... a dalších {effect.blocks.length - 3}</li>
                                                     )}
                                                 </ul>
                                             </div>
@@ -1315,6 +1317,18 @@ export default function EffectsView({
                                                     </span>
                                                 </div>
                                             </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full gap-2 mt-2"
+                                                onClick={() => {
+                                                    setSelectedEffectForCode(effect)
+                                                    setIsCodeDialogOpen(true)
+                                                }}
+                                            >
+                                                <Code size={16} />
+                                                Zobrazit kód
+                                            </Button>
                                         </div>
                                     )}
                                 </div>
@@ -1327,12 +1341,12 @@ export default function EffectsView({
                                     {effect.isActive ? (
                                         <>
                                             <Pause weight="fill" />
-                                            Stop
+                                            Zastavit
                                         </>
                                     ) : (
                                         <>
                                             <Play weight="fill" />
-                                            Start
+                                            Spustit
                                         </>
                                     )}
                                 </Button>
@@ -1341,6 +1355,43 @@ export default function EffectsView({
                     ))}
                 </div>
             )}
+
+            <Dialog open={isCodeDialogOpen} onOpenChange={setIsCodeDialogOpen}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Zkompilovaný kód efektu</DialogTitle>
+                        <DialogDescription>
+                            {selectedEffectForCode?.name}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        {selectedEffectForCode && selectedEffectForCode.blocks && (
+                            <>
+                                <div className="rounded-lg bg-muted p-4 font-mono text-sm overflow-x-auto">
+                                    <pre className="whitespace-pre-wrap">
+                                        {compileBlocks(selectedEffectForCode.blocks).compiled}
+                                    </pre>
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-2">
+                                        <Code size={16} />
+                                        <span>{selectedEffectForCode.blocks.length} bloků</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Lightning size={16} />
+                                        <span>~{(compileBlocks(selectedEffectForCode.blocks).estimatedDuration / 1000).toFixed(1)}s cyklus</span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCodeDialogOpen(false)}>
+                            Zavřít
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
