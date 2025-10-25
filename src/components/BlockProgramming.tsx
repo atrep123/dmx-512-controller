@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Plus, Trash, ArrowUp, ArrowDown, Play, Palette, Clock, Lightning, ArrowsClockwise, Sparkle, Shuffle, CrosshairSimple } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Plus, Trash, ArrowUp, ArrowDown, Play, Palette, Clock, Lightning, ArrowsClockwise, Sparkle, Shuffle, CrosshairSimple, Code, ListNumbers } from '@phosphor-icons/react'
+import { useState, useEffect } from 'react'
+import { compileBlocks, getEffectSummary, type CompiledEffect } from '@/lib/blockCompiler'
 
 interface BlockProgrammingProps {
     blocks: EffectBlock[]
@@ -97,6 +99,16 @@ const BLOCK_TYPES = [
 export default function BlockProgramming({ blocks, onBlocksChange }: BlockProgrammingProps) {
     const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
     const [editingBlock, setEditingBlock] = useState<EffectBlock | null>(null)
+    const [compiledEffect, setCompiledEffect] = useState<CompiledEffect | null>(null)
+
+    useEffect(() => {
+        if (blocks.length > 0) {
+            const compiled = compileBlocks(blocks)
+            setCompiledEffect(compiled)
+        } else {
+            setCompiledEffect(null)
+        }
+    }, [blocks])
 
     const addBlock = (type: EffectBlock['type']) => {
         const newBlock: EffectBlock = {
@@ -427,95 +439,171 @@ export default function BlockProgramming({ blocks, onBlocksChange }: BlockProgra
                 </Card>
 
                 <div className="space-y-4">
-                    <Card className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-semibold text-sm">Program Sequence</h3>
-                            <Badge variant="secondary" className="text-xs">{blocks.length} blocks</Badge>
-                        </div>
-                        <ScrollArea className="h-[400px] pr-3">
-                            {blocks.length === 0 ? (
-                                <div className="text-center py-16 text-muted-foreground">
-                                    <Plus size={40} className="mx-auto mb-2 opacity-30" />
-                                    <p className="text-sm">Click blocks from the library to add them</p>
-                                    <p className="text-xs mt-1 opacity-70">Build your custom effect sequence</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {blocks.map((block, index) => {
-                                        const blockInfo = getBlockInfo(block.type)
-                                        const Icon = blockInfo?.icon || Play
-                                        const isSelected = selectedBlockId === block.id
+                    <Tabs defaultValue="blocks" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="blocks" className="gap-2">
+                                <ListNumbers size={16} />
+                                Blocks
+                            </TabsTrigger>
+                            <TabsTrigger value="compiled" className="gap-2">
+                                <Code size={16} />
+                                Compiled
+                            </TabsTrigger>
+                        </TabsList>
 
-                                        return (
-                                            <div
-                                                key={block.id}
-                                                onClick={() => selectBlock(block)}
-                                                className={`p-2.5 rounded border-2 cursor-pointer transition-all ${
-                                                    isSelected 
-                                                        ? 'ring-2 ring-primary border-primary shadow-md' 
-                                                        : 'hover:border-accent hover:shadow-sm'
-                                                } ${blockInfo?.color || 'bg-card'}`}
-                                            >
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                        <Badge variant="outline" className="font-mono text-[10px] px-1.5 py-0 h-5 flex-shrink-0">
-                                                            {index + 1}
-                                                        </Badge>
-                                                        <Icon size={16} className="flex-shrink-0" />
-                                                        <span className="font-semibold text-xs truncate">{blockInfo?.name}</span>
+                        <TabsContent value="blocks" className="mt-4">
+                            <Card className="p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="font-semibold text-sm">Program Sequence</h3>
+                                    <Badge variant="secondary" className="text-xs">{blocks.length} blocks</Badge>
+                                </div>
+                                <ScrollArea className="h-[400px] pr-3">
+                                    {blocks.length === 0 ? (
+                                        <div className="text-center py-16 text-muted-foreground">
+                                            <Plus size={40} className="mx-auto mb-2 opacity-30" />
+                                            <p className="text-sm">Click blocks from the library to add them</p>
+                                            <p className="text-xs mt-1 opacity-70">Build your custom effect sequence</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {blocks.map((block, index) => {
+                                                const blockInfo = getBlockInfo(block.type)
+                                                const Icon = blockInfo?.icon || Play
+                                                const isSelected = selectedBlockId === block.id
+
+                                                return (
+                                                    <div
+                                                        key={block.id}
+                                                        onClick={() => selectBlock(block)}
+                                                        className={`p-2.5 rounded border-2 cursor-pointer transition-all ${
+                                                            isSelected 
+                                                                ? 'ring-2 ring-primary border-primary shadow-md' 
+                                                                : 'hover:border-accent hover:shadow-sm'
+                                                        } ${blockInfo?.color || 'bg-card'}`}
+                                                    >
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                                <Badge variant="outline" className="font-mono text-[10px] px-1.5 py-0 h-5 flex-shrink-0">
+                                                                    {index + 1}
+                                                                </Badge>
+                                                                <Icon size={16} className="flex-shrink-0" />
+                                                                <span className="font-semibold text-xs truncate">{blockInfo?.name}</span>
+                                                            </div>
+                                                            <div className="flex gap-0.5 flex-shrink-0">
+                                                                <Button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        moveBlock(block.id, 'up')
+                                                                    }}
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6"
+                                                                    disabled={index === 0}
+                                                                >
+                                                                    <ArrowUp size={12} />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        moveBlock(block.id, 'down')
+                                                                    }}
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6"
+                                                                    disabled={index === blocks.length - 1}
+                                                                >
+                                                                    <ArrowDown size={12} />
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        deleteBlock(block.id)
+                                                                    }}
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6"
+                                                                >
+                                                                    <Trash size={12} className="text-destructive" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="mt-1.5 text-[10px] text-muted-foreground font-mono pl-7 truncate">
+                                                            {Object.entries(block.parameters).length > 0 
+                                                                ? Object.entries(block.parameters)
+                                                                    .map(([key, value]) => `${key}: ${value}`)
+                                                                    .join(', ')
+                                                                : 'No parameters'}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex gap-0.5 flex-shrink-0">
-                                                        <Button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                moveBlock(block.id, 'up')
-                                                            }}
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6"
-                                                            disabled={index === 0}
-                                                        >
-                                                            <ArrowUp size={12} />
-                                                        </Button>
-                                                        <Button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                moveBlock(block.id, 'down')
-                                                            }}
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6"
-                                                            disabled={index === blocks.length - 1}
-                                                        >
-                                                            <ArrowDown size={12} />
-                                                        </Button>
-                                                        <Button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                deleteBlock(block.id)
-                                                            }}
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6"
-                                                        >
-                                                            <Trash size={12} className="text-destructive" />
-                                                        </Button>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+                                </ScrollArea>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="compiled" className="mt-4">
+                            <Card className="p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="font-semibold text-sm">Compiled Code</h3>
+                                    {compiledEffect && (
+                                        <Badge variant="secondary" className="text-xs font-mono">
+                                            {getEffectSummary(compiledEffect)}
+                                        </Badge>
+                                    )}
+                                </div>
+                                <ScrollArea className="h-[400px]">
+                                    {!compiledEffect || blocks.length === 0 ? (
+                                        <div className="text-center py-16 text-muted-foreground">
+                                            <Code size={40} className="mx-auto mb-2 opacity-30" />
+                                            <p className="text-sm">No blocks to compile</p>
+                                            <p className="text-xs mt-1 opacity-70">Add blocks to see compiled output</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div className="bg-muted/30 rounded-lg p-4 border">
+                                                <pre className="text-xs font-mono whitespace-pre-wrap break-words">
+                                                    {compiledEffect.compiled}
+                                                </pre>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div className="bg-blue-500/10 border border-blue-500/30 rounded p-3 text-center">
+                                                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                                                        {compiledEffect.blockCount}
                                                     </div>
+                                                    <div className="text-xs text-muted-foreground mt-1">Blocks</div>
                                                 </div>
-                                                <div className="mt-1.5 text-[10px] text-muted-foreground font-mono pl-7 truncate">
-                                                    {Object.entries(block.parameters).length > 0 
-                                                        ? Object.entries(block.parameters)
-                                                            .map(([key, value]) => `${key}: ${value}`)
-                                                            .join(', ')
-                                                        : 'No parameters'}
+                                                <div className="bg-purple-500/10 border border-purple-500/30 rounded p-3 text-center">
+                                                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                                                        {compiledEffect.loopCount}
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground mt-1">Loops</div>
+                                                </div>
+                                                <div className="bg-green-500/10 border border-green-500/30 rounded p-3 text-center">
+                                                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                                        {(compiledEffect.estimatedDuration / 1000).toFixed(1)}s
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground mt-1">Duration</div>
                                                 </div>
                                             </div>
-                                        )
-                                    })}
-                                </div>
-                            )}
-                        </ScrollArea>
-                    </Card>
+
+                                            <div className="bg-accent/30 rounded-lg p-3 border border-accent">
+                                                <div className="flex items-start gap-2">
+                                                    <Lightning size={16} className="text-accent-foreground mt-0.5 flex-shrink-0" />
+                                                    <div className="text-xs text-muted-foreground">
+                                                        <p className="font-semibold text-foreground mb-1">Optimization Applied</p>
+                                                        <p>Program compiled successfully with {compiledEffect.instructions.length} instructions. Ready for execution.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </ScrollArea>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
 
                     {editingBlock && (
                         <Card className="p-4">

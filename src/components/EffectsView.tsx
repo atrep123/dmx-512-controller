@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import BlockProgramming from '@/components/BlockProgramming'
+import { compileBlocks, getEffectSummary } from '@/lib/blockCompiler'
 
 const BLOCK_TYPES_MAP: Record<EffectBlock['type'], string> = {
     'set-color': 'Set Color',
@@ -1291,19 +1292,29 @@ export default function EffectsView({
                                             </div>
                                         </>
                                     )}
-                                    {effect.type === 'block-program' && effect.blocks && (
-                                        <div className="text-xs text-muted-foreground">
-                                            <p className="font-semibold mb-1">Program blocks:</p>
-                                            <ul className="space-y-0.5">
-                                                {effect.blocks.slice(0, 3).map((block, idx) => (
-                                                    <li key={block.id}>
-                                                        {idx + 1}. {BLOCK_TYPES_MAP[block.type] || block.type}
-                                                    </li>
-                                                ))}
-                                                {effect.blocks.length > 3 && (
-                                                    <li>... and {effect.blocks.length - 3} more</li>
-                                                )}
-                                            </ul>
+                                    {effect.type === 'block-program' && effect.blocks && effect.blocks.length > 0 && (
+                                        <div className="space-y-2">
+                                            <div className="text-xs text-muted-foreground">
+                                                <p className="font-semibold mb-1">Program blocks:</p>
+                                                <ul className="space-y-0.5">
+                                                    {effect.blocks.slice(0, 3).map((block, idx) => (
+                                                        <li key={block.id}>
+                                                            {idx + 1}. {BLOCK_TYPES_MAP[block.type] || block.type}
+                                                        </li>
+                                                    ))}
+                                                    {effect.blocks.length > 3 && (
+                                                        <li>... and {effect.blocks.length - 3} more</li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                            <div className="bg-accent/20 rounded border border-accent/40 p-2 mt-2">
+                                                <div className="flex items-center gap-1.5 text-xs">
+                                                    <Lightning size={14} className="text-accent-foreground flex-shrink-0" />
+                                                    <span className="font-mono text-[10px]">
+                                                        {getEffectSummary(compileBlocks(effect.blocks))}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
