@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import { Plus, Trash, Lightning, Play, Pause, Sparkle } from '@phosphor-icons/react'
+import { Plus, Trash, Lightning, Play, Pause, Sparkle, PencilSimple, Copy } from '@phosphor-icons/react'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface EffectsViewProps {
     effects: Effect[]
@@ -25,10 +25,14 @@ export default function EffectsView({
     fixtures,
     setFixtures,
 }: EffectsViewProps) {
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+    const [editingEffect, setEditingEffect] = useState<Effect | null>(null)
     const [effectName, setEffectName] = useState('')
     const [effectType, setEffectType] = useState<Effect['type']>('chase')
     const [selectedFixtures, setSelectedFixtures] = useState<string[]>([])
+    const [quickSpeed, setQuickSpeed] = useState(50)
+    const [quickIntensity, setQuickIntensity] = useState(100)
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -200,12 +204,12 @@ export default function EffectsView({
 
     const addEffect = () => {
         if (!effectName.trim()) {
-            toast.error('Please enter an effect name')
+            toast.error('Enter effect name')
             return
         }
 
         if (selectedFixtures.length === 0) {
-            toast.error('Please select at least one fixture')
+            toast.error('Select at least one fixture')
             return
         }
 
@@ -214,18 +218,86 @@ export default function EffectsView({
             name: effectName.trim(),
             type: effectType,
             fixtureIds: selectedFixtures,
-            speed: 50,
-            intensity: 100,
+            speed: quickSpeed,
+            intensity: quickIntensity,
             isActive: false,
             parameters: {},
         }
 
         setEffects((current) => [...current, newEffect])
+        resetCreateDialog()
+        toast.success(`Effect "${newEffect.name}" created`)
+    }
+
+    const resetCreateDialog = () => {
         setEffectName('')
         setEffectType('chase')
         setSelectedFixtures([])
-        setIsDialogOpen(false)
-        toast.success(`Effect "${newEffect.name}" created`)
+        setQuickSpeed(50)
+        setQuickIntensity(100)
+        setIsCreateDialogOpen(false)
+    }
+
+    const openEditDialog = (effect: Effect) => {
+        setEditingEffect(effect)
+        setEffectName(effect.name)
+        setEffectType(effect.type)
+        setSelectedFixtures(effect.fixtureIds)
+        setQuickSpeed(effect.speed)
+        setQuickIntensity(effect.intensity)
+        setIsEditDialogOpen(true)
+    }
+
+    const saveEditEffect = () => {
+        if (!editingEffect) return
+        
+        if (!effectName.trim()) {
+            toast.error('Enter effect name')
+            return
+        }
+
+        if (selectedFixtures.length === 0) {
+            toast.error('Select at least one fixture')
+            return
+        }
+
+        setEffects((current) =>
+            current.map((effect) =>
+                effect.id === editingEffect.id
+                    ? {
+                          ...effect,
+                          name: effectName.trim(),
+                          type: effectType,
+                          fixtureIds: selectedFixtures,
+                          speed: quickSpeed,
+                          intensity: quickIntensity,
+                      }
+                    : effect
+            )
+        )
+        resetEditDialog()
+        toast.success(`Effect updated`)
+    }
+
+    const resetEditDialog = () => {
+        setEditingEffect(null)
+        setEffectName('')
+        setEffectType('chase')
+        setSelectedFixtures([])
+        setQuickSpeed(50)
+        setQuickIntensity(100)
+        setIsEditDialogOpen(false)
+    }
+
+    const duplicateEffect = (effect: Effect) => {
+        const newEffect: Effect = {
+            ...effect,
+            id: Date.now().toString(),
+            name: `${effect.name} (Copy)`,
+            isActive: false,
+        }
+        setEffects((current) => [...current, newEffect])
+        toast.success(`Effect duplicated`)
     }
 
     const deleteEffect = (effectId: string) => {
@@ -264,6 +336,14 @@ export default function EffectsView({
         )
     }
 
+    const selectAllFixtures = () => {
+        setSelectedFixtures(fixtures.map(f => f.id))
+    }
+
+    const clearFixtureSelection = () => {
+        setSelectedFixtures([])
+    }
+
     const getEffectIcon = (type: Effect['type']) => {
         switch (type) {
             case 'chase':
@@ -299,80 +379,275 @@ export default function EffectsView({
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-xl font-semibold">Effects</h2>
-                    <p className="text-sm text-muted-foreground">Automated lighting effects</p>
+                    <p className="text-sm text-muted-foreground">Create and control lighting effects</p>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="gap-2" disabled={fixtures.length === 0}>
                             <Plus weight="bold" />
                             Create Effect
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                            <DialogTitle>Create Effect</DialogTitle>
+                            <DialogTitle>Create New Effect</DialogTitle>
+                            <DialogDescription>Choose effect type and settings</DialogDescription>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                        <div className="space-y-6 py-4">
                             <div className="space-y-2">
                                 <Label htmlFor="effect-name">Effect Name</Label>
                                 <Input
                                     id="effect-name"
                                     value={effectName}
                                     onChange={(e) => setEffectName(e.target.value)}
-                                    placeholder="e.g., Main Chase, Strobe All"
+                                    placeholder="e.g., Main Chase, Rainbow Loop"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="effect-type">Effect Type</Label>
-                                <Select
-                                    value={effectType}
-                                    onValueChange={(value) => setEffectType(value as Effect['type'])}
-                                >
-                                    <SelectTrigger id="effect-type">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="chase">Chase - Sequential activation</SelectItem>
-                                        <SelectItem value="strobe">Strobe - Rapid flashing</SelectItem>
-                                        <SelectItem value="rainbow">Rainbow - RGB cycling</SelectItem>
-                                        <SelectItem value="fade">Fade - Smooth intensity</SelectItem>
-                                        <SelectItem value="sweep">Sweep - Pan movement</SelectItem>
-                                    </SelectContent>
-                                </Select>
+
+                            <div className="space-y-3">
+                                <Label>Effect Type</Label>
+                                <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
+                                    <TabsList className="grid w-full grid-cols-5">
+                                        <TabsTrigger value="chase">Chase</TabsTrigger>
+                                        <TabsTrigger value="strobe">Strobe</TabsTrigger>
+                                        <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
+                                        <TabsTrigger value="fade">Fade</TabsTrigger>
+                                        <TabsTrigger value="sweep">Sweep</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="chase" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
+                                    </TabsContent>
+                                    <TabsContent value="strobe" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Rapid on/off flashing for all fixtures</p>
+                                    </TabsContent>
+                                    <TabsContent value="rainbow" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Smooth color cycling through RGB spectrum</p>
+                                    </TabsContent>
+                                    <TabsContent value="fade" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Smooth sine wave intensity fading</p>
+                                    </TabsContent>
+                                    <TabsContent value="sweep" className="mt-3">
+                                        <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                    </TabsContent>
+                                </Tabs>
                             </div>
-                            <div className="space-y-2">
-                                <Label>Select Fixtures</Label>
-                                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto border rounded-md p-3">
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Speed: {quickSpeed}%</Label>
+                                    <Slider
+                                        value={[quickSpeed]}
+                                        onValueChange={(v) => setQuickSpeed(v[0])}
+                                        max={100}
+                                        step={5}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Intensity: {quickIntensity}%</Label>
+                                    <Slider
+                                        value={[quickIntensity]}
+                                        onValueChange={(v) => setQuickIntensity(v[0])}
+                                        max={100}
+                                        step={5}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label>Select Fixtures ({selectedFixtures.length} selected)</Label>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={selectAllFixtures}
+                                        >
+                                            All
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={clearFixtureSelection}
+                                        >
+                                            Clear
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
                                     {fixtures.length === 0 ? (
                                         <p className="text-sm text-muted-foreground col-span-2">
                                             No fixtures available
                                         </p>
                                     ) : (
                                         fixtures.map((fixture) => (
-                                            <div
+                                            <button
                                                 key={fixture.id}
-                                                className="flex items-center gap-2 p-2 rounded border cursor-pointer hover:bg-accent"
+                                                type="button"
+                                                className={`flex items-center gap-2 p-2 rounded border text-left transition-colors ${
+                                                    selectedFixtures.includes(fixture.id)
+                                                        ? 'bg-primary text-primary-foreground border-primary'
+                                                        : 'hover:bg-accent'
+                                                }`}
                                                 onClick={() => toggleFixtureSelection(fixture.id)}
                                             >
-                                                <Switch
-                                                    checked={selectedFixtures.includes(fixture.id)}
-                                                    onCheckedChange={() =>
-                                                        toggleFixtureSelection(fixture.id)
-                                                    }
-                                                />
+                                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                                                    selectedFixtures.includes(fixture.id)
+                                                        ? 'bg-primary-foreground border-primary-foreground'
+                                                        : 'border-muted-foreground'
+                                                }`}>
+                                                    {selectedFixtures.includes(fixture.id) && (
+                                                        <div className="w-2 h-2 bg-primary rounded-sm" />
+                                                    )}
+                                                </div>
                                                 <span className="text-sm">{fixture.name}</span>
-                                            </div>
+                                            </button>
                                         ))
                                     )}
                                 </div>
                             </div>
                         </div>
                         <DialogFooter>
+                            <Button variant="outline" onClick={resetCreateDialog}>
+                                Cancel
+                            </Button>
                             <Button onClick={addEffect}>Create Effect</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
+
+
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Edit Effect</DialogTitle>
+                        <DialogDescription>Modify effect settings</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-6 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-effect-name">Effect Name</Label>
+                            <Input
+                                id="edit-effect-name"
+                                value={effectName}
+                                onChange={(e) => setEffectName(e.target.value)}
+                                placeholder="e.g., Main Chase, Rainbow Loop"
+                            />
+                        </div>
+
+                        <div className="space-y-3">
+                            <Label>Effect Type</Label>
+                            <Tabs value={effectType} onValueChange={(value) => setEffectType(value as Effect['type'])}>
+                                <TabsList className="grid w-full grid-cols-5">
+                                    <TabsTrigger value="chase">Chase</TabsTrigger>
+                                    <TabsTrigger value="strobe">Strobe</TabsTrigger>
+                                    <TabsTrigger value="rainbow">Rainbow</TabsTrigger>
+                                    <TabsTrigger value="fade">Fade</TabsTrigger>
+                                    <TabsTrigger value="sweep">Sweep</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="chase" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Activates fixtures one by one in sequence</p>
+                                </TabsContent>
+                                <TabsContent value="strobe" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Rapid on/off flashing for all fixtures</p>
+                                </TabsContent>
+                                <TabsContent value="rainbow" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Smooth color cycling through RGB spectrum</p>
+                                </TabsContent>
+                                <TabsContent value="fade" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Smooth sine wave intensity fading</p>
+                                </TabsContent>
+                                <TabsContent value="sweep" className="mt-3">
+                                    <p className="text-sm text-muted-foreground">Pan movement sweep for moving heads</p>
+                                </TabsContent>
+                            </Tabs>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Speed: {quickSpeed}%</Label>
+                                <Slider
+                                    value={[quickSpeed]}
+                                    onValueChange={(v) => setQuickSpeed(v[0])}
+                                    max={100}
+                                    step={5}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Intensity: {quickIntensity}%</Label>
+                                <Slider
+                                    value={[quickIntensity]}
+                                    onValueChange={(v) => setQuickIntensity(v[0])}
+                                    max={100}
+                                    step={5}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Label>Select Fixtures ({selectedFixtures.length} selected)</Label>
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={selectAllFixtures}
+                                    >
+                                        All
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={clearFixtureSelection}
+                                    >
+                                        Clear
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                                {fixtures.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground col-span-2">
+                                        No fixtures available
+                                    </p>
+                                ) : (
+                                    fixtures.map((fixture) => (
+                                        <button
+                                            key={fixture.id}
+                                            type="button"
+                                            className={`flex items-center gap-2 p-2 rounded border text-left transition-colors ${
+                                                selectedFixtures.includes(fixture.id)
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'hover:bg-accent'
+                                            }`}
+                                            onClick={() => toggleFixtureSelection(fixture.id)}
+                                        >
+                                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                                                selectedFixtures.includes(fixture.id)
+                                                    ? 'bg-primary-foreground border-primary-foreground'
+                                                    : 'border-muted-foreground'
+                                            }`}>
+                                                {selectedFixtures.includes(fixture.id) && (
+                                                    <div className="w-2 h-2 bg-primary rounded-sm" />
+                                                )}
+                                            </div>
+                                            <span className="text-sm">{fixture.name}</span>
+                                        </button>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={resetEditDialog}>
+                            Cancel
+                        </Button>
+                        <Button onClick={saveEditEffect}>Save Changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {effects.length === 0 ? (
                 <Card className="p-12 text-center">
@@ -406,13 +681,32 @@ export default function EffectsView({
                                             </p>
                                         </div>
                                     </div>
-                                    <Button
-                                        onClick={() => deleteEffect(effect.id)}
-                                        variant="ghost"
-                                        size="icon"
-                                    >
-                                        <Trash className="text-destructive" />
-                                    </Button>
+                                    <div className="flex gap-1">
+                                        <Button
+                                            onClick={() => openEditDialog(effect)}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                        >
+                                            <PencilSimple size={16} />
+                                        </Button>
+                                        <Button
+                                            onClick={() => duplicateEffect(effect)}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                        >
+                                            <Copy size={16} />
+                                        </Button>
+                                        <Button
+                                            onClick={() => deleteEffect(effect.id)}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                        >
+                                            <Trash size={16} className="text-destructive" />
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-2 flex-wrap">
@@ -466,12 +760,12 @@ export default function EffectsView({
                                     {effect.isActive ? (
                                         <>
                                             <Pause weight="fill" />
-                                            Stop Effect
+                                            Stop
                                         </>
                                     ) : (
                                         <>
                                             <Play weight="fill" />
-                                            Start Effect
+                                            Start
                                         </>
                                     )}
                                 </Button>

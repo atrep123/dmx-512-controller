@@ -62,28 +62,31 @@ A mobile-first DMX 512 lighting and motion controller web application optimized 
 - **Success criteria**: Angle accurately maps to DMX values, intuitive degree-based control
 
 ### Automated Effects
-- **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with speed/intensity control
-- **Purpose**: Create dynamic lighting sequences without manual programming
-- **Trigger**: User creates effect, selects fixtures, and activates
-- **Progression**: Create effect → Choose type → Select fixtures → Set speed/intensity → Start/stop effect → Effects run in real-time
-- **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly
+- **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with visual type selection, speed/intensity control, quick fixture selection (All/Clear buttons), effect editing, and duplication
+- **Purpose**: Create dynamic lighting sequences without manual programming, with simplified creation workflow
+- **Trigger**: User creates effect with tabbed interface for type selection, edits existing effects, or duplicates effects for quick variations
+- **Progression**: Create effect → Choose type via tabs with descriptions → Set initial speed/intensity → Select fixtures (All/Clear shortcuts) → Start/stop effect → Edit anytime → Duplicate for variations → Effects run in real-time
+- **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly, editing is intuitive, duplication creates independent copies
 
 ### Network Connection
-- **Functionality**: Configure and connect to DMX networks via Art-Net, sACN, or USB DMX interfaces
-- **Purpose**: Output DMX data to physical lighting equipment
-- **Trigger**: User configures network settings and connects
-- **Progression**: Select protocol → Enter IP/port → Configure universe → Connect → Monitor connection status
-- **Success criteria**: Connection establishes successfully, data transmission rate visible, auto-connect option works
+- **Functionality**: Configure and connect to DMX networks via Art-Net, sACN, or USB DMX interfaces with connection profiles, real-time status monitoring, packet counting, and visual connection states
+- **Purpose**: Output DMX data to physical lighting equipment with easy profile switching for different venues
+- **Trigger**: User configures network settings, saves/loads profiles, and connects
+- **Progression**: Select protocol → Enter IP/port → Configure universe/send rate → Save as profile (optional) → Connect → Monitor connection status with live packet counter → Quick-switch between saved profiles
+- **Success criteria**: Connection establishes successfully (with connecting animation), data transmission rate visible, packet counter increments, auto-connect option works, profiles load instantly, status clearly indicates connected/disconnected/connecting states
 
 ## Edge Case Handling
 - **Empty State**: Friendly onboarding showing how to add first universe and fixture with visual guide
 - **Invalid DMX Addresses**: Validation prevents overlapping fixture addresses with clear warning messages
 - **Maximum Channels**: Limit universes to 512 channels per DMX spec, show warning when approaching limit
-- **Deleted Fixtures in Scenes**: Gracefully handle scenes referencing deleted fixtures by skipping those channels
+- **Deleted Fixtures in Scenes/Effects**: Gracefully handle scenes and effects referencing deleted fixtures by skipping those channels
 - **Touch Precision**: Fader controls sized appropriately for finger interaction with generous hit areas
 - **Effect Conflicts**: Multiple effects on same fixtures blend or override based on priority
-- **Network Errors**: Display clear connection status and retry options for failed network connections
+- **Network Errors**: Display clear connection status (connecting/connected/error/disconnected) with visual feedback and retry options
 - **Motor Position Limits**: Validate stepper motor positions don't exceed configured maximum steps
+- **Empty Fixture Selection**: Prevent creating effects with no fixtures selected
+- **Profile Management**: Handle deletion of connection profiles gracefully, prevent saving without name
+- **Effect Duplication**: Create independent copies that can be edited separately without affecting original
 
 ## Design Direction
 The design should feel professional and precise like pro-grade lighting equipment, while remaining accessible and modern. Think sleek lighting console meets modern mobile UI - dark interface to preserve night vision during shows, with vibrant accent colors for active controls. Minimal interface that prioritizes the actual control surfaces over chrome.
