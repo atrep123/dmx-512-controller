@@ -1,14 +1,14 @@
 # Planning Guide
 
-A mobile-first DMX 512 lighting controller web application optimized for Android and iOS devices that allows users to control stage lighting fixtures, create scenes, and manage multiple DMX universes through an intuitive touch interface. Works as a Progressive Web App (PWA) that can be installed on mobile devices for an app-like experience.
+A mobile-first DMX 512 lighting and motion controller web application optimized for Android and iOS devices that allows users to control stage lighting fixtures, stepper motors, servos, create automated effects, manage scenes, and configure network connections through an intuitive touch interface. Works as a Progressive Web App (PWA) that can be installed on mobile devices for an app-like experience.
 
 **Experience Qualities**:
 1. **Tactile** - Controls should feel responsive and physical, like operating a real lighting console with immediate visual feedback
 2. **Professional** - Design conveys reliability and precision expected in live production environments
-3. **Intuitive** - Complex lighting control made accessible through clear visual hierarchy and logical grouping
+3. **Intuitive** - Complex lighting and motion control made accessible through clear visual hierarchy and logical grouping
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - The app provides multiple interconnected features (fixture control, scene management, universe setup) with persistent state, but doesn't require accounts or server synchronization.
+  - The app provides multiple interconnected features (fixture control, motor/servo control, effects, scene management, network configuration, universe setup) with persistent state, but doesn't require accounts or server synchronization.
 
 ## Essential Features
 
@@ -47,12 +47,43 @@ A mobile-first DMX 512 lighting controller web application optimized for Android
 - **Progression**: Tap color button → Color wheel appears → Select color → RGB channels auto-calculate → Color applies
 - **Success criteria**: Color translates accurately to DMX values, picker feels responsive
 
+### Stepper Motor Control
+- **Functionality**: Precise positioning control for stepper motors via DMX (16-bit position + speed control)
+- **Purpose**: Control motorized movement systems (pan, tilt, linear actuators) with precise positioning
+- **Trigger**: User adjusts motor position or speed sliders
+- **Progression**: Select motor → Set target position → Adjust speed → Motor moves to position → Values persist
+- **Success criteria**: Position accurately converts to DMX high/low byte values, smooth control response
+
+### Servo Control
+- **Functionality**: Angle-based control for servo motors (0-180 degrees mapped to DMX 0-255)
+- **Purpose**: Simple angular positioning for spotlights, mirrors, or moving elements
+- **Trigger**: User adjusts servo angle slider
+- **Progression**: Select servo → Set angle → DMX value updates → Servo moves → State persists
+- **Success criteria**: Angle accurately maps to DMX values, intuitive degree-based control
+
+### Automated Effects
+- **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with speed/intensity control
+- **Purpose**: Create dynamic lighting sequences without manual programming
+- **Trigger**: User creates effect, selects fixtures, and activates
+- **Progression**: Create effect → Choose type → Select fixtures → Set speed/intensity → Start/stop effect → Effects run in real-time
+- **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly
+
+### Network Connection
+- **Functionality**: Configure and connect to DMX networks via Art-Net, sACN, or USB DMX interfaces
+- **Purpose**: Output DMX data to physical lighting equipment
+- **Trigger**: User configures network settings and connects
+- **Progression**: Select protocol → Enter IP/port → Configure universe → Connect → Monitor connection status
+- **Success criteria**: Connection establishes successfully, data transmission rate visible, auto-connect option works
+
 ## Edge Case Handling
 - **Empty State**: Friendly onboarding showing how to add first universe and fixture with visual guide
 - **Invalid DMX Addresses**: Validation prevents overlapping fixture addresses with clear warning messages
 - **Maximum Channels**: Limit universes to 512 channels per DMX spec, show warning when approaching limit
 - **Deleted Fixtures in Scenes**: Gracefully handle scenes referencing deleted fixtures by skipping those channels
 - **Touch Precision**: Fader controls sized appropriately for finger interaction with generous hit areas
+- **Effect Conflicts**: Multiple effects on same fixtures blend or override based on priority
+- **Network Errors**: Display clear connection status and retry options for failed network connections
+- **Motor Position Limits**: Validate stepper motor positions don't exceed configured maximum steps
 
 ## Design Direction
 The design should feel professional and precise like pro-grade lighting equipment, while remaining accessible and modern. Think sleek lighting console meets modern mobile UI - dark interface to preserve night vision during shows, with vibrant accent colors for active controls. Minimal interface that prioritizes the actual control surfaces over chrome.
@@ -92,35 +123,45 @@ Animations should feel precise and mechanical like physical lighting equipment, 
 - **Components**: 
   - Cards for fixture grouping and scene containers
   - Slider components for DMX channel faders with custom styling
-  - Tabs for switching between fixtures/scenes/setup views
+  - Tabs for switching between fixtures/motors/effects/scenes/connection/setup views
   - Dialog for fixture setup and scene naming
   - Button variants for actions (primary for scenes, secondary for settings)
-  - Badge components for DMX address display
+  - Badge components for DMX address display and connection status
   - ScrollArea for long fixture lists
   - Input/Label for DMX values and names
+  - Switch for toggling effects and auto-connect
+  - Select for protocol and fixture type selection
   
 - **Customizations**: 
   - Custom vertical fader component styled like professional lighting console
   - Custom color picker wheel for RGB fixtures
   - DMX value display overlay on sliders showing 0-255 range
+  - Connection status indicators with animated pulse effects
+  - Effect visualization cards with real-time status
   
 - **States**: 
   - Faders: Active (bright accent), inactive (muted), dragging (highlighted with value popup)
   - Scene buttons: Default (card), active/selected (accent border), hover (subtle glow)
   - Fixtures: Collapsed/expanded states for channel visibility
+  - Effects: Running (accent ring), stopped (default), editing (dialog open)
+  - Connection: Connected (green accent), disconnected (muted), connecting (pulse animation)
   
 - **Icon Selection**: 
-  - Lightbulb for fixtures, Palette for color picker, Faders for channel control
-  - Plus for add actions, Gear for settings, Play for scene recall
-  - Eye for visibility toggles, Trash for deletions
+  - Lightbulb for fixtures, Palette for scenes, Faders for channel control
+  - GearSix for stepper motors, ArrowsOutCardinal for servos
+  - Lightning/Sparkle for effects, Plugs for connection
+  - Plus for add actions, Gear for settings, Play/Pause for effect/scene control
+  - Eye for visibility toggles, Trash for deletions, Target for positioning
+  - WifiHigh/WifiSlash for connection status
   
 - **Spacing**: 
   - Consistent 4px base unit, 16px card padding, 8px between related elements
   - 24px gaps between major sections, 12px between fixture cards
   
 - **Mobile**: 
+  - Responsive tab layout with icons and text that collapses to icons-only on small screens
   - Single column layout on mobile with full-width faders
-  - Bottom navigation for main sections (Fixtures/Scenes/Setup)
-  - Collapsible fixture cards to save vertical space
+  - Collapsible motor/servo cards to save vertical space
   - Large touch targets (min 44px) for all interactive elements
   - Faders optimized for thumb/finger dragging with haptic-feeling resistance
+  - 6-tab navigation adapts to 2-row layout on very small screens if needed

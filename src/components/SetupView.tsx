@@ -150,6 +150,10 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                 return ['Red', 'Green', 'Blue', 'White']
             case 'moving-head':
                 return ['Intensity', 'Pan', 'Tilt', 'Color', 'Gobo', 'Shutter', 'Prism', 'Focus']
+            case 'stepper-motor':
+                return ['Position High', 'Position Low', 'Speed']
+            case 'servo':
+                return ['Angle']
             default:
                 return Array.from({ length: count }, (_, i) => `Channel ${i + 1}`)
         }
@@ -289,6 +293,8 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                             <SelectItem value="rgb">RGB</SelectItem>
                                             <SelectItem value="rgbw">RGBW</SelectItem>
                                             <SelectItem value="moving-head">Moving Head</SelectItem>
+                                            <SelectItem value="stepper-motor">Stepper Motor</SelectItem>
+                                            <SelectItem value="servo">Servo</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
