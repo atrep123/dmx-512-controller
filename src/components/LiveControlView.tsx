@@ -1,10 +1,11 @@
-import { Fixture, Effect, Universe } from '@/lib/types'
+import { Fixture, Effect, Universe, StepperMotor, Servo } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Lightbulb, Lightning, Play, Pause, Faders } from '@phosphor-icons/react'
+import JoystickControl from '@/components/JoystickControl'
 
 interface LiveControlViewProps {
     fixtures: Fixture[]
@@ -12,6 +13,10 @@ interface LiveControlViewProps {
     effects: Effect[]
     setEffects: (updater: (effects: Effect[]) => Effect[]) => void
     universes: Universe[]
+    stepperMotors: StepperMotor[]
+    setStepperMotors: (updater: (motors: StepperMotor[]) => StepperMotor[]) => void
+    servos: Servo[]
+    setServos: (updater: (servos: Servo[]) => Servo[]) => void
 }
 
 export default function LiveControlView({
@@ -20,6 +25,10 @@ export default function LiveControlView({
     effects,
     setEffects,
     universes,
+    stepperMotors,
+    setStepperMotors,
+    servos,
+    setServos,
 }: LiveControlViewProps) {
     const updateChannelValue = (fixtureId: string, channelId: string, value: number) => {
         setFixtures((currentFixtures) =>
@@ -75,6 +84,15 @@ export default function LiveControlView({
 
     return (
         <div className="space-y-6">
+            <JoystickControl
+                fixtures={fixtures}
+                stepperMotors={stepperMotors}
+                servos={servos}
+                setFixtures={setFixtures}
+                setStepperMotors={setStepperMotors}
+                setServos={setServos}
+            />
+
             {activeEffects.length > 0 && (
                 <div>
                     <div className="flex items-center gap-2 mb-4">

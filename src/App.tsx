@@ -70,6 +70,10 @@ function App() {
                             effects={effects || []}
                             setEffects={setEffects}
                             universes={universes || []}
+                            stepperMotors={stepperMotors || []}
+                            setStepperMotors={setStepperMotors}
+                            servos={servos || []}
+                            setServos={setServos}
                         />
                     </TabsContent>
 
