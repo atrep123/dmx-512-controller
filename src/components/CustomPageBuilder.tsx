@@ -14,22 +14,22 @@ import {
     ArrowUp,
     ArrowDown,
     DotsSixVertical,
-    Lightning,
     Faders,
-    Palette,
-    Lightbulb,
-    Target,
+    Lightbu
     Fire
-} from '@phosphor-icons/react'
-import { StepperMotor, Servo, Effect, Fixture } from '@/lib/types'
-import {
-    ChannelSliderBlock,
-    ColorPickerBlock,
-    ToggleButtonBlock,
-    ButtonPadBlock,
+import { Stepp
+    Channel
+    Togg
     PositionControlBlock,
-    IntensityFaderBlock
 } from '@/components/controls'
+interfac
+    type: 'toggle' | 'c
+    fixtureId?: strin
+    servoId?: string
+    channelName?: s
+    config?: any
+
+    stepperMotors: StepperMoto
 
 interface ControlBlock {
     id: string
@@ -70,19 +70,19 @@ export default function CustomPageBuilder({
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedBlock, setSelectedBlock] = useState<ControlBlock | null>(null)
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-
+ newBlock.type || 'toggle',
     const [newBlock, setNewBlock] = useState<Partial<ControlBlock>>({
         type: 'toggle',
         title: '',
         variant: 'default',
-    })
+    })ock.channelName,
 
     const addBlock = () => {
         if (!newBlock.title) {
             toast.error('Zadejte název bloku')
-            return
-        }
-
+            return block])
+        }e: '', variant: 'default' })
+Open(false)
         const block: ControlBlock = {
             id: `block-${Date.now()}`,
             title: newBlock.title,
@@ -94,13 +94,13 @@ export default function CustomPageBuilder({
             channelName: newBlock.channelName,
             variant: newBlock.variant || 'default',
             config: newBlock.config,
-        }
-
+        }=== selectedBlock.id
+       ? {
         setControlBlocks((prev) => [...(prev || []), block])
         setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-        setIsDialogOpen(false)
-        toast.success('Blok přidán')
-    }
+        setIsDialogOpen(false)effectId || b.effectId,
+        toast.success('Blok přidán')eId || b.fixtureId,
+    }: newBlock.motorId || b.motorId,
 
     const updateBlock = () => {
         if (!selectedBlock || !newBlock.title) {
@@ -254,22 +254,6 @@ export default function CustomPageBuilder({
                             <div>
                                 <p className="font-medium">{block.title}</p>
                                 <p className="text-xs text-muted-foreground">
-                                    {block.type} - {block.variant}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditBlock(block)}
-                            >
-                                Upravit
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => moveBlock(index, 'up')}
                                 disabled={index === 0}
                             >
                                 <ArrowUp size={16} />
