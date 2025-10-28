@@ -27,7 +27,6 @@ import {
 
 import { toast } from 'sonner'
 
-// Pokud máš barrel file, nech to takto. Jinak uprav cesty dle projektu.
 import {
   ToggleButtonBlock,
   ChannelSliderBlock,
@@ -35,38 +34,12 @@ import {
   IntensityFaderBlock,
   PositionControlBlock,
   ButtonPadBlock,
-} from '@/components/blocks'
+} from '@/components/controls'
 
-// ---------- Typy domény ----------
-interface StepperMotor {
-  id: string
-  name: string
-}
-
-interface Servo {
-  id: string
-  name: string
-}
-
-interface Effect {
-  id: string
-  name: string
-  isActive?: boolean
-}
-
-interface Channel {
-  name: string
-  value: number
-}
-
-interface Fixture {
-  id: string
-  name: string
-  channels: Channel[]
-}
+import { Effect, Fixture, StepperMotor, Servo } from '@/lib/types'
 
 type ControlBlockType = 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
-type BlockVariant = 'default' | 'large' | 'minimal' | 'compact'
+type BlockVariant = string
 
 interface ControlBlock {
   id: string
@@ -113,6 +86,14 @@ export default function CustomPageBuilder({
     title: '',
     variant: 'default',
   })
+
+  const getVariant = <T extends string>(
+    variant: BlockVariant | undefined,
+    allowed: readonly T[]
+  ): T | undefined => {
+    if (!variant) return undefined
+    return allowed.includes(variant as T) ? (variant as T) : undefined
+  }
 
   // ---------- Akce nad bloky ----------
   const addBlock = () => {
@@ -333,7 +314,7 @@ export default function CustomPageBuilder({
               active={effect?.isActive || false}
               onToggle={toggleEffect}
               icon={<Lightning weight="fill" />}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'large', 'minimal'] as const)}
               effectId={block.effectId}
               showEdit={true}
               onEffectChange={() => handleEditBlock(block)}
@@ -352,7 +333,7 @@ export default function CustomPageBuilder({
               label={block.title}
               value={channel?.value ?? 0}
               onChange={value => updateFixtureChannel(block.channelName || '', value)}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'card', 'compact', 'large'] as const)}
             />
           </div>
         )
@@ -373,7 +354,7 @@ export default function CustomPageBuilder({
               white={wCh?.value}
               onColorChange={c => updateFixtureColor(c.red, c.green, c.blue, c.white)}
               hasWhite={!!wCh}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'compact'] as const)}
             />
           </div>
         )
@@ -391,7 +372,7 @@ export default function CustomPageBuilder({
               label={block.title}
               value={intensityChannel?.value ?? 0}
               onChange={value => updateFixtureChannel('dimmer', value)}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'vertical', 'compact'] as const)}
             />
           </div>
         )
@@ -409,7 +390,7 @@ export default function CustomPageBuilder({
               tiltValue={tiltCh?.value ?? 127}
               onPanChange={value => updateFixtureChannel('pan', value)}
               onTiltChange={value => updateFixtureChannel('tilt', value)}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'compact'] as const)}
             />
           </div>
         )
@@ -436,7 +417,7 @@ export default function CustomPageBuilder({
                 setEffects(prev => prev.map(e => ({ ...e, isActive: e.id === id ? !e.isActive : false })))
               }}
               columns={3}
-              variant={block.variant as BlockVariant}
+              variant={getVariant(block.variant, ['default', 'compact'] as const)}
             />
           </div>
         )
