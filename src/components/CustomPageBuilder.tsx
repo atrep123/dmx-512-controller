@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/s
-import {
-    Trash,
-    ArrowDown,
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import {
     Plus,
@@ -14,26 +14,57 @@ import {
     ArrowUp,
     ArrowDown,
     DotsSixVertical,
-
-    id: string
-    title: 
-    motorId?
-    effectI
-    varia
-}
-interfac
-    stepperMotors: St
-    effects: Effect
-    setStepperMotors: (m
-    setEffects: (effec
-
-    fixtures,
-    servos,
-    setFixtures,
+    Lightning,
+    Faders,
+    Palette,
+    Lightbulb,
+    Target,
+    Fire
+} from '@phosphor-icons/react'
+import { StepperMotor, Servo, Effect, Fixture } from '@/lib/types'
+import {
+    ChannelSliderBlock,
+    ColorPickerBlock,
+    ToggleButtonBlock,
+    ButtonPadBlock,
+    PositionControlBlock,
+    IntensityFaderBlock
+} from '@/components/controls'
 
 interface ControlBlock {
-    id: string,
+    id: string
     type: 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
+    title: string
+    fixtureId?: string
+    motorId?: string
+    servoId?: string
+    effectId?: string
+    channelName?: string
+    variant?: 'default' | 'large' | 'minimal' | 'compact'
+    config?: any
+}
+
+interface CustomPageBuilderProps {
+    stepperMotors: StepperMotor[]
+    servos: Servo[]
+    effects: Effect[]
+    fixtures: Fixture[]
+    setStepperMotors: (motors: StepperMotor[] | ((prev: StepperMotor[]) => StepperMotor[])) => void
+    setServos: (servos: Servo[] | ((prev: Servo[]) => Servo[])) => void
+    setEffects: (effects: Effect[] | ((prev: Effect[]) => Effect[])) => void
+    setFixtures: (fixtures: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
+}
+
+export default function CustomPageBuilder({
+    stepperMotors,
+    servos,
+    effects,
+    fixtures,
+    setStepperMotors,
+    setServos,
+    setEffects,
+    setFixtures,
+}: CustomPageBuilderProps) {
     const [controlBlocks, setControlBlocks] = useKV<ControlBlock[]>('custom-control-blocks', [])
     const [editMode, setEditMode] = useState(false)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
