@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Pencil } from '@phosphor-icons/react'
 
 interface ToggleButtonBlockProps {
     label: string
@@ -11,6 +12,9 @@ interface ToggleButtonBlockProps {
     variant?: 'default' | 'large' | 'minimal'
     disabled?: boolean
     showStatus?: boolean
+    effectId?: string
+    onEffectChange?: () => void
+    showEdit?: boolean
 }
 
 export function ToggleButtonBlock({
@@ -22,6 +26,9 @@ export function ToggleButtonBlock({
     variant = 'default',
     disabled = false,
     showStatus = true,
+    effectId,
+    onEffectChange,
+    showEdit = false,
 }: ToggleButtonBlockProps) {
     const displayIcon = active && activeIcon ? activeIcon : icon
 
@@ -47,7 +54,20 @@ export function ToggleButtonBlock({
 
     if (variant === 'large') {
         return (
-            <Card className={`p-6 transition-all ${active ? 'ring-2 ring-accent bg-accent/5' : ''}`}>
+            <Card className={`p-6 transition-all ${active ? 'ring-2 ring-accent bg-accent/5' : ''} relative group`}>
+                {showEdit && onEffectChange && (
+                    <Button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onEffectChange()
+                        }}
+                        size="sm"
+                        variant="ghost"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                        <Pencil size={16} />
+                    </Button>
+                )}
                 <button
                     onClick={onToggle}
                     disabled={disabled}
@@ -70,7 +90,20 @@ export function ToggleButtonBlock({
     }
 
     return (
-        <Card className={`p-4 transition-all ${active ? 'ring-2 ring-accent' : ''}`}>
+        <Card className={`p-4 transition-all ${active ? 'ring-2 ring-accent' : ''} relative group`}>
+            {showEdit && onEffectChange && (
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onEffectChange()
+                    }}
+                    size="sm"
+                    variant="ghost"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 h-auto"
+                >
+                    <Pencil size={14} />
+                </Button>
+            )}
             <button
                 onClick={onToggle}
                 disabled={disabled}

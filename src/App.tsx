@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube } from '@phosphor-icons/react'
+import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
 import FixturesView from '@/components/FixturesView'
 import ScenesView from '@/components/ScenesView'
@@ -11,6 +11,7 @@ import EffectsView from '@/components/EffectsView'
 import ConnectionView from '@/components/ConnectionView'
 import LiveControlView from '@/components/LiveControlView'
 import ControlBlocksDemo from '@/components/ControlBlocksDemo'
+import CustomPageBuilder from '@/components/CustomPageBuilder'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -34,8 +35,12 @@ function App() {
                     <p className="text-sm text-muted-foreground mt-1">Profesionální řízení osvětlení a motorů</p>
                 </header>
 
-                <Tabs defaultValue="blocks" className="w-full">
-                    <TabsList className="grid w-full grid-cols-8 mb-6 h-auto">
+                <Tabs defaultValue="custom" className="w-full">
+                    <TabsList className="grid w-full grid-cols-9 mb-6 h-auto">
+                        <TabsTrigger value="custom" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
+                            <SquaresFour weight="fill" />
+                            <span className="text-xs sm:text-sm">Moje stránka</span>
+                        </TabsTrigger>
                         <TabsTrigger value="blocks" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Cube weight="fill" />
                             <span className="text-xs sm:text-sm">UI Bloky</span>
@@ -69,6 +74,19 @@ function App() {
                             <span className="text-xs sm:text-sm">Nastavení</span>
                         </TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="custom" className="mt-0">
+                        <CustomPageBuilder
+                            effects={effects || []}
+                            fixtures={fixtures || []}
+                            stepperMotors={stepperMotors || []}
+                            servos={servos || []}
+                            setEffects={setEffects}
+                            setFixtures={setFixtures}
+                            setStepperMotors={setStepperMotors}
+                            setServos={setServos}
+                        />
+                    </TabsContent>
 
                     <TabsContent value="blocks" className="mt-0">
                         <ControlBlocksDemo />

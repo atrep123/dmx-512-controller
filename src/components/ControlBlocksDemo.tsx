@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { toast } from 'sonner'
 import {
     ChannelSliderBlock,
     ColorPickerBlock,
@@ -235,6 +236,8 @@ export default function ControlBlocksDemo() {
                                         onToggle={() => setIsActive(!isActive)}
                                         icon={<Lightning size={24} />}
                                         activeIcon={<Lightning size={24} weight="fill" />}
+                                        showEdit={true}
+                                        onEffectChange={() => toast.info('Otevřít nastavení efektu')}
                                     />
                                     <ToggleButtonBlock
                                         label="Efekt zapnut"
@@ -242,12 +245,14 @@ export default function ControlBlocksDemo() {
                                         onToggle={() => setIsActive(!isActive)}
                                         icon={<Sparkle size={24} />}
                                         activeIcon={<Sparkle size={24} weight="fill" />}
+                                        showEdit={true}
+                                        onEffectChange={() => toast.info('Změnit efekt')}
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velká varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velká varianta s editací</h3>
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <ToggleButtonBlock
                                         label="Play"
@@ -256,6 +261,8 @@ export default function ControlBlocksDemo() {
                                         icon={<Play size={32} />}
                                         activeIcon={<Play size={32} weight="fill" />}
                                         variant="large"
+                                        showEdit={true}
+                                        onEffectChange={() => toast.success('Otevřít editor efektu')}
                                     />
                                     <ToggleButtonBlock
                                         label="Pause"
@@ -264,6 +271,8 @@ export default function ControlBlocksDemo() {
                                         icon={<Pause size={32} />}
                                         activeIcon={<Pause size={32} weight="fill" />}
                                         variant="large"
+                                        showEdit={true}
+                                        onEffectChange={() => toast.success('Změnit nastavení')}
                                     />
                                     <ToggleButtonBlock
                                         label="Stop"
