@@ -1,0 +1,6 @@
+export { ChannelSliderBlock } from './ChannelSliderBlock'
+export { ColorPickerBlock } from './ColorPickerBlock'
+export { ToggleButtonBlock } from './ToggleButtonBlock'
+export { ButtonPadBlock } from './ButtonPadBlock'
+export { PositionControlBlock } from './PositionControlBlock'
+export { IntensityFaderBlock } from './IntensityFaderBlock'
