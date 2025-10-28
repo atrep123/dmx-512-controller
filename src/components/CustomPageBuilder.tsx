@@ -9,52 +9,30 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import {
-    Plus,
-    Trash,
-    ArrowUp,
+    Trash
+    ArrowD
+    Faders,
     ArrowDown,
     DotsSixVertical,
     Faders,
     Lightbulb,
-    Palette,
-    Lightning,
-    Target,
-    Fire
-} from '@phosphor-icons/react'
-import { StepperMotor, Servo, Effect, Fixture } from '@/lib/types'
-import {
-    ChannelSliderBlock,
-    ColorPickerBlock,
-    IntensityFaderBlock,
-    ToggleButtonBlock,
-    ButtonPadBlock,
-    PositionControlBlock,
-} from '@/components/controls'
+    ColorPic
+    ToggleButt
+    Positio
 
-interface ControlBlock {
     id: string
-    type: 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
     title: string
-    fixtureId?: string
-    motorId?: string
-    servoId?: string
+    moto
     effectId?: string
-    channelName?: string
-    variant?: 'default' | 'large' | 'minimal' | 'compact'
-    config?: any
+    variant?: 'defaul
 }
-
-interface CustomPageBuilderProps {
-    stepperMotors: StepperMotor[]
+interface CustomPageBu
     servos: Servo[]
-    effects: Effect[]
     fixtures: Fixture[]
-    setStepperMotors: (motors: StepperMotor[] | ((prev: StepperMotor[]) => StepperMotor[])) => void
-    setServos: (servos: Servo[] | ((prev: Servo[]) => Servo[])) => void
-    setEffects: (effects: Effect[] | ((prev: Effect[]) => Effect[])) => void
-    setFixtures: (fixtures: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
-}
+    setServos: (servos: Servo[
 
+interface ControlBlock {es: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
+    id: string
 export default function CustomPageBuilder({
     stepperMotors,
     servos,
