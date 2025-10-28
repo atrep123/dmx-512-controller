@@ -101,8 +101,8 @@ export default function LiveControlView({
     const activeEffects = effects.filter(e => e.isActive)
     const hasActiveContent = fixtures.length > 0 || activeEffects.length > 0
     const slots = effectSlots || [null, null, null, null, null, null]
-                    </div>
-
+    
+    const slotIcons = [
         NumberSquareOne,
         NumberSquareTwo,
         NumberSquareThree,
