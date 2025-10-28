@@ -15,21 +15,21 @@ import {
     ArrowDown,
     DotsSixVertical,
     Faders,
-    Lightbu
+    Lightbulb,
+    Palette,
+    Lightning,
+    Target,
     Fire
-import { Stepp
-    Channel
-    Togg
+} from '@phosphor-icons/react'
+import { StepperMotor, Servo, Effect, Fixture } from '@/lib/types'
+import {
+    ChannelSliderBlock,
+    ColorPickerBlock,
+    IntensityFaderBlock,
+    ToggleButtonBlock,
+    ButtonPadBlock,
     PositionControlBlock,
 } from '@/components/controls'
-interfac
-    type: 'toggle' | 'c
-    fixtureId?: strin
-    servoId?: string
-    channelName?: s
-    config?: any
-
-    stepperMotors: StepperMoto
 
 interface ControlBlock {
     id: string
@@ -70,19 +70,18 @@ export default function CustomPageBuilder({
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedBlock, setSelectedBlock] = useState<ControlBlock | null>(null)
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
- newBlock.type || 'toggle',
     const [newBlock, setNewBlock] = useState<Partial<ControlBlock>>({
         type: 'toggle',
         title: '',
         variant: 'default',
-    })ock.channelName,
+    })
 
     const addBlock = () => {
         if (!newBlock.title) {
             toast.error('Zadejte název bloku')
-            return block])
-        }e: '', variant: 'default' })
-Open(false)
+            return
+        }
+        
         const block: ControlBlock = {
             id: `block-${Date.now()}`,
             title: newBlock.title,
@@ -94,13 +93,13 @@ Open(false)
             channelName: newBlock.channelName,
             variant: newBlock.variant || 'default',
             config: newBlock.config,
-        }=== selectedBlock.id
-       ? {
+        }
+        
         setControlBlocks((prev) => [...(prev || []), block])
         setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-        setIsDialogOpen(false)effectId || b.effectId,
-        toast.success('Blok přidán')eId || b.fixtureId,
-    }: newBlock.motorId || b.motorId,
+        setIsDialogOpen(false)
+        toast.success('Blok přidán')
+    }
 
     const updateBlock = () => {
         if (!selectedBlock || !newBlock.title) {
@@ -254,6 +253,27 @@ Open(false)
                             <div>
                                 <p className="font-medium">{block.title}</p>
                                 <p className="text-xs text-muted-foreground">
+                                    {block.type === 'toggle' && 'Přepínač efektu'}
+                                    {block.type === 'channel' && 'Slider kanálu'}
+                                    {block.type === 'color' && 'Výběr barvy'}
+                                    {block.type === 'intensity' && 'Intenzita'}
+                                    {block.type === 'position' && 'Pozice Pan/Tilt'}
+                                    {block.type === 'button-pad' && 'Panel tlačítek'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditBlock(block)}
+                            >
+                                <Faders size={16} />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => moveBlock(index, 'up')}
                                 disabled={index === 0}
                             >
                                 <ArrowUp size={16} />
