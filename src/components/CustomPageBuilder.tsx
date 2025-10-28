@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/but
+import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { toast } from 'sonner'
 import {
     Plus,
     Trash,
@@ -14,22 +15,21 @@ import {
     ArrowDown,
     DotsSixVertical,
     Lightning,
-    Light
+    Lightbulb,
     Target,
+    Palette,
+    Faders,
+    Fire,
+} from '@phosphor-icons/react'
 import {
-    ColorPi
-    ButtonP
+    ColorPickerBlock,
+    ButtonPadBlock,
     IntensityFaderBlock,
-import {
-
-    id: string
-    title: string
-    motorId?: strin
-    effectId?: string
-    variant?: 'default' 
-}
-interface CustomPageBuilderPro
-    stepperMotors: StepperMotor[]
+    ToggleButtonBlock,
+    ChannelSliderBlock,
+    PositionControlBlock,
+} from '@/components/controls'
+import { Fixture, StepperMotor, Servo, Effect } from '@/lib/types'
 
 interface ControlBlock {
     id: string
@@ -141,7 +141,7 @@ export default function CustomPageBuilder({
         setControlBlocks((prev) => {
             const newBlocks = [...(prev || [])]
             const targetIndex = direction === 'up' ? index - 1 : index + 1
-            if (targetIndex < 0 || targetIndex >= newBlocks.length) return prev
+            if (targetIndex < 0 || targetIndex >= newBlocks.length) return prev || []
 
             ;[newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]]
             return newBlocks
@@ -337,12 +337,12 @@ export default function CustomPageBuilder({
                 return (
                     <div key={block.id}>
                         <ColorPickerBlock
-                            label={block.title}
                             red={rCh?.value || 0}
                             green={gCh?.value || 0}
                             blue={bCh?.value || 0}
                             white={wCh?.value}
-                            onChange={(r, g, b, w) => updateFixtureColor(r, g, b, w)}
+                            onColorChange={(color) => updateFixtureColor(color.red, color.green, color.blue, color.white)}
+                            hasWhite={!!wCh}
                             variant={block.variant as any}
                         />
                     </div>
@@ -371,9 +371,9 @@ export default function CustomPageBuilder({
                 return (
                     <div key={block.id}>
                         <PositionControlBlock
-                            label={block.title}
-                            pan={panCh?.value || 127}
-                            tilt={tiltCh?.value || 127}
+                            title={block.title}
+                            panValue={panCh?.value || 127}
+                            tiltValue={tiltCh?.value || 127}
                             onPanChange={(value) => updateFixtureChannel('pan', value)}
                             onTiltChange={(value) => updateFixtureChannel('tilt', value)}
                             variant={block.variant as any}
@@ -382,12 +382,15 @@ export default function CustomPageBuilder({
                 )
 
             case 'button-pad':
-                const effectButtons = effects.slice(0, 6).map((e, i) => ({
-                    id: e.id,
-                    label: e.name,
-                    icon: <Lightning weight="fill" />,
-                    color: (i % 2 === 0 ? 'accent' : 'default') as const,
-                }))
+                const effectButtons = effects.slice(0, 6).map((e, i) => {
+                    const color = i % 2 === 0 ? 'accent' : 'default'
+                    return {
+                        id: e.id,
+                        label: e.name,
+                        icon: <Lightning weight="fill" />,
+                        color: color as 'accent' | 'default',
+                    }
+                })
 
                 return (
                     <div key={block.id}>
@@ -537,7 +540,7 @@ export default function CustomPageBuilder({
                                                 onValueChange={(value) =>
                                                     setNewBlock({ ...newBlock, effectId: value })
                                                 }
-                                             
+                                            >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Vyberte efekt" />
                                                 </SelectTrigger>
@@ -548,7 +551,7 @@ export default function CustomPageBuilder({
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
-                                            <Label>Ná
+                                            </Select>
                                         </div>
                                     )}
 
@@ -608,27 +611,27 @@ export default function CustomPageBuilder({
                                         >
                                             Zrušit
                                         </Button>
-
+                                    </div>
                                 </div>
                             </ScrollArea>
                         </DialogContent>
                     </Dialog>
                 </div>
+            </div>
 
-
-
+            {!controlBlocks || controlBlocks.length === 0 ? (
                 <Card className="p-12 text-center">
                     <Lightbulb size={48} className="mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                         Začněte přidáním prvního ovládacího bloku
-
-
+                    </p>
+                </Card>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {(controlBlocks || []).map((block, index) => renderBlock(block, index))}
-
+                </div>
             )}
-
+        </div>
     )
-
+}
