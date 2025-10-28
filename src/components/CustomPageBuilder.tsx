@@ -1,32 +1,32 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/labe
+import { Select, SelectContent, SelectItem, Sel
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { toast } from 'sonner'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Trash,
   ArrowUp,
-  ArrowDown,
-  DotsSixVertical,
-  Faders,
-  Target,
-  Lightning,
+import { ScrollArea } from '@/components/ui/scroll-area'
+  Faders
+  Trash,
   Palette,
-  Lightbulb,
-  Plus,
+  ArrowDown,
   PencilSimple,
-  Gear,
-} from '@phosphor-icons/react'
+  Faders,
 import {
+  Lightning,
+  ToggleBu
+  Lightbulb,
+  Inten
+  PencilSimple,
+
+} from '@phosphor-icons/react'
+
   ChannelSliderBlock,
   ColorPickerBlock,
   ToggleButtonBlock,
-  ButtonPadBlock,
+  motorId?: strin
   PositionControlBlock,
   IntensityFaderBlock,
 } from '@/components/controls'
@@ -36,7 +36,7 @@ type BlockType = 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'bu
 type BlockVariant = 'default' | 'compact' | 'minimal'
 
 interface ControlBlock {
-  id: string
+  setEffects
   type: BlockType
   title: string
   fixtureId?: string
@@ -44,29 +44,29 @@ interface ControlBlock {
   servoId?: string
   effectId?: string
   channelName?: string
-  variant?: BlockVariant
+}: CustomPageBuilderProp
 }
 
 interface CustomPageBuilderProps {
-  fixtures: Fixture[]
+  const [newBlock, se
   stepperMotors: StepperMotor[]
-  servos: Servo[]
+    variant: 'def
   effects: Effect[]
   setFixtures: (value: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
   setStepperMotors: (value: StepperMotor[] | ((prev: StepperMotor[]) => StepperMotor[])) => void
   setServos: (value: Servo[] | ((prev: Servo[]) => Servo[])) => void
   setEffects: (value: Effect[] | ((prev: Effect[]) => Effect[])) => void
-}
+ 
 
 export default function CustomPageBuilder({
   fixtures,
-  stepperMotors,
+      servoId: n
   servos,
-  effects,
+      vari
   setFixtures,
   setStepperMotors,
   setServos,
-  setEffects,
+    toast.suc
 }: CustomPageBuilderProps) {
   const [controlBlocks, setControlBlocks] = useKV<ControlBlock[]>('custom-control-blocks', [])
   const [editMode, setEditMode] = useState(false)
@@ -82,7 +82,7 @@ export default function CustomPageBuilder({
   const addBlock = () => {
     if (!newBlock.title || !newBlock.type) {
       toast.error('Vyplňte název bloku')
-      return
+    setIsDia
     }
 
     const block: ControlBlock = {
@@ -97,159 +97,154 @@ export default function CustomPageBuilder({
       variant: (newBlock.variant as BlockVariant) ?? 'default',
     }
 
-    setControlBlocks((prev) => [...(prev || []), block])
+    setControlBlocks((prev) => [...prev, block])
     setIsDialogOpen(false)
-    setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-    toast.success('Blok přidán')
-  }
+              label={block.title}
+              onChange={(value) 
+   
 
-  const updateBlock = () => {
-    if (!selectedBlock) {
-      return
+                          cha
+                         
+            
+     
+
+          </div>
+      }
+      case 'color': {
+        if (!
+        const rCh =
+        const bCh = fixture.channels.find((ch) 
+
+          <div key={block.id} className=
+            <ColorPickerBlock
+              green={gCh?.value ?? 0}
+              white={wCh?.value ?? 0}
+                setFixtures((prev) =>
+             
+             
+       
+     
+                          
+                        }
+                  )
+              }}
+   
+
+
+        const fixture = fixtures.find((f) => f.id === block.fix
+
+   
+
+        const intensityVariant: 'default' | 'vertical' | 'compact'
+        return (
+            <IntensityFaderBlock
+              value={intensityChannel?.value ?? 0}
+                setFixtures((prev) =>
+      
+                          ...f,
+                            intensityChannel &&
+                        }
+                  )
+      
+   
+
+
+        const fixture = fix
+
+        const tiltCh = 
+        return (
+            <PositionControlBlock
+              panValue={panCh
+              onPanChange={(v
+                  prev.map((f) 
+                      ? {
+                          channels: f.chan
+      
+                      : f
+   
+
+                  prev.map((f) =>
+                      ? {
+
+                         
+                      
+                )
+              variant={variant =
+
+      }
+          <div key={block.id}>
+          id: e.id,
+          icon: <Lightning weight
+        }))
+        return (
+            <ButtonPadBlock
+              items={buttons}
+                s
+                
+              variant={variant 
+          </di
+      }
+      def
     }
 
-    setControlBlocks((prev) =>
-      (prev || []).map((b) =>
-        b.id === selectedBlock.id
-          ? {
-              ...b,
-              title: newBlock.title ?? b.title,
-              fixtureId: newBlock.fixtureId,
-              motorId: newBlock.motorId,
-              servoId: newBlock.servoId,
-              effectId: newBlock.effectId,
-              channelName: newBlock.channelName,
-              variant: (newBlock.variant as BlockVariant) ?? b.variant,
-            }
-          : b
-      )
-    )
-    setIsDialogOpen(false)
-    setSelectedBlock(null)
-    setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-    toast.success('Blok upraven')
-  }
+    <div className="spa
+        <div>
+          <p className="text-sm text-muted-foreground mt-1">
+          </p>
 
-  const deleteBlock = (id: string) => {
-    setControlBlocks((prev) => (prev || []).filter((b) => b.id !== id))
-    toast.success('Blok odstraněn')
-  }
+            <Gea
+          </Button>
+            <Plus className="mr
+          </Button>
+      </div>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setNewBlock({ type: 'toggle
+        }}
+        <DialogContent classNam
+            <DialogTitle>{selectedBlock ? 'Upravit blok' :
+          <ScrollArea className="max-h-[60vh] pr-4">
+              <div>
+                <Input
+                  onChang
+                />
 
-  const moveBlock = (index: number, direction: 'up' | 'down') => {
-    setControlBlocks((prev) => {
-      const currentBlocks = prev || []
-      const newBlocks = [...currentBlocks]
-      const targetIndex = direction === 'up' ? index - 1 : index + 1
-      if (targetIndex < 0 || targetIndex >= newBlocks.length) return currentBlocks
-      
-      const temp = newBlocks[index]
-      newBlocks[index] = newBlocks[targetIndex]
-      newBlocks[targetIndex] = temp
-      return newBlocks
-    })
-  }
+                
+                  <SelectTrigge
+              
+                
+         
+       
 
-  const openEditDialog = (block: ControlBlock) => {
-    setSelectedBlock(block)
-    setNewBlock({
-      type: block.type,
-      title: block.title,
-      fixtureId: block.fixtureId,
-      motorId: block.motorId,
-      servoId: block.servoId,
-      effectId: block.effectId,
-      channelName: block.channelName,
-      variant: block.variant ?? 'default',
-    })
-    setIsDialogOpen(true)
-  }
+                     
+                      </div>
+                    <SelectItem v
 
-  const renderBlock = (block: ControlBlock) => {
-    const variant = block.variant ?? 'default'
+                      </div>
+                    <SelectItem value="intensity">
+                        <Lightbulb size={16} />
+                      </div>
 
-    switch (block.type) {
-      case 'toggle': {
-        const effect = effects.find((e) => e.id === block.effectId)
-        if (!effect) return null
-
-        const toggleVariant: 'default' | 'large' | 'minimal' = variant === 'compact' ? 'minimal' : variant as any
-
-        return (
-          <div key={block.id}>
-            <ToggleButtonBlock
-              label={block.title}
-              active={effect.isActive}
-              onToggle={() => {
-                setEffects((prev) =>
-                  (prev || []).map((e) => (e.id === effect.id ? { ...e, isActive: !e.isActive } : e))
-                )
-              }}
-              variant={toggleVariant}
-            />
-          </div>
-        )
-      }
-
-      case 'channel': {
-        const fixture = fixtures.find((f) => f.id === block.fixtureId)
-        const channel = fixture?.channels.find((ch) => ch.name === block.channelName)
-        if (!fixture || !channel) return null
-
-        const channelVariant: 'default' | 'card' | 'compact' | 'large' = variant === 'minimal' ? 'compact' : variant as any
-
-        return (
-          <div key={block.id}>
-            <ChannelSliderBlock
-              label={block.title}
-              value={channel.value}
-              onChange={(value) => {
-                setFixtures((prev) =>
-                  prev.map((f) =>
-                    f.id === fixture.id
-                      ? {
-                          ...f,
-                          channels: f.channels.map((ch) =>
-                            ch.id === channel.id ? { ...ch, value } : ch
-                          ),
-                        }
-                      : f
-                  )
-                )
-              }}
-              variant={channelVariant}
-            />
-          </div>
-        )
-      }
-
-      case 'color': {
-        const fixture = fixtures.find((f) => f.id === block.fixtureId)
-        if (!fixture) return null
-
-        const rCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('red'))
-        const gCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('green'))
-        const bCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('blue'))
-        const wCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('white'))
-
-        return (
-          <div key={block.id} className="space-y-2">
-            <h3 className="text-sm font-medium">{block.title}</h3>
+                
+                      </div>
             <ColorPickerBlock
+              label={block.title}
               red={rCh?.value ?? 0}
               green={gCh?.value ?? 0}
               blue={bCh?.value ?? 0}
               white={wCh?.value ?? 0}
-              onColorChange={(color) => {
+              onColorChange={(r, g, b, w) => {
                 setFixtures((prev) =>
                   prev.map((f) =>
                     f.id === fixture.id
                       ? {
                           ...f,
                           channels: f.channels.map((ch) => {
-                            if (rCh && ch.id === rCh.id) return { ...ch, value: color.red }
-                            if (gCh && ch.id === gCh.id) return { ...ch, value: color.green }
-                            if (bCh && ch.id === bCh.id) return { ...ch, value: color.blue }
-                            if (wCh && ch.id === wCh.id && color.white !== undefined) return { ...ch, value: color.white }
+                            if (rCh && ch.id === rCh.id) return { ...ch, value: r }
+                            if (gCh && ch.id === gCh.id) return { ...ch, value: g }
+                            if (bCh && ch.id === bCh.id) return { ...ch, value: b }
+                            if (wCh && ch.id === wCh.id) return { ...ch, value: w }
                             return ch
                           }),
                         }
@@ -257,7 +252,7 @@ export default function CustomPageBuilder({
                   )
                 )
               }}
-              variant={variant === 'minimal' ? 'compact' : 'default'}
+              variant={variant}
             />
           </div>
         )
@@ -271,8 +266,6 @@ export default function CustomPageBuilder({
           const n = ch.name.toLowerCase()
           return n.includes('dimmer') || n.includes('intensity') || n.includes('master')
         })
-
-        const intensityVariant: 'default' | 'vertical' | 'compact' = variant === 'minimal' ? 'compact' : variant as any
 
         return (
           <div key={block.id}>
@@ -293,7 +286,7 @@ export default function CustomPageBuilder({
                   )
                 )
               }}
-              variant={intensityVariant}
+              variant={variant}
             />
           </div>
         )
@@ -340,7 +333,7 @@ export default function CustomPageBuilder({
                   )
                 )
               }}
-              variant={variant === 'minimal' ? 'compact' : 'default'}
+              variant={variant}
             />
           </div>
         )
@@ -350,6 +343,7 @@ export default function CustomPageBuilder({
         const buttons = effects.map((e) => ({
           id: e.id,
           label: e.name,
+          isActive: e.isActive,
           icon: <Lightning weight="fill" />,
           color: 'accent' as const,
         }))
@@ -364,7 +358,7 @@ export default function CustomPageBuilder({
                   (prev || []).map((e) => (e.id === id ? { ...e, isActive: !e.isActive } : e))
                 )
               }}
-              variant={variant === 'minimal' ? 'compact' : 'default'}
+              variant={variant}
             />
           </div>
         )
@@ -419,15 +413,15 @@ export default function CustomPageBuilder({
                   onChange={(e) => setNewBlock({ ...newBlock, title: e.target.value })}
                   placeholder="Např. Hlavní světla"
                 />
-              </div>
 
-              <div>
+
+
                 <Label>Typ bloku</Label>
                 <Select value={newBlock.type} onValueChange={(value) => setNewBlock({ ...newBlock, type: value as BlockType })}>
                   <SelectTrigger>
-                    <SelectValue />
+
                   </SelectTrigger>
-                  <SelectContent>
+
                     <SelectItem value="toggle">
                       <div className="flex items-center gap-2">
                         <Lightning size={16} />
@@ -464,9 +458,9 @@ export default function CustomPageBuilder({
                         Tlačítkový panel
                       </div>
                     </SelectItem>
-                  </SelectContent>
+
                 </Select>
-              </div>
+
 
               <div>
                 <Label>Varianta zobrazení</Label>
@@ -488,17 +482,17 @@ export default function CustomPageBuilder({
                   <Select value={newBlock.effectId} onValueChange={(value) => setNewBlock({ ...newBlock, effectId: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Vyberte efekt" />
-                    </SelectTrigger>
+
                     <SelectContent>
-                      {effects.map((effect) => (
+
                         <SelectItem key={effect.id} value={effect.id}>
-                          {effect.name}
+
                         </SelectItem>
-                      ))}
+
                     </SelectContent>
-                  </Select>
+
                 </div>
-              )}
+
 
               {(newBlock.type === 'channel' || newBlock.type === 'color' || newBlock.type === 'intensity' || newBlock.type === 'position') && (
                 <div>
@@ -512,11 +506,11 @@ export default function CustomPageBuilder({
                         <SelectItem key={fixture.id} value={fixture.id}>
                           {fixture.name}
                         </SelectItem>
-                      ))}
+
                     </SelectContent>
                   </Select>
                 </div>
-              )}
+
 
               {newBlock.type === 'channel' && newBlock.fixtureId && (
                 <div>
@@ -526,61 +520,61 @@ export default function CustomPageBuilder({
                       <SelectValue placeholder="Vyberte kanál" />
                     </SelectTrigger>
                     <SelectContent>
-                      {fixtures
+
                         .find((f) => f.id === newBlock.fixtureId)
                         ?.channels.map((ch) => (
                           <SelectItem key={ch.id} value={ch.name}>
                             {ch.name}
                           </SelectItem>
-                        ))}
+
                     </SelectContent>
-                  </Select>
+
                 </div>
-              )}
+
             </div>
           </ScrollArea>
 
           <DialogFooter>
             {selectedBlock ? (
-              <>
+
                 <Button variant="outline" onClick={() => {
                   setIsDialogOpen(false)
                   setSelectedBlock(null)
                   setNewBlock({ type: 'toggle', title: '', variant: 'default' })
                 }}>
-                  Zrušit
+
                 </Button>
                 <Button onClick={updateBlock}>Uložit změny</Button>
               </>
-            ) : (
+
               <>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Zrušit
-                </Button>
-                <Button onClick={addBlock}>Přidat blok</Button>
-              </>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {(controlBlocks || []).length === 0 ? (
+                <Button onClick={addBlock}>Přidat blok</Button>
+
+            )}
+
+        </DialogContent>
+
+
+
         <Card className="p-12 text-center">
-          <div className="flex flex-col items-center gap-4">
+
             <Plus className="w-12 h-12 text-muted-foreground" />
-            <div>
+
               <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
               <p className="text-muted-foreground mb-6">
                 Začněte přidáním ovládacích bloků pro vytvoření vlastního panelu
-              </p>
+
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="mr-2" size={16} />
                 Přidat první blok
               </Button>
             </div>
-          </div>
+
         </Card>
-      ) : (
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {(controlBlocks || []).map((block, index) => (
             <Card key={block.id} className="p-4 relative">
@@ -594,27 +588,27 @@ export default function CustomPageBuilder({
                     size="sm"
                     disabled={index === 0}
                     onClick={() => moveBlock(index, 'up')}
-                  >
+
                     <ArrowUp />
-                  </Button>
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    disabled={index === (controlBlocks || []).length - 1}
+
                     onClick={() => moveBlock(index, 'down')}
-                  >
+
                     <ArrowDown />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => deleteBlock(block.id)}>
                     <Trash />
                   </Button>
-                </div>
+
               )}
               {renderBlock(block)}
             </Card>
-          ))}
+
         </div>
-      )}
+
     </div>
-  )
+
 }
