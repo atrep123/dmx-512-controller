@@ -29,20 +29,20 @@ import { toast } from 'sonner'
 
 import {
   ToggleButtonBlock,
-  IntensityFaderBlock,
-  ButtonPadBlock,
+  PositionControlBlock
+  ColorPickerBloc
   PositionControlBlock,
   ChannelSliderBlock,
   ColorPickerBlock,
-} from '@/components/controls'
+  type BlockVariant,
+  title: string
 
-import type { Fixture, StepperMotor, Servo, Effect } from '@/lib/types'
+  servoId?: string
 
-type ControlBlockType = 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
-type BlockVariant = 'default' | 'large' | 'minimal' | 'compact' | 'card' | 'vertical'
+  config?: Record<string, unknown>
 
-interface ControlBlock {
-  id: string
+  stepperMotors: Stepper
+  effects: E
   title: string
   type: ControlBlockType
   fixtureId?: string
@@ -52,33 +52,8 @@ interface ControlBlock {
   channelName?: string
   variant?: BlockVariant
   config?: Record<string, unknown>
-}
+} stepperMotors,
 
-interface CustomPageBuilderProps {
-  stepperMotors: StepperMotor[]
-  servos: Servo[]
-  effects: Effect[]
-  fixtures: Fixture[]
-  setStepperMotors: React.Dispatch<React.SetStateAction<StepperMotor[]>>
-  setServos: React.Dispatch<React.SetStateAction<Servo[]>>
-  setEffects: React.Dispatch<React.SetStateAction<Effect[]>>
-  setFixtures: React.Dispatch<React.SetStateAction<Fixture[]>>
-}
-
-// ---------- Komponenta ----------
-export default function CustomPageBuilder({
-  stepperMotors,
-  servos,
-  effects,
-  fixtures,
-  setStepperMotors, // připraveno do budoucna
-  setServos,        // připraveno do budoucna
-  setEffects,
-  setFixtures,
-}: CustomPageBuilderProps) {
-  const [controlBlocks, setControlBlocks] = useKV<ControlBlock[]>('custom-control-blocks', [])
-  const [editMode, setEditMode] = useState(false)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedBlock, setSelectedBlock] = useState<ControlBlock | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [newBlock, setNewBlock] = useState<Partial<ControlBlock>>({
@@ -542,6 +517,31 @@ export default function CustomPageBuilder({
                   {newBlock.type === 'toggle' && (
                     <div>
                       <Label>Efekt</Label>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                        <SelectTrigger>
+                          <SelectValue placeholder="Vyberte efekt" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {effects.map(effect => (
+                            <SelectItem key={effect.id} value={effect.id}>
+                              {effect.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {(newBlock.type === 'channel' ||
+                    newBlock.type === 'color' ||
+                    newBlock.type === 'intensity' ||
+                    newBlock.type === 'position') && (
+                  {newBlock.type === 'toggle' && (
+                    <div>
+                      <Label>Efekt</Label>
                       <Select
                         value={newBlock.effectId ?? ''}
                         onValueChange={value => setNewBlock({ ...newBlock, effectId: value })}
@@ -564,6 +564,74 @@ export default function CustomPageBuilder({
                     newBlock.type === 'color' ||
                     newBlock.type === 'intensity' ||
                     newBlock.type === 'position') && (
+                    <div>
+                      <Label>Světlo</Label>
+                      <Select
+                        value={newBlock.fixtureId ?? ''}
+                        onValueChange={value => setNewBlock({ ...newBlock, fixtureId: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Vyberte světlo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fixtures.map(fixture => (
+                            <SelectItem key={fixture.id} value={fixture.id}>
+                              {fixture.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {newBlock.type === 'channel' && (
+                    <div>
+                      <Label>Název kanálu</Label>
+                      <Input
+                        value={newBlock.channelName ?? ''}
+                        onChange={e => setNewBlock({ ...newBlock, channelName: e.target.value })}
+                        placeholder="Např. dimmer, red, pan"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={selectedBlock ? updateBlock : addBlock} className="flex-1">
+                      {selectedBlock ? 'Uložit změny' : 'Přidat'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsDialogOpen(false)
+                        setSelectedBlock(null)
+                        setNewBlock({ type: 'toggle', title: '', variant: 'default' })
+                      }}
+                    >
+                      Zrušit
+                    </Button>
+                  </div>
+                </div>
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {!controlBlocks || controlBlocks.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Lightbulb size={48} className="mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
+          <p className="text-sm text-muted-foreground mb-4">Začněte přidáním prvního ovládacího bloku</p>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {(controlBlocks || []).map((block, index) => renderBlock(block, index))}
+        </div>
+      )}
+    </div>
+  )
+}
+
                     <div>
                       <Label>Světlo</Label>
                       <Select
