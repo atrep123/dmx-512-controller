@@ -1,23 +1,23 @@
 import { Slider } from '@/components/ui/slider'
-import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/inpu
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 
-interface ChannelSliderBlockProps {
-    label: string
-    value: number
-    onChange: (value: number) => void
-    min?: number
     max?: number
-    step?: number
-    disabled?: boolean
-    showInput?: boolean
-    icon?: React.ReactNode
-    variant?: 'default' | 'compact' | 'large'
-    color?: 'primary' | 'accent' | 'secondary'
-}
+    disabled?: bo
+    icon?: React.
+    color?: 'primary' | 'accent' | 's
 
-export function ChannelSliderBlock({
+    label,
+    onChange,
+    max = 255,
+    disabled = false,
+    icon,
+    color = 'primary',
+    const [inputValue, setInputValue] = useSta
+ 
+
+            onChange(numValue)
     label,
     value,
     onChange,
@@ -38,46 +38,46 @@ export function ChannelSliderBlock({
         if (!isNaN(numValue) && numValue >= min && numValue <= max) {
             onChange(numValue)
         }
-    }
+     
 
-    const handleInputBlur = () => {
-        setInputValue(value.toString())
-    }
+                            {label}
+                        {showInput && (
+     
 
-    const colorClasses = {
-        primary: 'text-primary',
-        accent: 'text-accent',
-        secondary: 'text-secondary',
-    }
+                          
+                                
+                            />
+                    </div>
+     
 
-    if (variant === 'compact') {
-        return (
-            <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                    <label className="text-muted-foreground flex items-center gap-1.5">
-                        {icon && <span className="opacity-70">{icon}</span>}
-                        {label}
-                    </label>
-                    <span className={`font-mono font-semibold ${colorClasses[color]}`}>
-                        {value}
-                    </span>
+                        step={st
+                
+                    <div className="flex 
+                        <span>{max}</span>
                 </div>
-                <Slider
-                    value={[value]}
-                    onValueChange={(values) => onChange(values[0])}
-                    min={min}
-                    max={max}
-                    step={step}
-                    disabled={disabled}
-                    className="cursor-pointer"
-                />
-            </div>
         )
-    }
 
-    if (variant === 'large') {
-        return (
-            <Card className="p-6">
+        <div className="spac
+                <label className="text-muted-foreground flex items-center gap-2">
+                    {label}
+                {showInput 
+                      
+                       
+                        min={min}
+                        disabled={disabled}
+                    />
+                    <span cla
+                    </span>
+            </div>
+                value={[value]}
+                mi
+                st
+         
+     
+
+
+
+
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <label className="text-base font-medium flex items-center gap-2">
