@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { Button } from '@/components/ui/but
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,22 +14,22 @@ import {
     ArrowDown,
     DotsSixVertical,
     Lightning,
-    Fire,
-    Palette,
-    Lightbulb,
-    Faders,
+    Light
     Target,
-} from '@phosphor-icons/react'
 import {
-    ChannelSliderBlock,
-    ColorPickerBlock,
-    ToggleButtonBlock,
-    ButtonPadBlock,
-    PositionControlBlock,
+    ColorPi
+    ButtonP
     IntensityFaderBlock,
-} from '@/components/controls'
-import { toast } from 'sonner'
-import { Fixture, StepperMotor, Servo, Effect } from '@/lib/types'
+import {
+
+    id: string
+    title: string
+    motorId?: strin
+    effectId?: string
+    variant?: 'default' 
+}
+interface CustomPageBuilderPro
+    stepperMotors: StepperMotor[]
 
 interface ControlBlock {
     id: string
@@ -139,10 +139,9 @@ export default function CustomPageBuilder({
 
     const moveBlock = (index: number, direction: 'up' | 'down') => {
         setControlBlocks((prev) => {
-            const current = prev || []
-            const newBlocks = [...current]
+            const newBlocks = [...(prev || [])]
             const targetIndex = direction === 'up' ? index - 1 : index + 1
-            if (targetIndex < 0 || targetIndex >= newBlocks.length) return current
+            if (targetIndex < 0 || targetIndex >= newBlocks.length) return prev
 
             ;[newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]]
             return newBlocks
@@ -338,12 +337,12 @@ export default function CustomPageBuilder({
                 return (
                     <div key={block.id}>
                         <ColorPickerBlock
+                            label={block.title}
                             red={rCh?.value || 0}
                             green={gCh?.value || 0}
                             blue={bCh?.value || 0}
                             white={wCh?.value}
-                            onColorChange={(color) => updateFixtureColor(color.red, color.green, color.blue, color.white)}
-                            hasWhite={!!wCh}
+                            onChange={(r, g, b, w) => updateFixtureColor(r, g, b, w)}
                             variant={block.variant as any}
                         />
                     </div>
@@ -372,9 +371,9 @@ export default function CustomPageBuilder({
                 return (
                     <div key={block.id}>
                         <PositionControlBlock
-                            title={block.title}
-                            panValue={panCh?.value || 127}
-                            tiltValue={tiltCh?.value || 127}
+                            label={block.title}
+                            pan={panCh?.value || 127}
+                            tilt={tiltCh?.value || 127}
                             onPanChange={(value) => updateFixtureChannel('pan', value)}
                             onTiltChange={(value) => updateFixtureChannel('tilt', value)}
                             variant={block.variant as any}
@@ -383,15 +382,12 @@ export default function CustomPageBuilder({
                 )
 
             case 'button-pad':
-                const effectButtons = effects.slice(0, 6).map((e, i) => {
-                    const color: 'default' | 'accent' | 'secondary' | 'destructive' = i % 2 === 0 ? 'accent' : 'default'
-                    return {
-                        id: e.id,
-                        label: e.name,
-                        icon: <Lightning weight="fill" />,
-                        color: color,
-                    }
-                })
+                const effectButtons = effects.slice(0, 6).map((e, i) => ({
+                    id: e.id,
+                    label: e.name,
+                    icon: <Lightning weight="fill" />,
+                    color: (i % 2 === 0 ? 'accent' : 'default') as const,
+                }))
 
                 return (
                     <div key={block.id}>
@@ -541,7 +537,7 @@ export default function CustomPageBuilder({
                                                 onValueChange={(value) =>
                                                     setNewBlock({ ...newBlock, effectId: value })
                                                 }
-                                            >
+                                             
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Vyberte efekt" />
                                                 </SelectTrigger>
@@ -552,7 +548,7 @@ export default function CustomPageBuilder({
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
-                                            </Select>
+                                            <Label>Ná
                                         </div>
                                     )}
 
@@ -612,27 +608,27 @@ export default function CustomPageBuilder({
                                         >
                                             Zrušit
                                         </Button>
-                                    </div>
+
                                 </div>
                             </ScrollArea>
                         </DialogContent>
                     </Dialog>
                 </div>
-            </div>
 
-            {(controlBlocks || []).length === 0 ? (
+
+
                 <Card className="p-12 text-center">
                     <Lightbulb size={48} className="mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                         Začněte přidáním prvního ovládacího bloku
-                    </p>
-                </Card>
+
+
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {(controlBlocks || []).map((block, index) => renderBlock(block, index))}
-                </div>
+
             )}
-        </div>
+
     )
-}
+
