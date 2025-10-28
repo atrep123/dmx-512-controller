@@ -29,20 +29,13 @@ import { toast } from 'sonner'
 
 import {
   ToggleButtonBlock,
-  ChannelSliderBlock,
-  ColorPickerBlock,
+  IntensityFaderBlock
+  ButtonPadBlock,
   IntensityFaderBlock,
   PositionControlBlock,
   ButtonPadBlock,
 } from '@/components/controls'
-
-import { Effect, Fixture, StepperMotor, Servo } from '@/lib/types'
-
 type ControlBlockType = 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
-type BlockVariant = string
-
-interface ControlBlock {
-  id: string
   title: string
   type: ControlBlockType
   fixtureId?: string
