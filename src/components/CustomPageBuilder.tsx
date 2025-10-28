@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 
-// shadcn/ui
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-// ikony (Phosphor)
 import {
   Trash,
   ArrowDown,
@@ -29,20 +27,20 @@ import { toast } from 'sonner'
 
 import {
   ToggleButtonBlock,
-  PositionControlBlock
-  ColorPickerBloc
   PositionControlBlock,
   ChannelSliderBlock,
   ColorPickerBlock,
-  type BlockVariant,
-  title: string
+  IntensityFaderBlock,
+  ButtonPadBlock,
+} from '@/components/controls'
 
-  servoId?: string
+import { Fixture, Effect, StepperMotor, Servo } from '@/lib/types'
 
-  config?: Record<string, unknown>
+type ControlBlockType = 'toggle' | 'channel' | 'color' | 'intensity' | 'position' | 'button-pad'
+type BlockVariant = 'default' | 'large' | 'minimal' | 'compact' | 'card' | 'vertical'
 
-  stepperMotors: Stepper
-  effects: E
+interface ControlBlock {
+  id: string
   title: string
   type: ControlBlockType
   fixtureId?: string
@@ -52,8 +50,32 @@ import {
   channelName?: string
   variant?: BlockVariant
   config?: Record<string, unknown>
-} stepperMotors,
+}
 
+interface CustomPageBuilderProps {
+  fixtures: Fixture[]
+  setFixtures: (value: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
+  stepperMotors: StepperMotor[]
+  setStepperMotors: (value: StepperMotor[] | ((prev: StepperMotor[]) => StepperMotor[])) => void
+  servos: Servo[]
+  setServos: (value: Servo[] | ((prev: Servo[]) => Servo[])) => void
+  effects: Effect[]
+  setEffects: (value: Effect[] | ((prev: Effect[]) => Effect[])) => void
+}
+
+export default function CustomPageBuilder({
+  fixtures,
+  setFixtures,
+  stepperMotors,
+  setStepperMotors,
+  servos,
+  setServos,
+  effects,
+  setEffects,
+}: CustomPageBuilderProps) {
+  const [controlBlocks, setControlBlocks] = useKV<ControlBlock[]>('custom-page-blocks', [])
+  const [editMode, setEditMode] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedBlock, setSelectedBlock] = useState<ControlBlock | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [newBlock, setNewBlock] = useState<Partial<ControlBlock>>({
@@ -70,7 +92,6 @@ import {
     return allowed.includes(variant as T) ? (variant as T) : undefined
   }
 
-  // ---------- Akce nad bloky ----------
   const addBlock = () => {
     if (!newBlock.title) {
       toast.error('Zadejte název bloku')
@@ -141,7 +162,6 @@ import {
     })
   }
 
-  // ---------- Drag & drop ----------
   const handleDragStart = (index: number) => setDraggedIndex(index)
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -176,7 +196,6 @@ import {
     setIsDialogOpen(true)
   }
 
-  // ---------- Render jednoho bloku ----------
   const renderBlock = (block: ControlBlock, index: number) => {
     const fixture = fixtures.find(f => f.id === block.fixtureId)
     const effect = effects.find(e => e.id === block.effectId)
@@ -403,7 +422,6 @@ import {
     }
   }
 
-  // ---------- Render celé stránky ----------
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -517,31 +535,6 @@ import {
                   {newBlock.type === 'toggle' && (
                     <div>
                       <Label>Efekt</Label>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                        <SelectTrigger>
-                          <SelectValue placeholder="Vyberte efekt" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {effects.map(effect => (
-                            <SelectItem key={effect.id} value={effect.id}>
-                              {effect.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {(newBlock.type === 'channel' ||
-                    newBlock.type === 'color' ||
-                    newBlock.type === 'intensity' ||
-                    newBlock.type === 'position') && (
-                  {newBlock.type === 'toggle' && (
-                    <div>
-                      <Label>Efekt</Label>
                       <Select
                         value={newBlock.effectId ?? ''}
                         onValueChange={value => setNewBlock({ ...newBlock, effectId: value })}
@@ -631,72 +624,3 @@ import {
     </div>
   )
 }
-
-                    <div>
-                      <Label>Světlo</Label>
-                      <Select
-                        value={newBlock.fixtureId ?? ''}
-                        onValueChange={value => setNewBlock({ ...newBlock, fixtureId: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Vyberte světlo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fixtures.map(fixture => (
-                            <SelectItem key={fixture.id} value={fixture.id}>
-                              {fixture.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {newBlock.type === 'channel' && (
-                    <div>
-                      <Label>Název kanálu</Label>
-                      <Input
-                        value={newBlock.channelName ?? ''}
-                        onChange={e => setNewBlock({ ...newBlock, channelName: e.target.value })}
-                        placeholder="Např. dimmer, red, pan"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 pt-4">
-                    <Button onClick={selectedBlock ? updateBlock : addBlock} className="flex-1">
-                      {selectedBlock ? 'Uložit změny' : 'Přidat'}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setIsDialogOpen(false)
-                        setSelectedBlock(null)
-                        setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-                      }}
-                    >
-                      Zrušit
-                    </Button>
-                  </div>
-                </div>
-              </ScrollArea>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {!controlBlocks || controlBlocks.length === 0 ? (
-        <Card className="p-12 text-center">
-          <Lightbulb size={48} className="mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
-          <p className="text-sm text-muted-foreground mb-4">Začněte přidáním prvního ovládacího bloku</p>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {(controlBlocks || []).map((block, index) => renderBlock(block, index))}
-        </div>
-      )}
-    </div>
-  )
-}
-
