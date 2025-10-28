@@ -1,24 +1,73 @@
 {
-  "name": "DMX 512 Controller",
+  "name": "DMX 512 Kontrolér",
   "short_name": "DMX 512",
-  "description": "Professional DMX 512 Lighting Controller",
+  "description": "Profesionální DMX 512 světelný kontrolér",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#262626",
   "theme_color": "#262626",
-  "orientation": "portrait",
+  "orientation": "any",
+  "categories": ["entertainment", "utilities"],
+  "lang": "cs",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Živá Kontrola",
+      "short_name": "Kontrola",
+      "description": "Otevřít živou kontrolu světel",
+      "url": "/?tab=live",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Scény",
+      "short_name": "Scény",
+      "description": "Spravovat scény osvětlení",
+      "url": "/?tab=scenes",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

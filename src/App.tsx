@@ -10,6 +10,7 @@ import MotorsView from '@/components/MotorsView'
 import EffectsView from '@/components/EffectsView'
 import ConnectionView from '@/components/ConnectionView'
 import LiveControlView from '@/components/LiveControlView'
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { Toaster } from '@/components/ui/sonner'
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Toaster />
+            <PWAInstallPrompt />
             
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <header className="mb-6">
