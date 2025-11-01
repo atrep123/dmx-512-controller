@@ -6,6 +6,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.0-blue)](https://reactjs.org/)
 [![PWA](https://img.shields.io/badge/PWA-Enabled-green)](https://web.dev/progressive-web-apps/)
+[![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
 ## 🎭 O projektu
 
@@ -34,9 +36,7 @@ DMX 512 Kontrolér je mobilní Progressive Web App (PWA) pro profesionální ř�
 
 ## 📸 Screenshoty
 
-```
-TODO: Přidat screenshoty aplikace
-```
+_Screenshoty aplikace budou přidány brzy. Prozatím si můžete aplikaci vyzkoušet přímo!_
 
 ## 🚀 Rychlý start
 
@@ -88,6 +88,9 @@ Podrobný návod: [Android Setup Guide](docs/ANDROID_SETUP.md)
 - [Uživatelská příručka](docs/USER_GUIDE.md) - Kompletní návod k použití
 - [Android Setup](docs/ANDROID_SETUP.md) - Instalace na Android zařízení
 - [Quick Start Android](docs/QUICKSTART_ANDROID.md) - Rychlý start pro Android
+- [FAQ](docs/FAQ.md) - Často kladené otázky
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Řešení problémů
+- [Glosář](docs/GLOSSARY.md) - Vysvětlení pojmů
 
 ### Pro vývojáře
 
@@ -101,6 +104,10 @@ Podrobný návod: [Android Setup Guide](docs/ANDROID_SETUP.md)
 - [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - Nasazení do produkce
 - [Security Guide](docs/SECURITY.md) - Bezpečnostní best practices
 - [Icons Guide](docs/ICONS_README.md) - Vytvoření PWA ikon
+
+### Plánování
+
+- [Roadmap](docs/ROADMAP.md) - Plánované funkce a vize projektu
 
 ## 🏗️ Technologie
 

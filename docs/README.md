@@ -11,6 +11,9 @@ Vítejte v dokumentaci DMX 512 Kontrolér projektu! Zde najdete veškeré inform
 | [**User Guide**](USER_GUIDE.md) | Kompletní návod k použití aplikace | Začátečník |
 | [**Quick Start Android**](QUICKSTART_ANDROID.md) | Rychlý start pro Android zařízení | Začátečník |
 | [**Android Setup**](ANDROID_SETUP.md) | Detailní instalace na Android | Pokročilý |
+| [**FAQ**](FAQ.md) | Často kladené otázky | Všichni |
+| [**Troubleshooting**](TROUBLESHOOTING.md) | Řešení problémů | Všichni |
+| [**Glossary**](GLOSSARY.md) | Vysvětlení pojmů a terminologie | Začátečník |
 
 ### Pro vývojáře
 
@@ -28,6 +31,12 @@ Vítejte v dokumentaci DMX 512 Kontrolér projektu! Zde najdete veškeré inform
 | [**Deployment Guide**](DEPLOYMENT_GUIDE.md) | Nasazení do produkce | Středně pokročilý |
 | [**Icons Guide**](ICONS_README.md) | Vytvoření PWA ikon | Začátečník |
 | [**Security Guide**](SECURITY.md) | Bezpečnostní best practices | Pokročilý |
+
+### Plánování a vize
+
+| Dokument | Popis | Úroveň |
+|----------|-------|--------|
+| [**Roadmap**](ROADMAP.md) | Plánované funkce a timeline | Všichni |
 
 ## 🚀 Rychlé odkazy
 
