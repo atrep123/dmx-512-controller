@@ -1,35 +1,35 @@
 import { useState } from 'react'
-import { Label } from '@/components/ui/labe
+import { useKV } from '@github/spark/hooks'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { toast } from 'sonner'
 import {
   Trash,
   ArrowUp,
-} from '
-import 
+  ArrowDown,
+  PencilSimple,
+  Plus,
+} from '@phosphor-icons/react'
 import {
-  ColorPickerBl
-  ButtonPa
-  IntensityF
+  ChannelSliderBlock,
+  ColorPickerBlock,
+  ToggleButtonBlock,
+  ButtonPadBlock,
+  PositionControlBlock,
+  IntensityFaderBlock,
+} from '@/components/controls'
+import { Fixture, StepperMotor, Servo, Effect } from '@/lib/types'
 
+type BlockType = 'toggle' | 'intensity' | 'channel' | 'color' | 'position' | 'buttonpad'
 type BlockVariant = 'default' | 'compact' | 'minimal'
+
 interface ControlBlock {
-  type: BlockType
-  fixtur
-  servoId?: string
-  channelName?: str
-}
-interface CustomP
-  stepperMotors: Steppe
-  effects: Effect[]
-  setStepperMotors: (value: St
-
-
-  fixtures,
-
-  setFixtures,
-  setServos,
+  id: string
   type: BlockType
   title: string
   fixtureId?: string
@@ -175,7 +175,7 @@ export default function CustomPageBuilder({
                 setEffects((prev) =>
                   prev.map((e) => (e.id === effect.id ? { ...e, isActive: !e.isActive } : e))
                 )
-
+              }}
               variant={toggleVariant}
             />
           </div>
@@ -188,7 +188,7 @@ export default function CustomPageBuilder({
 
         const intensityVariant = block.variant === 'minimal' ? 'vertical' : block.variant === 'compact' ? 'compact' : 'default'
 
-                
+        return (
           <div key={block.id}>
             <IntensityFaderBlock
               label={block.title}
@@ -229,45 +229,47 @@ export default function CustomPageBuilder({
                           ),
                         }
                       : f
-                   
+                  )
                 )
-                
+              }}
               variant={channelVariant}
-              
-                
-         
+            />
+          </div>
+        )
       }
 
-      }
-      case 'position': {
+      case 'color': {
+        const fixture = fixtures.find((f) => f.id === block.fixtureId)
         if (!fixture) return null
 
-
-
-
-          <div key={block.id}>
+        const rCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('red'))
+        const gCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('green'))
+        const bCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('blue'))
+        const wCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('white'))
 
         if (!rCh || !gCh || !bCh) return null
 
+        const colorVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
+
         return (
-                    f.id === f
+          <div key={block.id}>
             <ColorPickerBlock
-              label={block.title}
               red={rCh.value}
               green={gCh.value}
               blue={bCh.value}
               white={wCh?.value ?? 0}
-              onChange={(r, g, b, w) => {
+              hasWhite={!!wCh}
+              onColorChange={(color) => {
                 setFixtures((prev) =>
                   prev.map((f) =>
                     f.id === fixture.id
                       ? {
                           ...f,
                           channels: f.channels.map((ch) => {
-                            if (ch.id === rCh.id) return { ...ch, value: r }
-                            if (ch.id === gCh.id) return { ...ch, value: g }
-                            if (ch.id === bCh.id) return { ...ch, value: b }
-                            if (wCh && ch.id === wCh.id) return { ...ch, value: w ?? 0 }
+                            if (ch.id === rCh.id) return { ...ch, value: color.red }
+                            if (ch.id === gCh.id) return { ...ch, value: color.green }
+                            if (ch.id === bCh.id) return { ...ch, value: color.blue }
+                            if (wCh && ch.id === wCh.id) return { ...ch, value: color.white ?? 0 }
                             return ch
                           }),
                         }
@@ -275,7 +277,7 @@ export default function CustomPageBuilder({
                   )
                 )
               }}
-              variant={variant}
+              variant={colorVariant}
             />
           </div>
         )
@@ -290,12 +292,14 @@ export default function CustomPageBuilder({
 
         if (!panCh || !tiltCh) return null
 
+        const positionVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
+
         return (
           <div key={block.id}>
             <PositionControlBlock
-              label={block.title}
-              pan={panCh.value}
-              tilt={tiltCh.value}
+              title={block.title}
+              panValue={panCh.value}
+              tiltValue={tiltCh.value}
               onPanChange={(value) => {
                 setFixtures((prev) =>
                   prev.map((f) =>
@@ -324,7 +328,7 @@ export default function CustomPageBuilder({
                   )
                 )
               }}
-              variant={variant}
+              variant={positionVariant}
             />
           </div>
         )
@@ -334,21 +338,23 @@ export default function CustomPageBuilder({
         const padEffects = effects.filter((e) => block.effectId?.split(',').includes(e.id))
         if (!padEffects.length) return null
 
+        const buttonPadVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
+
         return (
           <div key={block.id}>
             <ButtonPadBlock
-              label={block.title}
-              buttons={padEffects.map((e) => ({
+              title={block.title}
+              items={padEffects.map((e) => ({
                 id: e.id,
                 label: e.name,
                 isActive: e.isActive,
               }))}
-              onButtonClick={(id) => {
+              onItemClick={(id) => {
                 setEffects((prev) =>
                   prev.map((e) => (e.id === id ? { ...e, isActive: !e.isActive } : e))
                 )
               }}
-              variant={variant}
+              variant={buttonPadVariant}
             />
           </div>
         )
@@ -403,9 +409,9 @@ export default function CustomPageBuilder({
                   value={newBlock.type || 'toggle'}
                   onValueChange={(value) => setNewBlock({ ...newBlock, type: value as BlockType })}
                 >
-                    <SelectConten
+                  <SelectTrigger>
                     <SelectValue />
-                          {fixture
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="toggle">Přepínač efektu</SelectItem>
                     <SelectItem value="intensity">Intenzita efektu</SelectItem>
@@ -414,25 +420,25 @@ export default function CustomPageBuilder({
                     <SelectItem value="position">Pozice Pan/Tilt</SelectItem>
                     <SelectItem value="buttonpad">Tlačítkový panel</SelectItem>
                   </SelectContent>
-                    value
+                </Select>
+              </div>
 
-
-
+              <div>
                 <Label>Varianta zobrazení</Label>
                 <Select
                   value={newBlock.variant || 'default'}
                   onValueChange={(value) => setNewBlock({ ...newBlock, variant: value as BlockVariant })}
                 >
                   <SelectTrigger>
-
+                    <SelectValue />
                   </SelectTrigger>
-
+                  <SelectContent>
                     <SelectItem value="default">Výchozí</SelectItem>
                     <SelectItem value="compact">Kompaktní</SelectItem>
                     <SelectItem value="minimal">Minimální</SelectItem>
-
+                  </SelectContent>
                 </Select>
-
+              </div>
 
               {(newBlock.type === 'toggle' || newBlock.type === 'intensity') && (
                 <div>
@@ -443,17 +449,17 @@ export default function CustomPageBuilder({
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Vyberte efekt" />
-
+                    </SelectTrigger>
                     <SelectContent>
-
+                      {effects.map((effect) => (
                         <SelectItem key={effect.id} value={effect.id}>
-
+                          {effect.name}
                         </SelectItem>
-
+                      ))}
                     </SelectContent>
-
+                  </Select>
                 </div>
-
+              )}
 
               {(newBlock.type === 'channel' || newBlock.type === 'color' || newBlock.type === 'position') && (
                 <div>
@@ -470,11 +476,11 @@ export default function CustomPageBuilder({
                         <SelectItem key={fixture.id} value={fixture.id}>
                           {fixture.name}
                         </SelectItem>
-
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-
+              )}
 
               {newBlock.type === 'channel' && newBlock.fixtureId && (
                 <div>
@@ -487,55 +493,54 @@ export default function CustomPageBuilder({
                       <SelectValue placeholder="Vyberte kanál" />
                     </SelectTrigger>
                     <SelectContent>
-
+                      {fixtures
                         .find((f) => f.id === newBlock.fixtureId)
                         ?.channels.map((ch) => (
                           <SelectItem key={ch.id} value={ch.name}>
                             {ch.name}
                           </SelectItem>
-
+                        ))}
                     </SelectContent>
-
+                  </Select>
                 </div>
-
+              )}
             </div>
           </ScrollArea>
 
           <DialogFooter>
             {selectedBlock ? (
-
+              <>
                 <Button variant="outline" onClick={() => {
                   setIsDialogOpen(false)
                   setSelectedBlock(null)
                   setNewBlock({ type: 'toggle', title: '', variant: 'default' })
                 }}>
-
+                  Zrušit
                 </Button>
                 <Button onClick={updateBlock}>
                   Uložit změny
                 </Button>
               </>
-
+            ) : (
               <>
                 <Button variant="outline" onClick={() => {
                   setIsDialogOpen(false)
                   setNewBlock({ type: 'toggle', title: '', variant: 'default' })
                 }}>
                   Zrušit
-
+                </Button>
                 <Button onClick={addBlock}>
                   Přidat blok
                 </Button>
-
+              </>
             )}
-
+          </DialogFooter>
         </DialogContent>
+      </Dialog>
 
-
-
+      {!controlBlocks || controlBlocks.length === 0 ? (
         <Card className="p-12">
           <div className="flex flex-col items-center text-center">
-
             <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Začněte přidáním prvního ovládacího bloku
@@ -543,9 +548,9 @@ export default function CustomPageBuilder({
             <Button onClick={() => setIsDialogOpen(true)}>
               Přidat první blok
             </Button>
-
+          </div>
         </Card>
-
+      ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {controlBlocks.map((block, index) => (
             <Card key={block.id} className="p-4">
@@ -556,9 +561,9 @@ export default function CustomPageBuilder({
                     variant="ghost"
                     size="sm"
                     onClick={() => openEditDialog(block)}
-
+                  >
                     <PencilSimple />
-
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -571,8 +576,8 @@ export default function CustomPageBuilder({
                     variant="ghost"
                     size="sm"
                     onClick={() => moveBlock(index, 'down')}
-
-
+                    disabled={index === controlBlocks.length - 1}
+                  >
                     <ArrowDown />
                   </Button>
                   <Button
@@ -582,13 +587,13 @@ export default function CustomPageBuilder({
                   >
                     <Trash />
                   </Button>
-
+                </div>
               </div>
               {renderBlock(block)}
             </Card>
-
+          ))}
         </div>
-
+      )}
     </div>
-
+  )
 }
