@@ -2,591 +2,591 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Select, SelectContent, SelectItem,
 import { toast } from 'sonner'
-import { Trash, ArrowUp, ArrowDown, PencilSimple, Plus } from '@phosphor-icons/react'
 import {
-  ColorPickerBlock,
   ButtonPadBlock,
-  IntensityFaderBlock,
   ChannelSliderBlock,
-  PositionControlBlock,
   ToggleButtonBlock,
-} from '@/components/controls'
-import { Fixture, StepperMotor, Servo, Effect } from '@/lib/types'
+import {
+type BlockType = 't
 
-type BlockType = 'toggle' | 'intensity' | 'channel' | 'color' | 'position' | 'buttonpad'
-type BlockVariant = 'default' | 'compact' | 'minimal'
-
-interface ControlBlock {
   id: string
-  type: BlockType
   title: string
-  fixtureId?: string
   motorId?: string
-  servoId?: string
   effectId?: string
-  channelName?: string
   variant?: BlockVariant
-}
 
-interface CustomPageBuilderProps {
-  fixtures: Fixture[]
-  stepperMotors: StepperMotor[]
+
   servos: Servo[]
-  effects: Effect[]
-  setFixtures: (value: Fixture[] | ((prev: Fixture[]) => Fixture[])) => void
-  setStepperMotors: (value: StepperMotor[] | ((prev: StepperMotor[]) => StepperMotor[])) => void
-  setServos: (value: Servo[] | ((prev: Servo[]) => Servo[])) => void
-  setEffects: (value: Effect[] | ((prev: Effect[]) => Effect[])) => void
+  setFixtures: (value: Fixture[] | ((prev: Fixture[])
+
 }
-
-export default function CustomPageBuilder({
-  fixtures,
+export defau
   stepperMotors,
-  servos,
   effects,
-  setFixtures,
   setStepperMotors,
-  setServos,
   setEffects,
-}: CustomPageBuilderProps) {
-  const [controlBlocks, setControlBlocks] = useKV<ControlBlock[]>('custom-control-blocks', [])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedBlock, setSelectedBlock] = useState<ControlBlock | null>(null)
-  const [newBlock, setNewBlock] = useState<Partial<ControlBlock>>({
+  const [controlBl
+  const [selectedBl
     type: 'toggle',
-    title: '',
     variant: 'default',
-  })
 
-  const addBlock = () => {
-    if (!newBlock.title || !newBlock.type) {
-      toast.error('Vyplňte všechny povinné údaje')
+
       return
-    }
 
-    const block: ControlBlock = {
-      id: Date.now().toString(),
-      type: newBlock.type as BlockType,
-      title: newBlock.title,
-      fixtureId: newBlock.fixtureId,
-      motorId: newBlock.motorId,
-      servoId: newBlock.servoId,
+      id: Date.now().toString()
+      title: newB
+      motorId: newB
       effectId: newBlock.effectId,
-      channelName: newBlock.channelName,
       variant: (newBlock.variant as BlockVariant) ?? 'default',
-    }
 
-    setControlBlocks((prev) => [...(prev ?? []), block])
     setIsDialogOpen(false)
-    setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-    toast.success('Blok přidán')
-  }
+ 
 
-  const updateBlock = () => {
-    if (!selectedBlock || !newBlock.title || !newBlock.type) {
-      toast.error('Vyplňte všechny povinné údaje')
-      return
-    }
+    if (!selectedBlock || !newBlock.title |
+      retur
 
-    setControlBlocks((prev) =>
-      (prev ?? []).map((block) =>
-        block.id === selectedBlock.id
-          ? {
-              ...block,
-              type: newBlock.type as BlockType,
-              title: newBlock.title!,
-              fixtureId: newBlock.fixtureId,
-              motorId: newBlock.motorId,
-              servoId: newBlock.servoId,
-              effectId: newBlock.effectId,
-              channelName: newBlock.channelName,
-              variant: (newBlock.variant as BlockVariant) ?? 'default',
+      (pr
+          
+              
+              fixtu
+            
+             
             }
-          : block
       )
-    )
 
-    setIsDialogOpen(false)
     setSelectedBlock(null)
-    setNewBlock({ type: 'toggle', title: '', variant: 'default' })
     toast.success('Blok aktualizován')
-  }
 
-  const deleteBlock = (id: string) => {
-    setControlBlocks((prev) => (prev ?? []).filter((block) => block.id !== id))
-    toast.success('Blok smazán')
+    setControl
   }
+  co
 
-  const openEditDialog = (block: ControlBlock) => {
-    setSelectedBlock(block)
-    setNewBlock({
-      type: block.type,
       title: block.title,
-      fixtureId: block.fixtureId,
       motorId: block.motorId,
-      servoId: block.servoId,
       effectId: block.effectId,
-      channelName: block.channelName,
-      variant: block.variant,
-    })
-    setIsDialogOpen(true)
-  }
+      varian
+    s
 
-  const moveBlock = (index: number, direction: 'up' | 'down') => {
     setControlBlocks((prev) => {
-      const blocks = [...(prev ?? [])]
-      const newIndex = direction === 'up' ? index - 1 : index + 1
-      if (newIndex < 0 || newIndex >= blocks.length) return blocks
+      const newIndex = direction
       
-      const temp = blocks[index]
-      blocks[index] = blocks[newIndex]
-      blocks[newIndex] = temp
+      blocks[index] = blocks
       return blocks
-    })
   }
-
-  const renderBlock = (block: ControlBlock) => {
-    switch (block.type) {
+  const renderBlock = (block: Co
       case 'toggle': {
-        const effect = effects.find((e) => e.id === block.effectId)
         if (!effect) return null
+        const toggleVariant = block.variant === 'minimal' ? 'mi
+     
 
-        const toggleVariant = block.variant === 'minimal' ? 'minimal' : block.variant === 'compact' ? 'default' : 'large'
-
-        return (
-          <div key={block.id}>
-            <ToggleButtonBlock
-              label={block.title}
               active={effect.isActive}
-              onToggle={() => {
-                setEffects((prev) =>
-                  prev.map((e) => (e.id === effect.id ? { ...e, isActive: !e.isActive } : e))
+                setEffects
                 )
-              }}
-              variant={toggleVariant}
-            />
-          </div>
-        )
-      }
+              variant={toggleVar
+   
 
       case 'intensity': {
-        const effect = effects.find((e) => e.id === block.effectId)
         if (!effect) return null
+        const intensityVariant = block.variant ===
+        retu
+     
 
-        const intensityVariant = block.variant === 'minimal' ? 'vertical' : block.variant === 'compact' ? 'compact' : 'default'
-
-        return (
-          <div key={block.id}>
-            <IntensityFaderBlock
-              label={block.title}
-              value={effect.intensity}
-              onChange={(value) => {
-                setEffects((prev) =>
-                  prev.map((e) => (e.id === effect.id ? { ...e, intensity: value } : e))
+                setEffects((pr
                 )
-              }}
-              variant={intensityVariant}
-            />
-          </div>
-        )
+              variant={intensityVaria
+          </d
       }
-
       case 'channel': {
-        const fixture = fixtures.find((f) => f.id === block.fixtureId)
-        if (!fixture || !block.channelName) return null
+        if (!fixture || !block.channe
+        const channel = fixture.channels.fin
 
-        const channel = fixture.channels.find((ch) => ch.name === block.channelName)
-        if (!channel) return null
 
-        const channelVariant = block.variant === 'minimal' ? 'large' : block.variant === 'compact' ? 'compact' : 'default'
-
-        return (
           <div key={block.id}>
-            <ChannelSliderBlock
               label={block.title}
-              value={channel.value}
               onChange={(value) => {
-                setFixtures((prev) =>
-                  prev.map((f) =>
-                    f.id === fixture.id
-                      ? {
-                          ...f,
-                          channels: f.channels.map((ch) =>
-                            ch.id === channel.id ? { ...ch, value } : ch
-                          ),
-                        }
-                      : f
-                  )
+             
+                 
+       
+     
+
                 )
-              }}
-              variant={channelVariant}
-            />
+              variant={cha
           </div>
-        )
       }
+   
 
-      case 'color': {
-        const fixture = fixtures.find((f) => f.id === block.fixtureId)
-        if (!fixture) return null
+        const rCh = fixture.channels.fi
+        const bCh = fixture.channels.find((ch) => ch.name.toLowerCase().include
 
-        const rCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('red'))
-        const gCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('green'))
-        const bCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('blue'))
-        const wCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('white'))
 
-        if (!rCh || !gCh || !bCh) return null
 
-        const colorVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
-
-        return (
           <div key={block.id}>
-            <ColorPickerBlock
-              red={rCh.value}
-              green={gCh.value}
-              blue={bCh.value}
-              white={wCh?.value ?? 0}
-              hasWhite={!!wCh}
-              onColorChange={(color) => {
-                setFixtures((prev) =>
-                  prev.map((f) =>
-                    f.id === fixture.id
-                      ? {
-                          ...f,
-                          channels: f.channels.map((ch) => {
-                            if (ch.id === rCh.id) return { ...ch, value: color.red }
-                            if (ch.id === gCh.id) return { ...ch, value: color.green }
-                            if (ch.id === bCh.id) return { ...ch, value: color.blue }
-                            if (wCh && ch.id === wCh.id) return { ...ch, value: color.white ?? 0 }
+              red={rCh.valu
+              blu
+              hasWhite=
+                setFixtur
+                    f.id === fixt
+                          ...
+                            i
+                            if 
                             return ch
-                          }),
                         }
-                      : f
-                  )
-                )
+      
               }}
-              variant={colorVariant}
-            />
-          </div>
-        )
-      }
+   
 
-      case 'position': {
-        const fixture = fixtures.find((f) => f.id === block.fixtureId)
-        if (!fixture) return null
 
-        const panCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('pan'))
-        const tiltCh = fixture.channels.find((ch) => ch.name.toLowerCase().includes('tilt'))
+        const fixture = fixtures
 
+        const tiltCh = fixture.channels.find((ch) => ch.name.toLo
         if (!panCh || !tiltCh) return null
-
-        const positionVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
-
+      
         return (
-          <div key={block.id}>
             <PositionControlBlock
-              title={block.title}
-              panValue={panCh.value}
-              tiltValue={tiltCh.value}
-              onPanChange={(value) => {
-                setFixtures((prev) =>
-                  prev.map((f) =>
-                    f.id === fixture.id
-                      ? {
-                          ...f,
-                          channels: f.channels.map((ch) =>
-                            ch.id === panCh.id ? { ...ch, value } : ch
+              panValue={panCh
+              onPan
+      
+   
+
                           ),
-                        }
                       : f
-                  )
                 )
-              }}
               onTiltChange={(value) => {
-                setFixtures((prev) =>
-                  prev.map((f) =>
-                    f.id === fixture.id
-                      ? {
-                          ...f,
+                  prev.map((f) =
+
                           channels: f.channels.map((ch) =>
-                            ch.id === tiltCh.id ? { ...ch, value } : ch
-                          ),
-                        }
-                      : f
-                  )
-                )
-              }}
-              variant={positionVariant}
-            />
-          </div>
-        )
-      }
 
+                
+                )
+              variant={positio
+          </div>
+      }
       case 'buttonpad': {
-        const padEffects = effects.filter((e) => block.effectId?.split(',').includes(e.id))
-        if (!padEffects.length) return null
-
-        const buttonPadVariant = (block.variant === 'minimal' || block.variant === 'compact') ? 'compact' : 'default'
-
+        if (!padEffects.length) retu
+        const buttonPadVariant = (block.variant === 'minimal' || block.variant === 'compact')
         return (
-          <div key={block.id}>
-            <ButtonPadBlock
-              title={block.title}
-              items={padEffects.map((e) => ({
-                id: e.id,
-                label: e.name,
-                isActive: e.isActive,
-              }))}
-              onItemClick={(id) => {
-                setEffects((prev) =>
-                  prev.map((e) => (e.id === id ? { ...e, isActive: !e.isActive } : e))
-                )
-              }}
-              variant={buttonPadVariant}
-            />
+            <But
+              items={padEffects.map((
+              
+              })
+         
+       
+
           </div>
-        )
       }
-
       default:
-        return null
-    }
-  }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+
+
         <div>
-          <h2 className="text-2xl font-bold">Moje vlastní stránka</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Přizpůsobte si ovládací prvky podle svých potřeb
+          <p className="text-s
           </p>
-        </div>
         <Button onClick={() => {
-          setSelectedBlock(null)
-          setNewBlock({ type: 'toggle', title: '', variant: 'default' })
-          setIsDialogOpen(true)
+          setNewBlock({ type: 'toggle'
         }}>
-          <Plus className="mr-2" />
           Přidat blok
-        </Button>
       </div>
+      <Dialog ope
+          <Dialo
+              {selectedBlock ? 'Upravit 
+          </Di
+          <Scrol
+         
+       
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedBlock ? 'Upravit blok' : 'Přidat nový blok'}
-            </DialogTitle>
-          </DialogHeader>
-
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-4">
-              <div>
-                <Label>Název bloku</Label>
-                <Input
-                  value={newBlock.title || ''}
-                  onChange={(e) => setNewBlock({ ...newBlock, title: e.target.value })}
-                  placeholder="Např. Hlavní světlo"
                 />
-              </div>
 
-              <div>
                 <Label>Typ bloku</Label>
-                <Select
-                  value={newBlock.type || 'toggle'}
-                  onValueChange={(value) => setNewBlock({ ...newBlock, type: value as BlockType })}
+
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="toggle">Přepínač efektu</SelectItem>
+                    <SelectValue 
+
                     <SelectItem value="intensity">Intenzita efektu</SelectItem>
-                    <SelectItem value="channel">Ovládání kanálu</SelectItem>
-                    <SelectItem value="color">Výběr barvy</SelectItem>
-                    <SelectItem value="position">Pozice Pan/Tilt</SelectItem>
-                    <SelectItem value="buttonpad">Tlačítkový panel</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div>
-                <Label>Varianta zobrazení</Label>
-                <Select
-                  value={newBlock.variant || 'default'}
-                  onValueChange={(value) => setNewBlock({ ...newBlock, variant: value as BlockVariant })}
+                
+                </Select>
+
+                <Label>Varianta z
+                  value={newBlock.v
                 >
-                  <SelectTrigger>
                     <SelectValue />
-                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Výchozí</SelectItem>
-                    <SelectItem value="compact">Kompaktní</SelectItem>
-                    <SelectItem value="minimal">Minimální</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <SelectItem value="
+                  </Selec
               </div>
-
-              {(newBlock.type === 'toggle' || newBlock.type === 'intensity') && (
-                <div>
+              {(newBlock.type === 'toggle' || newBlock.typ
                   <Label>Efekt</Label>
-                  <Select
-                    value={newBlock.effectId || ''}
-                    onValueChange={(value) => setNewBlock({ ...newBlock, effectId: value })}
+                    value={n
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vyberte efekt" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {effects.map((effect) => (
-                        <SelectItem key={effect.id} value={effect.id}>
-                          {effect.name}
-                        </SelectItem>
-                      ))}
+                      <Se
+                   
+                 
+                
                     </SelectContent>
-                  </Select>
-                </div>
-              )}
+              
 
-              {(newBlock.type === 'channel' || newBlock.type === 'color' || newBlock.type === 'position') && (
-                <div>
-                  <Label>Světlo</Label>
-                  <Select
-                    value={newBlock.fixtureId || ''}
-                    onValueChange={(value) => setNewBlock({ ...newBlock, fixtureId: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vyberte světlo" />
+         
+       
+
+                    <
                     </SelectTrigger>
-                    <SelectContent>
-                      {fixtures.map((fixture) => (
-                        <SelectItem key={fixture.id} value={fixture.id}>
-                          {fixture.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                      {fixtures.m
 
+                      ))}
+                  </Select>
+              )}
               {newBlock.type === 'channel' && newBlock.fixtureId && (
-                <div>
-                  <Label>Kanál</Label>
-                  <Select
-                    value={newBlock.channelName || ''}
-                    onValueChange={(value) => setNewBlock({ ...newBlock, channelName: value })}
-                  >
-                    <SelectTrigger>
+
+                    value={newBlock.channelNa
+
                       <SelectValue placeholder="Vyberte kanál" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fixtures
-                        .find((f) => f.id === newBlock.fixtureId)
-                        ?.channels.map((ch) => (
-                          <SelectItem key={ch.id} value={ch.name}>
-                            {ch.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+
+                
+                          <Sel
+                          </S
+                    </SelectC
                 </div>
-              )}
             </div>
-          </ScrollArea>
 
-          <DialogFooter>
             {selectedBlock ? (
-              <>
-                <Button variant="outline" onClick={() => {
-                  setIsDialogOpen(false)
-                  setSelectedBlock(null)
-                  setNewBlock({ type: 'toggle', title: '', variant: 'default' })
+                <Button variant="outline"
+                  setSelectedBlock(nu
                 }}>
-                  Zrušit
                 </Button>
-                <Button onClick={updateBlock}>
-                  Uložit změny
-                </Button>
+                  Uložit 
               </>
-            ) : (
               <>
-                <Button variant="outline" onClick={() => {
                   setIsDialogOpen(false)
-                  setNewBlock({ type: 'toggle', title: '', variant: 'default' })
                 }}>
-                  Zrušit
                 </Button>
-                <Button onClick={addBlock}>
                   Přidat blok
-                </Button>
               </>
-            )}
           </DialogFooter>
-        </DialogContent>
       </Dialog>
-
-      {!controlBlocks || controlBlocks.length === 0 ? (
-        <Card className="p-12">
-          <div className="flex flex-col items-center text-center">
-            <h3 className="text-lg font-semibold mb-2">Žádné bloky</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Začněte přidáním prvního ovládacího bloku
+      {!controlBlocks || 
+          <div clas
+            <p cl
             </p>
-            <Button onClick={() => setIsDialogOpen(true)}>
               Přidat první blok
-            </Button>
-          </div>
-        </Card>
+          </di
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {controlBlocks.map((block, index) => (
-            <Card key={block.id} className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="font-semibold text-sm">{block.title}</h3>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
+         
+       
+
+                    vari
                     onClick={() => openEditDialog(block)}
-                  >
-                    <PencilSimple />
-                  </Button>
-                  <Button
-                    variant="ghost"
+                    <PencilSimple
+
                     size="sm"
-                    onClick={() => moveBlock(index, 'up')}
                     disabled={index === 0}
-                  >
-                    <ArrowUp />
-                  </Button>
+
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => moveBlock(index, 'down')}
+
                     disabled={index === controlBlocks.length - 1}
-                  >
-                    <ArrowDown />
-                  </Button>
-                  <Button
-                    variant="ghost"
+
+                
                     size="sm"
-                    onClick={() => deleteBlock(block.id)}
                   >
-                    <Trash />
                   </Button>
-                </div>
               </div>
-              {renderBlock(block)}
             </Card>
-          ))}
         </div>
-      )}
     </div>
-  )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
