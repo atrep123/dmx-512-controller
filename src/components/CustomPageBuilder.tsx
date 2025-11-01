@@ -157,7 +157,7 @@ export default function CustomPageBuilder({
         const effect = effects.find((e) => e.id === block.effectId)
         if (!effect) return null
 
-        const toggleVariant = block.variant === 'minimal' ? 'small' : block.variant === 'compact' ? 'compact' : 'default'
+        const toggleVariant = block.variant === 'minimal' ? 'minimal' : block.variant === 'compact' ? 'default' : 'large'
 
         return (
           <div key={block.id}>
