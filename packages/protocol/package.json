@@ -1,0 +1,25 @@
+{
+  "name": "@dmx-controller/protocol",
+  "version": "1.0.0",
+  "description": "Shared protocol definitions and communication specifications for DMX-512 controller",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"Tests coming soon\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "dmx",
+    "dmx-512",
+    "art-net",
+    "sacn",
+    "protocol"
+  ],
+  "author": "atrep123",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
