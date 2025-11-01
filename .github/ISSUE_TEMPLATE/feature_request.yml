@@ -1,0 +1,103 @@
+name: ✨ Feature Request
+description: Navrhnout novou funkci nebo vylepšení
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Děkujeme za váš návrh! Prosím popište co byste chtěli vidět v aplikaci.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problém který feature řeší
+      description: Je váš feature request spojený s problémem? Popište ho.
+      placeholder: Jsem frustrovaný když... / Neexistuje způsob jak...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Navrhované řešení
+      description: Jasný a stručný popis toho, co byste chtěli implementovat.
+      placeholder: Chtěl bych aby aplikace...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativní řešení
+      description: Zvažovali jste nějaká alternativní řešení nebo funkce?
+      placeholder: Alternativně by se mohlo...
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Kategorie
+      description: Do které kategorie feature patří?
+      options:
+        - UI/UX vylepšení
+        - Nová funkce - Ovládání světel
+        - Nová funkce - Efekty
+        - Nová funkce - Scény
+        - Nová funkce - Motory
+        - Nová funkce - Připojení
+        - Performance optimalizace
+        - Accessibility
+        - Dokumentace
+        - Jiné
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorita (vaše názor)
+      description: Jak důležitá je pro vás tato funkce?
+      options:
+        - Nízká - Nice to have
+        - Střední - Bylo by to užitečné
+        - Vysoká - Velmi potřebné
+        - Kritická - Bez toho nelze pracovat
+    validations:
+      required: true
+
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use case
+      description: Jak byste tuto funkci používali? Konkrétní příklad.
+      placeholder: |
+        Když ovládám show, potřebuji...
+        Jako lighting designer používám...
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups / Screenshots
+      description: Máte nějaké návrhy vzhledu? Přidejte obrázky nebo popište.
+      placeholder: Přetáhněte obrázky sem nebo popište textově.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Další kontext
+      description: Jakékoliv další informace o feature requestu.
+      placeholder: Související funkce v jiných aplikacích, technické detaily, atd.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: Prohledal jsem existující issues a toto není duplikát
+          required: true
+        - label: Četl jsem dokumentaci a tato funkce tam není
+          required: true
+        - label: Jsem ochoten pomoci s implementací (optional)
+          required: false
