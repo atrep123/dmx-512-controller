@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import BlockProgramming from '@/components/BlockProgramming'
 import { compileBlocks, getEffectSummary } from '@/lib/blockCompiler'
+import EffectPreview from '@/components/EffectPreview'
 
 const BLOCK_TYPES_MAP: Record<EffectBlock['type'], string> = {
     'set-color': 'Nastavit barvu',
@@ -950,6 +951,28 @@ export default function EffectsView({
                                 </div>
                             </div>
 
+                            {effectType !== 'block-program' && selectedFixtures.length > 0 && (
+                                <div className="space-y-2">
+                                    <Label>Náhled efektu</Label>
+                                    <div className="flex justify-center p-4 bg-muted rounded-lg">
+                                        <EffectPreview
+                                            effect={{
+                                                id: 'preview',
+                                                name: 'Preview',
+                                                type: effectType,
+                                                fixtureIds: selectedFixtures,
+                                                speed: quickSpeed,
+                                                intensity: quickIntensity,
+                                                isActive: true,
+                                                parameters: {},
+                                            }}
+                                            fixtureCount={selectedFixtures.length}
+                                            size="lg"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <Label>Vybrat světla ({selectedFixtures.length} vybráno)</Label>
@@ -1119,6 +1142,28 @@ export default function EffectsView({
                             </div>
                         </div>
 
+                        {effectType !== 'block-program' && selectedFixtures.length > 0 && (
+                            <div className="space-y-2">
+                                <Label>Náhled efektu</Label>
+                                <div className="flex justify-center p-4 bg-muted rounded-lg">
+                                    <EffectPreview
+                                        effect={{
+                                            id: 'preview',
+                                            name: 'Preview',
+                                            type: effectType,
+                                            fixtureIds: selectedFixtures,
+                                            speed: quickSpeed,
+                                            intensity: quickIntensity,
+                                            isActive: true,
+                                            parameters: {},
+                                        }}
+                                        fixtureCount={selectedFixtures.length}
+                                        size="lg"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <Label>Vybrat světla ({selectedFixtures.length} vybráno)</Label>
@@ -1252,6 +1297,14 @@ export default function EffectsView({
                                             {effect.blocks.length} bloků
                                         </Badge>
                                     )}
+                                </div>
+
+                                <div className="flex justify-center py-2">
+                                    <EffectPreview 
+                                        effect={effect} 
+                                        fixtureCount={effect.fixtureIds.length}
+                                        size="md"
+                                    />
                                 </div>
 
                                 <div className="space-y-3">
