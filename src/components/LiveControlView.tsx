@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Lightbulb, Lightning, Play, Pause, Faders, NumberSquareOne, NumberSquareTwo, NumberSquareThree, NumberSquareFour, NumberSquareFive, NumberSquareSix } from '@phosphor-icons/react'
 import JoystickControl from '@/components/JoystickControl'
+import EffectPreview from '@/components/EffectPreview'
 
 interface LiveControlViewProps {
     fixtures: Fixture[]
@@ -225,6 +226,14 @@ export default function LiveControlView({
                                                 <Badge variant="outline" className="text-xs">{effect.fixtureIds.length} světel</Badge>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div className="flex justify-center py-1">
+                                        <EffectPreview
+                                            effect={effect}
+                                            fixtureCount={effect.fixtureIds.length}
+                                            size="sm"
+                                        />
                                     </div>
 
                                     {effect.type !== 'block-program' && (
