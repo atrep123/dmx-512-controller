@@ -1,0 +1,146 @@
+# Changelog
+
+Všechny významné změny v projektu DMX 512 Kontrolér jsou zdokumentovány v tomto souboru.
+
+Formát je založen na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Plánované funkce
+- Export/Import konfigurace a scén
+- MIDI kontrolér podpora
+- OSC protocol podpora
+- Multi-user collaboration
+- Timecode synchronizace
+- Více jazykových mutací (EN, DE)
+- Advanced effect editor
+- Fixture library (předpřipravené fixture profily)
+
+## [1.0.0] - 2024-11-01
+
+### Added - Nové funkce
+- 🎨 **DMX kontrola** - Ovládání jednotlivých DMX kanálů (0-255)
+- 🌈 **RGB/RGBW Color Picker** - Intuitivní výběr barev
+- 🎬 **Scene Management** - Ukládání a vyvolávání kompletních stavů
+- ⚡ **14 Preset Effects** - Chase, Strobe, Rainbow, Fade, Sweep, atd.
+- 🧩 **Block Programming** - Vizuální programování vlastních efektů
+- 🔧 **Stepper Motor Control** - 16-bit polohování motorů
+- 🎯 **Servo Control** - Úhlové polohování servomotorů (0-180°)
+- 🎮 **Joystick Control** - Pan/Tilt ovládání pomocí virtuálního joysticku
+- 🌐 **Art-Net Support** - DMX over Ethernet protokol
+- 📱 **PWA Support** - Instalace jako nativní aplikace
+- 🎨 **Custom Page Builder** - Vytváření vlastních ovládacích panelů
+- 📊 **Universe Management** - Správa DMX univerzí (512 kanálů/universe)
+- 💾 **Offline Storage** - Všechna data uložená lokálně v IndexedDB
+- 🎛️ **6 Control Blocks** - Reusable UI komponenty pro vlastní panely
+
+### Components
+- `FixturesView` - Správa a ovládání světelných zařízení
+- `ScenesView` - Správa scén
+- `EffectsView` - Vytváření a spouštění efektů
+- `MotorsView` - Ovládání motorů a servomotorů
+- `ConnectionView` - Konfigurace síťového připojení
+- `SetupView` - Nastavení univerzí a fixtures
+- `LiveControlView` - Živá kontrola s joystickem
+- `CustomPageBuilder` - Builder vlastních stránek
+- `BlockProgramming` - Vizuální editor bloků
+- `ControlBlocksDemo` - Demo UI bloků
+
+### Control Blocks
+- `ChannelSliderBlock` - Slider pro DMX kanály
+- `ColorPickerBlock` - RGB/RGBW color picker
+- `ToggleButtonBlock` - On/Off přepínač
+- `ButtonPadBlock` - Grid tlačítek
+- `PositionControlBlock` - Pan/Tilt kontrola
+- `IntensityFaderBlock` - Vertikální fader
+
+### Effects
+- Chase - Postupné zapínání fixtures
+- Strobe - Rychlé blikání
+- Rainbow - Plynulá změna barev
+- Fade - Stmívání/rozsvěcování
+- Sweep - Pohyb napříč fixtures
+- Sparkle - Náhodné blikání
+- Wipe - Wipe přechod
+- Bounce - Bounce efekt
+- Theater Chase - Theater chase pattern
+- Fire - Simulace ohně
+- Wave - Wave pattern
+- Pulse - Pulsní efekt
+- Color Fade - Fade mezi barvami
+- Block Program - Vlastní programování
+
+### Documentation
+- 📖 Kompletní README s přehledem projektu
+- 🤝 Contributing Guide pro vývojáře
+- 🏗️ Architecture Documentation
+- 📚 API Reference pro všechny typy a funkce
+- 👤 User Guide s návody k použití
+- 📱 Android Setup Guide
+- 🚀 Deployment Guide
+- 🎨 Icons Guide
+- 🔒 Security Guide
+- 📋 PRD (Product Requirements Document)
+
+### Technology Stack
+- React 19.0
+- TypeScript 5.7
+- Vite 6.3
+- Tailwind CSS 4.1
+- shadcn/ui komponenty
+- Radix UI primitives
+- Phosphor Icons
+- Framer Motion animace
+- @github/spark KV store
+
+### Design
+- Dark professional theme
+- Triadic color scheme (Deep Cyan + Magenta)
+- Mobile-first responsive design
+- WCAG AA compliant accessibility
+- Touch-optimized controls
+- Inter font family
+
+### Performance
+- Lazy loading komponent
+- Optimized rendering s React.memo
+- 60fps animations
+- Efficient IndexedDB storage
+- Service Worker caching
+
+## [0.1.0] - 2024-10-15
+
+### Added
+- Initial project setup
+- Basic React + TypeScript configuration
+- Tailwind CSS styling
+- shadcn/ui integration
+- Basic DMX types
+
+## Verze formát
+
+Format verzí: `MAJOR.MINOR.PATCH`
+
+- **MAJOR** - Breaking changes, nekompatibilní API změny
+- **MINOR** - Nové funkce, zpětně kompatibilní
+- **PATCH** - Bug fixes, malé vylepšení
+
+## Typy změn
+
+- `Added` - Nové funkce
+- `Changed` - Změny v existujících funkcích
+- `Deprecated` - Funkce která bude odstraněna
+- `Removed` - Odstraněné funkce
+- `Fixed` - Bug fixes
+- `Security` - Security fixes
+
+## Contributing
+
+Chcete přispět? Přečtěte si [Contributing Guide](CONTRIBUTING.md).
+
+---
+
+[Unreleased]: https://github.com/atrep123/dmx-512-controller/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/atrep123/dmx-512-controller/releases/tag/v1.0.0
+[0.1.0]: https://github.com/atrep123/dmx-512-controller/releases/tag/v0.1.0
