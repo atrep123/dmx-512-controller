@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "demo.rgb.cmd.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "cmdId", "src", "r", "g", "b"],
+  "properties": {
+    "schema": {
+      "const": "demo.rgb.cmd.v1"
+    },
+    "cmdId": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "src": {
+      "type": "string",
+      "minLength": 1
+    },
+    "r": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "g": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "b": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "ts": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}
