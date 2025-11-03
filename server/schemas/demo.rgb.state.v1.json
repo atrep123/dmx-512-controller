@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "demo.rgb.state.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "r", "g", "b", "seq", "updatedBy", "ts"],
+  "properties": {
+    "schema": {
+      "const": "demo.rgb.state.v1"
+    },
+    "r": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "g": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "b": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "updatedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ts": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

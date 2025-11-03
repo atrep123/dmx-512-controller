@@ -1,0 +1,20 @@
+[tool.black]
+target-version = ["py312"]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "B", "Q", "UP", "ASYNC", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+strict = true
+plugins = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

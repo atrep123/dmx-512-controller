@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  broker:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    environment:
+      - TZ=UTC
+
+  server:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      broker:
+        condition: service_started
+    environment:
+      - DMX_MQTT_HOST=broker
+      - DMX_MQTT_PORT=1883
+      - DMX_ALLOW_ORIGINS=*
+    ports:
+      - "8080:8080"
+    volumes:
+      - server_state:/app/data
+
+volumes:
+  mosquitto_data:
+  server_state:
