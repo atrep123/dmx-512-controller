@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import time
 from typing import Final
+import hashlib
 
 _ULID_ALPHABET: Final = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
@@ -34,3 +35,21 @@ def is_valid_ulid(value: str) -> bool:
 
 
 __all__ = ["new_ulid", "is_valid_ulid"]
+
+def ulid_from_string(value: str) -> str:
+    """Create a deterministic ULID from an arbitrary string.
+
+    Uses SHA1(value) to derive the 16-char randomness part; timestamp set to 0.
+    This is only for idempotence mapping (not for ordering).
+    """
+    if is_valid_ulid(value):
+        return value
+    # timestamp 0 encoded to 10 chars
+    ts_part = _encode(0, 10)
+    digest = hashlib.sha1(value.encode("utf-8")).digest()
+    # take first 10 bytes to form 16 base32 chars (80 bits -> fits 16 * 5 = 80)
+    rnd_int = int.from_bytes(digest[:10], "big")
+    rnd_part = _encode(rnd_int, 16)
+    return ts_part + rnd_part
+
+__all__.append("ulid_from_string")

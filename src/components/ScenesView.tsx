@@ -1,4 +1,4 @@
-import { Scene, Fixture } from '@/lib/types'
+import { Scene, Fixture, Universe } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '@/components/ui/label'
 import { Plus, Play, Trash, FloppyDisk } from '@phosphor-icons/react'
 import { useState } from 'react'
+import { addAckListener, removeAckListener } from '@/lib/transport'
 import { toast } from 'sonner'
 
 interface ScenesViewProps {
@@ -13,6 +14,7 @@ interface ScenesViewProps {
     setScenes: (updater: (scenes: Scene[]) => Scene[]) => void
     fixtures: Fixture[]
     setFixtures: (updater: (fixtures: Fixture[]) => Fixture[]) => void
+    universes?: Universe[]
     activeScene: string | null
     setActiveScene: (sceneId: string | null) => void
 }
@@ -22,11 +24,13 @@ export default function ScenesView({
     setScenes,
     fixtures,
     setFixtures,
+    universes = [],
     activeScene,
     setActiveScene,
 }: ScenesViewProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [sceneName, setSceneName] = useState('')
+    const [revertGuard, setRevertGuard] = useState<null | { prev: Fixture[]; deadline: number }>(null)
 
     const saveCurrentScene = () => {
         if (!sceneName.trim()) {
@@ -55,6 +59,7 @@ export default function ScenesView({
     }
 
     const recallScene = (scene: Scene) => {
+        const prevFixtures = JSON.parse(JSON.stringify(fixtures)) as Fixture[]
         setFixtures((currentFixtures) =>
             currentFixtures.map((fixture) => ({
                 ...fixture,
@@ -66,6 +71,41 @@ export default function ScenesView({
         )
         setActiveScene(scene.id)
         toast.success(`Scéna "${scene.name}" obnovena`)
+        const guard = { prev: prevFixtures, deadline: Date.now() + 1000 }
+        setRevertGuard(guard)
+        const onAck = (ack: { accepted: boolean }) => {
+            if (guard && Date.now() <= guard.deadline && ack.accepted === false) {
+                setFixtures(() => guard.prev)
+                setRevertGuard(null)
+                toast.error('Scéna odmítnuta serverem – vracím původní stav')
+            }
+        }
+        addAckListener(onAck as any)
+        setTimeout(() => removeAckListener(onAck as any), 1200)
+        // Send DMX patch commands grouped per universe (optimistic UI already applied above)
+        try {
+            const byUniverse = new Map<number, { ch: number; val: number }[]>()
+            for (const fixture of fixtures) {
+                const u = universes.find((uu) => uu.id === fixture.universeId)
+                const uniNum = u ? u.number : 0
+                for (const ch of fixture.channels) {
+                    const targetVal = scene.channelValues[ch.id]
+                    if (typeof targetVal === 'number') {
+                        const absCh = fixture.dmxAddress + (ch.number - 1)
+                        const arr = byUniverse.get(uniNum) || []
+                        arr.push({ ch: absCh, val: targetVal })
+                        byUniverse.set(uniNum, arr)
+                    }
+                }
+            }
+            // Use dmxQueue rAF batching; setChannel sends coalesced commands and splits by 64 internally
+            const { setChannel } = require('@/lib/dmxQueue') as typeof import('@/lib/dmxQueue')
+            for (const [uni, list] of byUniverse) {
+                for (const it of list) setChannel(uni, it.ch, it.val)
+            }
+        } catch {
+            // silent – UI už je optimisticky přepnuté
+        }
     }
 
     const deleteScene = (sceneId: string) => {

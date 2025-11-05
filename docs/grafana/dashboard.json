@@ -1,0 +1,128 @@
+{
+  "title": "DMX Controller — OLA & Fades",
+  "uid": "dmx-ola-fades",
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "version": 1,
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "Prometheus" }
+      },
+      {
+        "name": "universe",
+        "type": "query",
+        "datasource": "$DS_PROMETHEUS",
+        "query": "label_values(dmx_core_ola_frames_total, universe)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": [" .* "] }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Aktivní fade kanály",
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [{ "expr": "sum(dmx_core_fade_active{universe=~\"$universe\"})" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto" },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Aktivní fade joby",
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [{ "expr": "sum(dmx_core_fade_jobs_active{universe=~\"$universe\"})" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto" },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "OLA FPS",
+      "datasource": "$DS_PROMETHEUS",
+      "fieldConfig": { "defaults": { "unit": "fps" }, "overrides": [] },
+      "targets": [{ "expr": "rate(dmx_core_ola_frames_total{universe=~\"$universe\"}[1m])" }],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Ack latency p95 (ms)",
+      "datasource": "$DS_PROMETHEUS",
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(dmx_core_ack_latency_ms_bucket[5m])))"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Fade tick p95 (ms) a Queue delay p95 (ms)",
+      "datasource": "$DS_PROMETHEUS",
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(dmx_core_fade_tick_ms_bucket{universe=~\"$universe\"}[5m])))",
+          "legendFormat": "tick p95"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(dmx_core_fade_queue_delay_ms_bucket{universe=~\"$universe\"}[5m])))",
+          "legendFormat": "queue delay p95"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+    },
+    {
+      "id": 6,
+      "type": "bargauge",
+      "title": "Fades zrušené vs. dokončené (/s)",
+      "datasource": "$DS_PROMETHEUS",
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        { "expr": "sum by (reason) (rate(dmx_core_fades_cancelled_total{universe=~\"$universe\"}[5m]))" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "OLA skip ratio",
+      "datasource": "$DS_PROMETHEUS",
+      "fieldConfig": { "defaults": { "unit": "percentunit" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "sum(rate(dmx_core_ola_frames_skipped_total{universe=~\"$universe\"}[5m])) / (sum(rate(dmx_core_ola_frames_total{universe=~\"$universe\"}[5m])) + 1e-9)"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "DMX příkazy / s podle protokolu",
+      "datasource": "$DS_PROMETHEUS",
+      "targets": [
+        { "expr": "sum by (proto) (rate(dmx_core_cmds_total{type=\"dmx.patch\"}[5m]))" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+    }
+  ],
+  "time": { "from": "now-6h", "to": "now" }
+}
+

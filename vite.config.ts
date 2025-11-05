@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '^/(ws|rgb|healthz|readyz|metrics|version|debug)': {
+      '^/(ws|rgb|command|state|healthz|readyz|metrics|version|debug)': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         ws: true,

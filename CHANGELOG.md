@@ -7,6 +7,11 @@ a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+### Added
+- OLA integrační pipeline (feature‑flag `OUTPUT_MODE=ola`): per‑universe frame store, 44 fps guard, debounce identických framů, diagnostický endpoint `GET /universes/:u/frame` a metriky `dmx_core_ola_*`.
+- FE testy (Vitest): dmxQueue chunking (≤64), optimistic‑revert pro Scény.
+- /state nyní posílá ETag a podporuje volitelný `sparse=1` (přidá `universesSparse`, `sparse:true`).
+
 ## [1.1.1] - 2025-11-04
 
 ### Added

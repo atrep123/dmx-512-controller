@@ -1,0 +1,29 @@
+{
+  "$id": "https://example.com/schema/state.update.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StateUpdate v1",
+  "type": "object",
+  "required": ["type", "rev", "ts", "universe", "delta", "full"],
+  "properties": {
+    "type": { "const": "state.update" },
+    "rev":  { "type": "integer", "minimum": 0 },
+    "ts":   { "type": "integer", "minimum": 0 },
+    "universe": { "type": "integer", "minimum": 0, "maximum": 32767 },
+    "full": { "type": "boolean" },
+    "delta": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ch", "val"],
+        "properties": {
+          "ch":  { "type": "integer", "minimum": 1, "maximum": 512 },
+          "val": { "type": "integer", "minimum": 0, "maximum": 255 }
+        },
+        "additionalProperties": false
+      },
+      "maxItems": 512
+    }
+  },
+  "additionalProperties": false
+}
+

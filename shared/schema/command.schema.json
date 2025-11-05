@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/dmx/command.schema.json",
+  "title": "DMX Command",
+  "type": "object",
+  "oneOf": [
+    {
+      "properties": {
+        "type": { "const": "dmx.set" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "universe": { "type": "integer", "minimum": 0 },
+        "channel": { "type": "integer", "minimum": 1, "maximum": 512 },
+        "value": { "type": "integer", "minimum": 0, "maximum": 255 }
+      },
+      "required": ["type", "id", "ts", "universe", "channel", "value"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "dmx.patch" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "universe": { "type": "integer", "minimum": 0 },
+        "patch": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ch": { "type": "integer", "minimum": 1, "maximum": 512 },
+              "val": { "type": "integer", "minimum": 0, "maximum": 255 }
+            },
+            "required": ["ch", "val"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["type", "id", "ts", "universe", "patch"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "scene.save" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "name": { "type": "string", "minLength": 1 },
+        "snapshot": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 255 }
+        }
+      },
+      "required": ["type", "id", "ts", "name", "snapshot"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "scene.recall" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "name": { "type": "string", "minLength": 1 }
+      },
+      "required": ["type", "id", "ts", "name"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "effect.apply" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "fixtureId": { "type": "string", "minLength": 1 },
+        "effect": { "type": "array", "items": { "type": "object" }, "minItems": 1 }
+      },
+      "required": ["type", "id", "ts", "fixtureId", "effect"],
+      "additionalProperties": false
+    },
+    {
+      "properties": {
+        "type": { "const": "motor.move" },
+        "id": { "type": "string" },
+        "ts": { "type": "integer", "minimum": 0 },
+        "motorId": { "type": "string", "minLength": 1 },
+        "steps": { "type": "integer" },
+        "speed": { "type": ["integer", "number"], "minimum": 0 }
+      },
+      "required": ["type", "id", "ts", "motorId", "steps"],
+      "additionalProperties": false
+    }
+  ]
+}
+

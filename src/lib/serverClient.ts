@@ -1,8 +1,11 @@
+import type { Command, Ack } from '@/shared/types';
+import { notifyAck } from '@/lib/transport';
+
 export type RgbStateMsg = { type: 'state'; r: number; g: number; b: number; seq: number };
 type PongMsg = { type: 'pong'; ts?: number };
-type AckMsg = { type: 'ack'; cmdId?: string };
+type LegacyAckMsg = { type: 'ack'; cmdId?: string };
 type ErrMsg = { type: 'err'; code?: number; message?: string };
-type AnyMsg = RgbStateMsg | PongMsg | AckMsg | ErrMsg | Record<string, unknown>;
+type AnyMsg = RgbStateMsg | PongMsg | LegacyAckMsg | Ack | ErrMsg | Record<string, unknown>;
 
 export type ServerClientOptions = {
   url?: string;
@@ -13,10 +16,12 @@ export type ServerClientOptions = {
   onState?: (s: RgbStateMsg) => void;
   onConnect?: () => void;
   onDisconnect?: (event?: CloseEvent) => void;
+  onAck?: (ack: Ack) => void;
 };
 
 export type ServerClient = {
   setRgb: (r: number, g: number, b: number) => void;
+  sendCommand: (cmd: Command) => void;
   close: () => void;
 };
 
@@ -105,6 +110,10 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
           lastPong = Date.now();
         } else if (type === 'err' && (message as ErrMsg).code === 401) {
           opts.on401?.();
+        } else if ((message as Ack).ack !== undefined && typeof (message as Ack).accepted === 'boolean') {
+          const ack = message as Ack;
+          opts.onAck?.(ack);
+          try { notifyAck(ack) } catch {}
         }
       } catch {
         // ignore malformed payloads
@@ -128,14 +137,27 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
 
   return {
     setRgb(r: number, g: number, b: number) {
-      const payload = JSON.stringify({
-        type: 'set',
-        cmdId: crypto.randomUUID(),
-        src: 'ui',
-        r,
-        g,
-        b,
-      });
+      // Map to unified dmx.patch on universe 0, channels 1..3
+      const cmd: Command = {
+        type: 'dmx.patch',
+        id: crypto.randomUUID(),
+        ts: Date.now(),
+        universe: 0,
+        patch: [
+          { ch: 1, val: r },
+          { ch: 2, val: g },
+          { ch: 3, val: b },
+        ],
+      };
+      const payload = JSON.stringify(cmd);
+      if (ws?.readyState === WebSocket.OPEN) {
+        ws.send(payload);
+      } else {
+        queue.push(payload);
+      }
+    },
+    sendCommand(cmd: Command) {
+      const payload = JSON.stringify(cmd);
       if (ws?.readyState === WebSocket.OPEN) {
         ws.send(payload);
       } else {

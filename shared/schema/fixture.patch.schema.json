@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/fixture.patch.schema.json",
+  "title": "Fixture Patch",
+  "type": "object",
+  "properties": {
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "profile": { "type": "string" },
+          "universe": { "type": "integer", "minimum": 0 },
+          "address": { "type": "integer", "minimum": 1, "maximum": 512 },
+          "invert": { "type": "object", "additionalProperties": { "type": "boolean" } }
+        },
+        "required": ["id", "profile", "universe", "address"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": ["fixtures"],
+  "additionalProperties": true
+}
+

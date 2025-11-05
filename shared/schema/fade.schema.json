@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/dmx/fade.schema.json",
+  "title": "DMX Fade Command",
+  "type": "object",
+  "properties": {
+    "type": { "const": "dmx.fade" },
+    "id": { "type": "string" },
+    "ts": { "type": "integer", "minimum": 0 },
+    "universe": { "type": "integer", "minimum": 0 },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "easing": { "type": "string", "enum": ["linear", "s_curve", "expo"] },
+    "patch": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ch": { "type": "integer", "minimum": 1, "maximum": 512 },
+          "val": { "type": "integer", "minimum": 0, "maximum": 255 }
+        },
+        "required": ["ch", "val"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["type", "id", "ts", "universe", "durationMs", "easing", "patch"],
+  "additionalProperties": false
+}
+

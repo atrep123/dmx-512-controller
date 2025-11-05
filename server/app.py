@@ -13,6 +13,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import Settings, get_settings
 from .context import AppContext
 from .drivers.ola import OLAClient
+from .drivers.ola_universe import OLAUniverseManager, OLAMetrics
+from .dmx.fade_engine import FadeEngine
+from .inputs.sacn_receiver import SACNReceiver
+from .fixtures.profiles import load_profiles
+from .fixtures.patch import load_patch
 from .engine import Engine
 from .mqtt_in import run_mqtt_in
 from .mqtt_out import build_publisher, publish_state
@@ -46,6 +51,42 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     context = create_context(settings)
     app.state.context = context
     ola_driver = _build_ola(settings)
+    # Feature-flagged OLA universe manager
+    if settings.output_mode == "ola":
+        # Derive base URL (strip trailing /set_dmx if present)
+        base = settings.ola_url
+        if base.endswith("/set_dmx"):
+            base = base[: -len("/set_dmx")]
+        # Optional: mapping from config file
+        mapping: dict[int, int] = {}
+        try:
+            import yaml  # type: ignore
+
+            if settings.patch_file.exists():
+                with settings.patch_file.open("r", encoding="utf-8") as f:
+                    doc = yaml.safe_load(f) or {}
+                universes = (doc or {}).get("universes", {})
+                for k, v in universes.items():
+                    try:
+                        mapping[int(k)] = int(v.get("ola_universe", k))
+                    except Exception:
+                        continue
+        except Exception:
+            mapping = {}
+        context.ola_manager = OLAUniverseManager(
+            base_url=base,
+            fps=int(settings.ola_fps),
+            mapping=mapping,
+            metrics=OLAMetrics(
+                context.core.ola_frames_total,
+                context.core.ola_frames_skipped_identical,
+                context.core.ola_frames_skipped_rate,
+                context.core.ola_last_fps,
+                context.core.ola_http_errors_total,
+                context.core.ola_http_errors_by_code,
+                context.core.ola_queue_depth,
+            ),
+        )
     publisher = await build_publisher(settings)
 
     async def publish(state: dict[str, Any]) -> None:
@@ -56,12 +97,51 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         broadcast_state_cb=context.hub.send_state,
         persist_state_cb=context.store.save,
         dedupe_accept=context.dedupe.accept,
-        ola_cb=ola_driver,
+        ola_cb=(
+            (lambda state: _on_state_ola(context, state))  # type: ignore[arg-type]
+            if context.ola_manager is not None
+            else ola_driver
+        ),
         queue_limit=settings.queue_size,
         metrics=context.metrics,
     )
     context.engine = engine
     context.mqtt_publisher = publisher
+    # Optional: start fade engine
+    fade_engine: FadeEngine | None = None
+    if settings.fades_enabled:
+        fe = FadeEngine()
+        async def fe_metrics():
+            # could update metrics here if needed
+            return None
+        async def fe_broadcast(payload: dict[str, object]) -> None:
+            await context.hub.send_payload(payload)
+        async def fe_ola_apply(universe: int, delta: list[dict[str, int]]) -> None:
+            if context.ola_manager is not None:
+                context.ola_manager.apply_patch(universe, delta)
+                await context.ola_manager.maybe_send(universe)
+        context.dmx  # ensure dmx initialized
+        async def fe_run():
+            await fe.run(
+                apply_patch=context.dmx.apply_patch,
+                broadcast=fe_broadcast,
+                ola_apply=fe_ola_apply,
+                metrics=context.core,
+            )
+        context.app_fade_task = asyncio.create_task(fe_run(), name="fade_engine")  # type: ignore[attr-defined]
+        fade_engine = fe
+        # attach for API access
+        setattr(context, "_fade_engine", fe)
+    # Fixtures load (optional)
+    if settings.fixtures_enabled:
+        try:
+            profiles = load_profiles(settings.fixture_profiles_dir)
+            instances = load_patch(settings.fixture_patch_file, profiles)
+            context.fixture_profiles = profiles
+            context.fixture_instances = instances
+        except Exception:
+            context.fixture_profiles = {}
+            context.fixture_instances = {}
 
     restored = await context.store.load()
     if restored:
@@ -83,10 +163,61 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         name="mqtt_in",
     )
     context.mqtt_task = mqtt_task
+    # sACN receiver (optional)
+    sacn_task: asyncio.Task | None = None
+    receiver: SACNReceiver | None = None
+    if settings.sacn_enabled:
+        receiver = SACNReceiver(context)
+        loop = asyncio.get_running_loop()
+        try:
+            await loop.create_datagram_endpoint(lambda: receiver, local_addr=(settings.sacn_bind_addr, settings.sacn_port))
+            # prune task (TTL cleanup)
+            async def prune():
+                while True:
+                    await asyncio.sleep(0.5)
+                    # trigger recompute to purge stale
+                    for uni in list({u for (u, _) in receiver.sources.keys()}):
+                        comp = receiver._recompute_composite(uni)
+                        if comp is not None:
+                            context.dmx.apply_sacn_composite(uni, comp)
+                            context.dmx.recompute_output(uni)
+        
+            sacn_task = asyncio.create_task(prune(), name="sacn_prune")
+            # attach for diagnostics
+            setattr(context, "_sacn_receiver", receiver)
+        except Exception:
+            receiver = None
 
     try:
         yield
     finally:
+        # stop fade engine
+        task = getattr(context, "app_fade_task", None)
+        if task is not None:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+        # stop sACN
+        if sacn_task is not None:
+            sacn_task.cancel()
+            await asyncio.gather(sacn_task, return_exceptions=True)
+        if receiver is not None:
+            try:
+                await receiver.close()
+            except Exception:
+                pass
+        # Attempt graceful OLA flush and close HTTP client if enabled
+        if context.ola_manager is not None:
+            from contextlib import suppress
+            try:
+                with suppress(asyncio.CancelledError):
+                    await context.ola_manager.flush_all()
+            except Exception:
+                pass
+            try:
+                with suppress(asyncio.CancelledError):
+                    await context.ola_manager.aclose()
+            except Exception:
+                pass
         mqtt_task.cancel()
         engine_task.cancel()
         await asyncio.gather(mqtt_task, return_exceptions=True)
@@ -113,3 +244,19 @@ def create_app() -> FastAPI:
 app = create_app()
 
 __all__ = ["app", "create_app"]
+
+
+async def _on_state_ola(context: AppContext, state: dict[str, Any]) -> None:
+    """Map RGB state to universe 0 frame and schedule OLA send.
+
+    This preserves legacy behavior (RGB-only) while exercising the universe pipeline.
+    """
+    mgr = context.ola_manager
+    if mgr is None:
+        return
+    try:
+        mgr.on_rgb_state(int(state["r"]), int(state["g"]), int(state["b"]))
+        await mgr.maybe_send(0)
+    except Exception:
+        # Fail open
+        pass

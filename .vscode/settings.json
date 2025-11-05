@@ -25,5 +25,6 @@
     "**/dist": true,
     "**/.git": true,
     "**/package-lock.json": true
-  }
+  },
+  "chatgpt.openOnStartup": true
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/dmx/ack.schema.json",
+  "title": "DMX Ack",
+  "type": "object",
+  "properties": {
+    "ack": { "type": "string" },
+    "accepted": { "type": "boolean" },
+    "reason": { "type": "string" }
+  },
+  "required": ["ack", "accepted"],
+  "additionalProperties": false
+}
+

@@ -154,6 +154,7 @@ function App() {
                                 setScenes={setScenes}
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
+                                universes={universes || []}
                                 activeScene={activeScene}
                                 setActiveScene={setActiveScene}
                             />

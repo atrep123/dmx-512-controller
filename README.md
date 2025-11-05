@@ -118,6 +118,14 @@ Frontend v kontejneru očekává, že backend běží jako `server:8080`; promě
 - Tlačítko „Testovací příkaz“ odešle demo RGB příkaz; očekávané zvýšení `seq` lze ověřit v metrikách.
 - API key (`VITE_API_KEY`) se používá pouze pro podpis požadavků (`x-api-key`, `?token=`); UI jej nikdy nevypisuje.
 
+#### OLA výstup (volitelné)
+
+- Zapnutí: nastavte `OUTPUT_MODE=ola` (jinak běží `null` výstup a OLA se nevolá).
+- Konfigurace: `DMX_OLA_URL` (např. `http://localhost:9090/set_dmx`), `DMX_OLA_FPS` (default 44), `PATCH_FILE` (volitelná mapa universe→OLA universe, YAML).
+- Debug: `GET /universes/0/frame` vrátí aktuální 512‑kanálový frame pro universe 0.
+- Metriky: `dmx_core_ola_frames_total`, `dmx_core_ola_frames_skipped_total{reason}`, `dmx_core_ola_last_fps`, `dmx_core_ola_http_errors_total`/`_by_code`, `dmx_core_ola_queue_depth`.
+- Spolehlivost: httpx.AsyncClient (pool 4–8), timeout ~0.5 s, fail‑open; při shutdownu se provede poslední `maybe_send()` a zavře se klient.
+
 ### Smoke test (manuální)
 
 ```bash
@@ -139,7 +147,18 @@ mosquitto_sub -h localhost -t v1/demo/rgb/state -C 1 -v
 # očekávej initial {"type":"state",...}
 
 # Metrics
-curl -s http://localhost:8080/metrics | grep -E 'dmx_core_(cmds_total|queue_depth|ws_clients|apply_latency_ms_last)'
+curl -s http://localhost:8080/metrics | grep -E 'dmx_core_(cmds_total|queue_depth|ws_clients|apply_latency_ms_last|ack_latency_ms|patch_size)'
+
+# Unified REST
+curl -s http://localhost:8080/state | jq
+curl -s -X POST http://localhost:8080/command \
+  -H 'content-type: application/json' \
+  -d '{"type":"dmx.patch","id":"smk-1","ts":0,"universe":0,"patch":[{"ch":1,"val":10},{"ch":2,"val":20},{"ch":3,"val":30}]}'
+
+# Multi‑universe příklad
+curl -s -X POST http://localhost:8080/command \
+  -H 'content-type: application/json' \
+  -d '{"type":"dmx.patch","id":"u1","ts":0,"universe":1,"patch":[{"ch":1,"val":100},{"ch":2,"val":120}]}'
 ```
 
 ---
@@ -396,3 +415,11 @@ Pokud se vám tento projekt líbí, dejte mu hvězdičku! ⭐
 [🎭 Demo](https://atrep123.github.io/dmx-512-controller) • [📖 Dokumentace](PRD.md) • [🐛 Reportovat bug](https://github.com/atrep123/dmx-512-controller/issues)
 
 </div>
+
+TIP: ETag & sparse
+
+```
+etag=$(curl -sI http://localhost:8080/state | grep -i ETag | awk '{print $2}')
+curl -s -H "If-None-Match: $etag" http://localhost:8080/state -o /dev/null -w "%{http_code}\n"  # očekáváme 304
+curl -s "http://localhost:8080/state?sparse=1" | jq
+```

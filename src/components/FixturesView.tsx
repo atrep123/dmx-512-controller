@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Slider } from '@/components/ui/slider'
 import { Faders } from '@phosphor-icons/react'
+import { setChannel as enqueueDmxPatch } from '@/lib/dmxQueue'
 
 interface FixturesViewProps {
     fixtures: Fixture[]
@@ -25,6 +26,15 @@ export default function FixturesView({ fixtures, setFixtures, universes }: Fixtu
                     : fixture
             )
         )
+        // Send coalesced patch to backend (server-authoritative) if we can resolve universe/channel
+        const fx = fixtures.find((f) => f.id === fixtureId)
+        if (!fx) return
+        const u = universes.find((u) => u.id === fx.universeId)
+        if (!u) return
+        const ch = fx.channels.find((c) => c.id === channelId)
+        if (!ch) return
+        const absCh = fx.dmxAddress + (ch.number - 1)
+        enqueueDmxPatch(u.number, absCh, value)
     }
 
     if (fixtures.length === 0) {

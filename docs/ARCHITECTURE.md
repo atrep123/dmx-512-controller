@@ -1,572 +1,117 @@
-# Architektura DMX 512 Kontrolér
+# Architecture
 
-Tento dokument popisuje architekturu aplikace DMX 512 Kontrolér včetně design rozhodnutí, komponentové struktury a datových toků.
+Hybridní model: PWA funguje offline, ale pro live DMX je backend zdroj pravdy (server‑authoritative). Klient má lokální cache a frontuje změny, které po připojení odešle se zachováním idempotence.
 
-## 📋 Obsah
+## Režimy
 
-- [Přehled](#přehled)
-- [Technologický stack](#technologický-stack)
-- [Komponentová architektura](#komponentová-architektura)
-- [State management](#state-management)
-- [Datové modely](#datové-modely)
-- [PWA architektura](#pwa-architektura)
-- [Performance optimalizace](#performance-optimalizace)
+| Funkce              | Offline            | Online bez serveru | Online se serverem |
+|---------------------|--------------------|--------------------|--------------------|
+| Lokální scény       | ✅ (cache)         | ✅                  | ✅ + sync           |
+| Live DMX            | ⚠️ simulace        | ❌                  | ✅ server‑authoritative |
+| Motory              | ⚠️ simulace        | ❌                  | ✅                  |
+| Efekty              | ⚠️ klient           | ❌                  | ✅ backend preferovaný |
 
-## 🏗️ Přehled
+Legenda: ✅ plná podpora, ⚠️ omezeně/simulace, ❌ nepodporováno
 
-DMX 512 Kontrolér je Single Page Application (SPA) postavená na moderních web technologiích s mobile-first přístupem. Aplikace běží kompletně na klientovi bez nutnosti backendu, všechna data jsou uložená lokálně pomocí IndexedDB.
-
-### Klíčové design principy
-
-1. **Mobile-first** - Primárně navrženo pro dotykové zařízení
-2. **Offline-first** - Plně funkční bez internetového připojení
-3. **Progressive Enhancement** - Postupné zlepšování funkcí podle možností zařízení
-4. **Performance** - Optimalizováno pro 60fps animace a okamžitou odezvu
-5. **Accessibility** - WCAG AA compliant
-
-### Architektonický vzor
-
-Aplikace používá **komponentově orientovanou architekturu** s následující strukturou:
+## Datové toky (zjednodušeně)
 
 ```
-┌─────────────────────────────────────┐
-│         React Application           │
-├─────────────────────────────────────┤
-│  View Components (Pages/Views)      │
-│  ├─ FixturesView                    │
-│  ├─ ScenesView                      │
-│  ├─ EffectsView                     │
-│  └─ ...                             │
-├─────────────────────────────────────┤
-│  Reusable UI Blocks                 │
-│  ├─ ChannelSliderBlock              │
-│  ├─ ColorPickerBlock                │
-│  └─ ...                             │
-├─────────────────────────────────────┤
-│  Base UI Components (shadcn/ui)     │
-├─────────────────────────────────────┤
-│  State Management (React + KV)      │
-├─────────────────────────────────────┤
-│  Data Layer (IndexedDB)             │
-└─────────────────────────────────────┘
+UI akce → commands.enqueue()
+    ├─ online: WS send(Command)
+    │          ← Ack | StateUpdate
+    └─ offline: uložit do IndexedDB (pending queue)
+
+Server (single-writer engine):
+  Command → apply(LWW) → publish StateUpdate (WS, MQTT, persistence)
 ```
 
-## 🛠️ Technologický stack
-
-### Core technologies
-
-| Technologie | Verze | Účel |
-|------------|--------|------|
-| React | 19.0 | UI framework |
-| TypeScript | 5.7 | Type safety |
-| Vite | 6.3 | Build tool & dev server |
-| Tailwind CSS | 4.1 | Styling |
-| @github/spark | 0.39 | State management & KV store |
-
-### UI libraries
-
-| Knihovna | Účel |
-|----------|------|
-| Radix UI | Accessibility primitives |
-| shadcn/ui | Pre-built styled components |
-| Phosphor Icons | Icon system |
-| Framer Motion | Animations |
-
-### Utilities
-
-| Knihovna | Účel |
-|----------|------|
-| React Hook Form | Form management |
-| Zod | Schema validation |
-| date-fns | Date manipulation |
-| clsx + tailwind-merge | Conditional styling |
-
-## 🧩 Komponentová architektura
-
-### Hierarchie komponent
-
-```
-App.tsx (root)
-├── PWAInstallPrompt
-├── Tabs Navigation
-│   ├── CustomPageBuilder (Vlastní stránka)
-│   ├── ControlBlocksDemo (UI Bloky demo)
-│   ├── LiveControlView (Živá kontrola)
-│   │   ├── JoystickControl
-│   │   └── Effect controls
-│   ├── FixturesView (Světla)
-│   │   ├── Fixture cards
-│   │   └── Channel controls
-│   ├── MotorsView (Motory)
-│   │   ├── StepperMotor cards
-│   │   └── Servo cards
-│   ├── EffectsView (Efekty)
-│   │   ├── Effect cards
-│   │   └── BlockProgramming
-│   ├── ScenesView (Scény)
-│   │   └── Scene cards
-│   ├── ConnectionView (Připojení)
-│   │   └── Network config
-│   └── SetupView (Nastavení)
-│       └── Universe/Fixture setup
-└── Toaster (notifications)
-```
-
-### View komponenty
-
-View komponenty reprezentují celé stránky/taby v aplikaci:
-
-- **App.tsx** - Root komponenta, routing pomocí Tabs
-- **FixturesView** - Správa a ovládání světelných zařízení
-- **ScenesView** - Ukládání a vyvolávání scén
-- **EffectsView** - Vytváření a spouštění efektů
-- **MotorsView** - Ovládání stepper motorů a servomotorů
-- **ConnectionView** - Konfigurace síťového připojení
-- **SetupView** - Nastavení univerzí a přidávání zařízení
-- **LiveControlView** - Živé ovládání pomocí joysticku
-- **CustomPageBuilder** - Vytváření vlastních ovládacích panelů
-
-### Reusable Control Blocks
-
-Znovupoužitelné ovládací komponenty v `src/components/controls/`:
-
-```typescript
-// Channel slider pro DMX hodnoty
-<ChannelSliderBlock 
-  label="Dimmer"
-  value={255}
-  onChange={setValue}
-/>
-
-// RGB color picker
-<ColorPickerBlock
-  red={255} green={0} blue={0}
-  onColorChange={handleColor}
-/>
-
-// Toggle pro funkce on/off
-<ToggleButtonBlock
-  label="Strobe"
-  active={isActive}
-  onToggle={toggle}
-/>
-
-// Button pad pro efekty/scény
-<ButtonPadBlock
-  items={scenes}
-  onItemClick={handleClick}
-/>
-
-// Pan/Tilt kontrola
-<PositionControlBlock
-  panValue={127} tiltValue={127}
-  onPanChange={setPan}
-/>
-
-// Vertikální fader
-<IntensityFaderBlock
-  value={255}
-  onChange={setValue}
-/>
-```
-
-Každý block je:
-- **Standalone** - Funguje samostatně
-- **Configurable** - Props pro customizaci
-- **Accessible** - Keyboard & screen reader support
-- **Responsive** - Mobile optimalizováno
-
-### Base UI Components
-
-Používáme shadcn/ui komponenty z `src/components/ui/`:
-
-- Button, Card, Input, Label
-- Dialog, Sheet, Popover
-- Tabs, Select, Slider
-- Badge, Separator, Switch
-- A další...
-
-Tyto komponenty jsou:
-- Plně customizovatelné
-- TypeScript typed
-- Accessibility compliant
-- Theme-aware
-
-## 🔄 State management
-
-### Přehled state architektury
-
-```
-┌────────────────────────────────────┐
-│     Component Local State          │
-│  (useState, useReducer)             │
-├────────────────────────────────────┤
-│     Persistent State (KV Store)     │
-│  - Fixtures                         │
-│  - Scenes                           │
-│  - Effects                          │
-│  - Motors & Servos                  │
-│  - Connection profiles              │
-└────────────────────────────────────┘
-         ↓ persisted to ↓
-┌────────────────────────────────────┐
-│        IndexedDB                    │
-│    (offline persistence)            │
-└────────────────────────────────────┘
-```
-
-### Persistent state s useKV
-
-Používáme `@github/spark` KV store pro perzistentní data:
-
-```typescript
-import { useKV } from '@github/spark/hooks'
-
-function App() {
-  // Data jsou automaticky uložená do IndexedDB
-  const [fixtures, setFixtures] = useKV<Fixture[]>('dmx-fixtures', [])
-  const [scenes, setScenes] = useKV<Scene[]>('dmx-scenes', [])
-  const [effects, setEffects] = useKV<Effect[]>('dmx-effects', [])
-  
-  // Změny jsou okamžitě persistovány
-  const addFixture = (fixture: Fixture) => {
-    setFixtures([...fixtures, fixture])
-  }
-}
-```
-
-### State keys
-
-Všechna persistovaná data v KV store:
-
-| Key | Type | Popis |
-|-----|------|-------|
-| `dmx-universes` | Universe[] | DMX universa |
-| `dmx-fixtures` | Fixture[] | Světelná zařízení |
-| `dmx-scenes` | Scene[] | Uložené scény |
-| `dmx-stepper-motors` | StepperMotor[] | Stepper motory |
-| `dmx-servos` | Servo[] | Servomotory |
-| `dmx-effects` | Effect[] | Efekty |
-| `dmx-connection-profiles` | ConnectionProfile[] | Profily připojení |
-| `dmx-custom-pages` | CustomPage[] | Vlastní stránky |
-
-### Props drilling vs Context
-
-- **Props drilling** - Pro většinu komponent (preferováno pro jednoduchost)
-- **Context** - Zatím nepoužíváno, zvážit pro budoucí scaling
-
-### Serverová komunikace
-
-- `src/lib/serverClient.ts` sjednocuje REST (`/rgb`) a WebSocket (`/ws`) komunikaci a automaticky přidává token z `VITE_API_KEY`.
-- `ConnectionView` přes klienta načítá počáteční stav (`GET /rgb`), naslouchá změnám přes WebSocket a posílá příkazy (`POST /rgb` nebo WS fallback).
-- Auto‑reconnect se řídí na úrovni komponenty (zohledňuje volbu „automaticky připojit“), aby bylo možné zobrazovat přesný status uživateli.
-- Vite dev proxy mapuje všechny API cesty na backend (`localhost:8080`), takže klient volá pouze relativní URL.
-
-## 📊 Datové modely
-
-### Core typy
-
-Definováno v `src/lib/types.ts`:
-
-#### Fixture (Světelné zařízení)
-
-```typescript
-interface Fixture {
-  id: string                // UUID
-  name: string              // Uživatelské jméno
-  dmxAddress: number        // Start adresa (1-512)
-  channelCount: number      // Počet kanálů (1-512)
-  universeId: string        // Reference na Universe
-  channels: DMXChannel[]    // Jednotlivé kanály
-  fixtureType: FixtureType  // Typ zařízení
-}
-
-type FixtureType = 
-  | 'generic'      // Obecné světlo
-  | 'rgb'          // RGB světlo
-  | 'rgbw'         // RGBW světlo
-  | 'moving-head'  // Moving head
-  | 'stepper-motor'// Stepper motor
-  | 'servo'        // Servomotor
-```
-
-#### DMXChannel
-
-```typescript
-interface DMXChannel {
-  id: string          // Jedinečný identifikátor
-  number: number      // Číslo kanálu v zařízení (1-based)
-  name: string        // Název kanálu (např. "Dimmer", "Red")
-  value: number       // Aktuální hodnota (0-255)
-}
-```
-
-#### Scene
-
-```typescript
-interface Scene {
-  id: string                          // UUID
-  name: string                        // Jméno scény
-  channelValues: Record<string, number>  // channelId -> value
-  motorPositions?: Record<string, number> // motorId -> position
-  servoAngles?: Record<string, number>    // servoId -> angle
-  timestamp: number                   // Čas vytvoření
-}
-```
-
-#### Effect
-
-```typescript
-interface Effect {
-  id: string              // UUID
-  name: string            // Jméno efektu
-  type: EffectType        // Typ efektu
-  fixtureIds: string[]    // Které fixtures ovlivňuje
-  speed: number           // Rychlost (0-100)
-  intensity: number       // Intenzita (0-100)
-  isActive: boolean       // Běží nebo ne
-  parameters: Record<string, number>  // Extra parametry
-  blocks?: EffectBlock[]  // Pro block-program efekty
-}
-
-type EffectType = 
-  | 'chase' | 'strobe' | 'rainbow' | 'fade' 
-  | 'sweep' | 'sparkle' | 'wipe' | 'bounce'
-  | 'theater-chase' | 'fire' | 'wave' | 'pulse'
-  | 'color-fade' | 'block-program'
-```
-
-#### Effect Blocks (Blokové programování)
-
-```typescript
-interface EffectBlock {
-  id: string
-  type: BlockType
-  parameters: BlockParameters
-  order: number  // Pořadí v sekvenci
-}
-
-type BlockType = 
-  | 'set-color'      // Nastavit barvu
-  | 'fade'           // Fade přechod
-  | 'wait'           // Čekání
-  | 'chase-step'     // Krok chase efektu
-  | 'strobe-pulse'   // Strobe puls
-  | 'loop-start'     // Začátek smyčky
-  | 'loop-end'       // Konec smyčky
-  | 'set-intensity'  // Nastavit intenzitu
-  | 'rainbow-shift'  // Rainbow posun
-  | 'random-color'   // Náhodná barva
-  | 'pan-tilt'       // Pan/Tilt pozice
-```
-
-#### StepperMotor
-
-```typescript
-interface StepperMotor {
-  id: string
-  name: string
-  dmxAddress: number      // Start adresa (obvykle 2 kanály)
-  universeId: string
-  channelCount: number    // Obvykle 4 (high, low, speed, accel)
-  channels: DMXChannel[]
-  currentPosition: number // Aktuální pozice (0-65535)
-  targetPosition: number  // Cílová pozice (0-65535)
-  speed: number          // Rychlost (0-255)
-  acceleration: number   // Zrychlení (0-255)
-  maxSteps: number       // Max počet kroků
-}
-```
-
-#### Servo
-
-```typescript
-interface Servo {
-  id: string
-  name: string
-  dmxAddress: number
-  universeId: string
-  channelId: string      // DMX kanál ID
-  currentAngle: number   // Aktuální úhel (0-180)
-  targetAngle: number    // Cílový úhel (0-180)
-  minAngle: number       // Min úhel (default 0)
-  maxAngle: number       // Max úhel (default 180)
-  speed: number          // Rychlost pohybu (0-255)
-}
-```
-
-## 📱 PWA architektura
-
-### Service Worker
-
-Service Worker (`public/sw.js`) poskytuje:
-
-1. **Offline caching** - Statické soubory jsou cachovány
-2. **Update notifications** - Notifikace o nové verzi
-3. **Background sync** - Možnost budoucího background syncu
-
-```javascript
-// Cache strategy: Cache-first s network fallback
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  )
-})
-```
-
-### Manifest
-
-PWA manifest (`manifest.json`):
-
-```json
-{
-  "name": "DMX 512 Kontrolér",
-  "short_name": "DMX Control",
-  "icons": [...],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#262626",
-  "background_color": "#0a0a0a"
-}
-```
-
-### Offline storage
-
-- **IndexedDB** - Pro user data (fixtures, scenes, effects)
-- **Cache API** - Pro static assets (JS, CSS, images)
-- **LocalStorage** - Pro drobné preference (zatím nepoužíváno)
-
-### Installation flow
-
-```
-User visits app
-       ↓
-Service Worker registers
-       ↓
-Assets cached
-       ↓
-Install prompt shows (PWAInstallPrompt)
-       ↓
-User installs
-       ↓
-Icon added to home screen
-       ↓
-App opens in standalone mode
-```
-
-## ⚡ Performance optimalizace
-
-### Code splitting
-
-```typescript
-// Lazy loading view komponent
-const EffectsView = lazy(() => import('./components/EffectsView'))
-const ScenesView = lazy(() => import('./components/ScenesView'))
-
-// Vite automaticky rozděluje bundle
-```
-
-### Rendering optimizations
-
-1. **React.memo** - Pro expensive komponenty
-2. **useCallback** - Pro callback props
-3. **useMemo** - Pro expensive computations
-4. **Virtual scrolling** - Pro dlouhé seznamy (zvážit)
-
-```typescript
-// Příklad optimalizace
-const FixtureCard = React.memo(({ fixture, onChange }) => {
-  const handleChange = useCallback(
-    (value) => onChange(fixture.id, value),
-    [fixture.id, onChange]
-  )
-  
-  return <Card>...</Card>
-})
-```
-
-### Asset optimization
-
-- **Image lazy loading** - Pro ikony a obrázky
-- **Tree shaking** - Vite automaticky odstraňuje nepoužitý kód
-- **Minification** - Produkční build je minifikovaný
-- **Gzip compression** - Server-side komprese
-
-### Animation performance
-
-```typescript
-// Použití CSS transforms místo top/left
-// GPU accelerated animace
-<motion.div
-  animate={{ x: 100, opacity: 1 }}
-  transition={{ duration: 0.3 }}
-/>
-
-// Preferování will-change pro smooth animace
-className="will-change-transform"
-```
-
-### Lighthouse targets
-
-| Metrika | Target | Aktuální |
-|---------|--------|----------|
-| Performance | 90+ | TBD |
-| Accessibility | 100 | TBD |
-| Best Practices | 100 | TBD |
-| SEO | 90+ | TBD |
-| PWA | 100 | ✅ |
-
-## 🔐 Security considerations
-
-### Data security
-
-- **No backend** - Všechna data jsou lokální
-- **No authentication** - Není potřeba (lokální app)
-- **XSS prevention** - React escapuje výstupy
-- **CSP headers** - Content Security Policy (doporučeno nastavit)
-
-### DMX protocol security
-
-- **Network isolation** - DMX síť by měla být izolovaná
-- **Input validation** - Všechny DMX hodnoty jsou validovány (0-255)
-- **Rate limiting** - Omezení počtu DMX packets/sec
-
-## 🔮 Budoucí vylepšení
-
-### Plánované architektonické změny
-
-1. **State management** - Zvážit Zustand pro globální state
-2. **Testing** - Přidat Vitest + React Testing Library
-3. **Monitoring** - Error tracking (Sentry?)
-4. **Analytics** - Usage analytics (privacy-friendly)
-5. **i18n** - Internationalization podpora
-6. **WebRTC** - Pro remote control možnosti
-7. **MIDI support** - Ovládání pomocí MIDI kontrolérů
-
-### Škálovatelnost
-
-Aktuální architektura by měla zvládnout:
-- 50+ fixtures
-- 100+ scenes
-- 50+ effects
-- 10+ univerzí
-
-Pro větší instalace zvážit:
-- Virtual scrolling
-- Pagination
-- Lazy loading dat
-- Worker threads pro effect computations
-
-## 📚 Další čtení
-
-- [React Documentation](https://react.dev/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [PWA Documentation](https://web.dev/progressive-web-apps/)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [Radix UI](https://www.radix-ui.com/)
-
----
-
-**Vytvořeno pro DMX 512 Kontrolér**  
-Poslední aktualizace: 2024
+Stavy připojení: `Idle → Connecting → Syncing → Online → Degraded → Offline`
+
+Backpressure: engine má frontu s limitem, klient coalescuje změny (rAF 16–33 ms) a posílá `dmx.patch` místo záplavy jednotlivých `dmx.set`.
+
+## Sjednocené schéma (REST/WS/MQTT)
+
+- `Command`: `dmx.set` | `dmx.patch` | `scene.save` | `scene.recall` | `effect.apply` | `motor.move`
+- `Ack`: `{ ack, accepted, reason? }`
+- `StateUpdate`: `{ ts, universes, motors?, effects? }`
+
+Kanály:
+- WebSocket: client→server `Command`, server→client `Ack | StateUpdate`
+- REST: `POST /command` → `Ack`, `GET /state` → `StateUpdate`
+- MQTT: `dmx/command`, `dmx/state`, `dmx/ack` (stejná JSON payloady)
+
+Sdílené typy (frontend): `src/shared/types.ts`
+JSON Schema (kontrakt): `shared/schema/*.json`
+
+## Frontend synchronizace
+
+- `useKV` pro cache zůstává, přidá se `serverStore` (Zustand/Rx) napojený na WS.
+- Optimistic UI s revert na NACK.
+- Coalescing sliderů (rAF, 30–60 fps), posílání `dmx.patch`.
+- Scény: `scene.save` ukládat lokálně i na server; `scene.recall` je serverová operace.
+
+## Backend
+
+- Single-writer engine (LWW), idempotence přes ULID.
+- WS hub pro snapshoty, MQTT publish pro retained state.
+- Validace payloadů proti JSON Schema (TODO: napojit na `shared/schema`).
+
+### Unified WS State
+
+Vedle legacy `{"type":"state"}` se publikuje i `{"type":"state.update"}` s rev (seq), timestampem a deltou pro universe 0 (kanály 1..3). UI může preferovat `state.update` a periodicky si vyžádat plný snapshot přes `GET /state`.
+
+## Bezpečnost
+
+- API key validovat na serveru (WS `?token=`, REST `x-api-key`).
+- CORS a WS origin check, limitace příkazů, role (viewer/operator/admin) – v roadmapě.
+
+## Roadmap
+
+- v1.1: sjednocené schéma, WS klient, Scenes/Effects/LiveControl → server commands, CI + E2E.
+- v1.2: fixture templaty, validace adres, import/export, efekty na backendu.
+### OLA Output Pipeline
+
+- Per‑universe frame store (512 kanálů) s mapováním universe→OLA universe (`config/patch.yaml`).
+- Guard 44 fps na universe a debounce identických framů (stejný 512‑array neposílat).
+- Fail‑open: chyby HTTP do OLA se jen logují, engine/WS běží dál.
+- Zapnutí přes `OUTPUT_MODE=ola` (default `null`).
+- Metriky:
+  - `dmx_core_ola_frames_total{universe}`
+  - `dmx_core_ola_frames_skipped_total{universe,reason="identical|rate"}`
+  - `dmx_core_ola_last_fps{universe}`
+  - `dmx_core_ola_http_errors_total{universe}` + `..._by_code{universe,code}`
+  - `dmx_core_ola_queue_depth{universe}` (potlačené sendy během rate‑guard okna)
+
+Reliability:
+- HTTP klient je `httpx.AsyncClient` s pool limity (4–8), timeout ~0.5 s, fail‑open.
+- Při shutdownu ASGI se pokusí o `maybe_send()` a uzavření HTTP klienta (graceful close).
+
+### sACN Input Pipeline
+
+- Parser: minimalistická E1.31 implementace (UDP) parsuje Root/Framing/DMP vrstvy, čte `universe`, `priority`, `seq`, `cid`, `source_name`, `dmx` (start code 0x00).
+- Aggregator: per‑universe udržuje zdroje `(cid)` s TTL; vybere nejvyšší `priority` a v rámci ní provede HTP (per‑kanál `max`).
+- Vrstvení: DMX engine vrství `local_frame` a `sacn_frame` do `output_frame` jako per‑kanál `max(local, sacn)`; lokální vrstva má efektivně prioritu 255.
+- TTL/HLKL: po vypršení zdroje se kompozit přepočítá a výstup se aktualizuje.
+- Metriky:
+  - `dmx_core_sacn_packets_total{universe}` – počet paketů
+  - `dmx_core_sacn_sources{universe}` – aktivní zdroje
+  - `dmx_core_sacn_ooo_total{universe}` – out‑of‑order zahozené
+  - `dmx_core_sacn_priority_current{universe}` – aktuální vybraná priorita
+### DMX Engine
+
+- Kanonický stav: mapování `universe -> 512 bytearray`.
+- `apply_patch(universe, items)` provede LWW v rámci patche a vrátí `delta`, `rev`, `ts`.
+- `/command` a WS `dmx.patch` volají DMX engine; po aplikaci se vysílá `state.update` s `full:false` pro daný universe.
+- Při připojení WS klienta jdou `state.update` s `full:true` pro všechny dostupné universy.
+- Legacy `/rgb` a WS `{type:'set'}` zůstávají – stav RGB je mirror universe 0 (ch1..3).
+
+#### LTP behavior (jen při `FADES_ENABLED=true`)
+
+- Příchozí `dmx.patch` má LTP prioritu nad běžícími fades: dotčené kanály jsou v plánovači fade okamžitě zrušeny a `patch` se aplikuje jako zdroj pravdy.
+- Metriky (per‑kanál):
+  - `dmx_core_fade_active{universe}` – počet aktivních kanálů ve fades (gauge)
+  - `dmx_core_fade_jobs_active{universe}` – počet aktivních fade úloh (gauge)
+  - `dmx_core_fades_started_total{universe}` – starty (inkrement o počet kanálů v příkazu)
+  - `dmx_core_fades_cancelled_total{universe,reason="ltp|done"}` – zrušené/dokončené kanály
+  - `dmx_core_fade_tick_ms_bucket{universe,le=...}` – doba zpracování ticku
+  - `dmx_core_fade_queue_delay_ms_bucket{universe,le=...}` – zpoždění od zařazení po první tick kanálu

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/dmx/state.schema.json",
+  "title": "DMX State Update",
+  "type": "object",
+  "properties": {
+    "ts": { "type": "integer", "minimum": 0 },
+    "universes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    },
+    "motors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "pos": { "type": "number" },
+          "status": { "enum": ["idle", "moving", "error"] }
+        },
+        "required": ["pos", "status"],
+        "additionalProperties": false
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "running": { "type": "boolean" }
+        },
+        "required": ["running"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["ts", "universes"],
+  "additionalProperties": false
+}
+

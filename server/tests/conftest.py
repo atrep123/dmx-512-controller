@@ -2,17 +2,22 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import socket
 import sys
+import threading
+import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
+import requests
+import uvicorn
+from fastapi import FastAPI
+
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-import pytest
-from fastapi import FastAPI
 
 from server.api import router
 from server.config import Settings
@@ -87,3 +92,35 @@ async def test_app(tmp_path) -> AsyncIterator[tuple[FastAPI, AppContext, list[di
 
     yield app, context, published
 
+
+def _free_port() -> int:
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+@pytest.fixture(scope="session")
+def live_server_url() -> str:
+    """
+    Boot uvicorn in a background thread and wait for /healthz.
+    Assumes MQTT either reachable or server handles backoff.
+    """
+    port = _free_port()
+    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    server = uvicorn.Server(config)
+    t = threading.Thread(target=server.run, daemon=True)
+    t.start()
+
+    base = f"http://127.0.0.1:{port}"
+    for _ in range(100):
+        try:
+            r = requests.get(f"{base}/healthz", timeout=0.2)
+            if r.status_code == 200:
+                break
+        except Exception:
+            pass
+        time.sleep(0.1)
+
+    yield base
+    server.should_exit = True
+    t.join(timeout=5)

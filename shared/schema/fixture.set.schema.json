@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schema/fixture.set.schema.json",
+  "title": "Fixture Set Command",
+  "type": "object",
+  "properties": {
+    "type": { "const": "fixture.set" },
+    "id": { "type": "string" },
+    "ts": { "type": "number" },
+    "fixtureId": { "type": "string" },
+    "attrs": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "integer", "minimum": 0, "maximum": 255 },
+          { "type": "object", "properties": { "value16": { "type": "integer", "minimum": 0, "maximum": 65535 } }, "required": ["value16"], "additionalProperties": false }
+        ]
+      }
+    }
+  },
+  "required": ["type", "id", "ts", "fixtureId", "attrs"],
+  "additionalProperties": false
+}
+

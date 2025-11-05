@@ -22,6 +22,7 @@ import {
   Lightning,
 } from '@phosphor-icons/react'
 import { createServerClient, type ServerClient, type RgbStateMsg } from '@/lib/serverClient'
+import { registerServerClient } from '@/lib/transport'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
@@ -197,9 +198,16 @@ export default function ConnectionView() {
       onDisconnect: () => {
         setIsConnected(false)
         setConnectionStatus((prev) => (prev === 'disconnected' ? prev : 'connecting'))
+        registerServerClient(null)
+      },
+      onAck: (ack) => {
+        if (ack.accepted && pendingCommandTsRef.current !== null) {
+          setLatencyMs(Math.round(performance.now() - pendingCommandTsRef.current))
+          pendingCommandTsRef.current = null
+        }
       },
     })
-
+    registerServerClient(client)
     clientRef.current = client
   }, [])
 
@@ -253,6 +261,7 @@ export default function ConnectionView() {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
       clientRef.current?.close()
+      registerServerClient(null)
       clientRef.current = null
     }
   }, [connectionSettings?.autoConnect, startClient])
@@ -383,11 +392,31 @@ export default function ConnectionView() {
       pendingCommandTsRef.current = performance.now()
       clientRef.current?.setRgb(r, g, b)
       if (connectionStatus !== 'connected') {
-        await fetch('/rgb', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ cmdId: crypto.randomUUID(), src: 'ui', r, g, b }),
+        const body = JSON.stringify({
+          type: 'dmx.patch',
+          id: crypto.randomUUID(),
+          ts: Date.now(),
+          universe: 0,
+          patch: [
+            { ch: 1, val: r },
+            { ch: 2, val: g },
+            { ch: 3, val: b },
+          ],
         })
+        let ok = false
+        try {
+          const res = await fetch('/command', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
+          ok = res.ok
+        } catch {
+          ok = false
+        }
+        if (!ok) {
+          await fetch('/rgb', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ cmdId: crypto.randomUUID(), src: 'ui', r, g, b }),
+          })
+        }
       }
       setPacketsSent((prev) => prev + 1)
       toast.success(`Testovací barva odeslána (${r}, ${g}, ${b})`)

@@ -1,612 +1,129 @@
-# API Reference
+# API Overview
 
-Kompletní reference všech TypeScript typů, rozhraní a funkcí v DMX 512 Kontrolér aplikaci.
+This project exposes a unified control plane used by REST, WebSocket, and MQTT.
 
-## 📋 Obsah
+- Command: `dmx.set | dmx.patch | scene.save | scene.recall | effect.apply | motor.move`
+- Ack: `{ ack, accepted, ts, reason?, errors? }`
+- State: REST snapshot (`/state`) and WS broadcast (`state.update`)
 
-- [Core Types](#core-types)
-- [Component Props](#component-props)
-- [Utility Functions](#utility-functions)
-- [Hooks](#hooks)
-- [Constants](#constants)
+## REST
 
-## 🎯 Core Types
+- GET `/state` → snapshot
+- POST `/command` → ack
 
-### Fixture
+Example:
 
-Reprezentuje světelné zařízení nebo DMX device.
+```
+curl -s http://localhost:8080/state | jq
 
-```typescript
-interface Fixture {
-  id: string
-  name: string
-  dmxAddress: number
-  channelCount: number
-  universeId: string
-  channels: DMXChannel[]
-  fixtureType: 'generic' | 'rgb' | 'rgbw' | 'moving-head' | 'stepper-motor' | 'servo'
+curl -s -X POST http://localhost:8080/command \
+  -H 'content-type: application/json' \
+  -d '{"type":"dmx.patch","id":"smk-1","ts":0,"universe":0,"patch":[{"ch":1,"val":10},{"ch":2,"val":20},{"ch":3,"val":30}]}'
+```
+
+Ack (accepted):
+
+```
+{ "ack":"smk-1", "accepted":true, "ts": 1730850000123 }
+```
+
+Ack (validation failed):
+
+```
+{ "ack":"bad-1", "accepted":false, "reason":"VALIDATION_FAILED",
+  "errors":[{"path":"/patch/0/ch","msg":"out of range"}], "ts":1730850000123 }
+```
+
+### GET /state – ETag a volitelný sparse režim
+
+- Server přidává hlavičku `ETag: W/"rev-<rev>"`. Pokud klient pošle `If-None-Match` se stejnou hodnotou, vrací `304 Not Modified`.
+- Volitelný parametr `sparse=1` přidá do odpovědi klíče `universesSparse` (jen nenulové kanály) a `sparse: true`. Výchozí `universes` zůstává beze změny.
+
+Příklad:
+
+```
+GET /state?sparse=1
+{
+  "ts": 1730850000123,
+  "universes": { "0": { "1": 10, "2": 20, "3": 30, ... } },
+  "universesSparse": { "0": { "1": 10, "2": 20, "3": 30 } },
+  "sparse": true
 }
 ```
 
-**Properties:**
-- `id` - Jedinečný identifikátor (UUID)
-- `name` - Uživatelské jméno fixture
-- `dmxAddress` - Start DMX adresa (1-512)
-- `channelCount` - Počet DMX kanálů (1-512)
-- `universeId` - Reference na parent Universe
-- `channels` - Array DMX kanálů
-- `fixtureType` - Typ zařízení
+## WebSocket
 
-**Example:**
-```typescript
-const fixture: Fixture = {
-  id: 'fixture-123',
-  name: 'Par LED 1',
-  dmxAddress: 1,
-  channelCount: 4,
-  universeId: 'universe-1',
-  channels: [
-    { id: 'ch1', number: 1, name: 'Red', value: 255 },
-    { id: 'ch2', number: 2, name: 'Green', value: 0 },
-    { id: 'ch3', number: 3, name: 'Blue', value: 0 },
-    { id: 'ch4', number: 4, name: 'Dimmer', value: 255 }
-  ],
-  fixtureType: 'rgb'
-}
+- URL: `/ws?token=...`
+- Client→Server: `Command` JSON
+- Server→Client: `Ack` and `state.update`
+
+Example session:
+
+```
+> {"type":"dmx.patch","id":"ws-1","ts":0,"universe":0,"patch":[{"ch":1,"val":5}]}
+< {"ack":"ws-1","accepted":true,"ts":1730850000456}
+< {"type":"state.update","rev":42,"ts":1730850000456,
+    "universe":0,"delta":[{"ch":1,"val":5}],"full":false}
 ```
 
-### DMXChannel
+Multi‑universe example:
 
-Reprezentuje jeden DMX kanál.
+```
+POST /command
+{"type":"dmx.patch","id":"u1","ts":0,"universe":1,
+  "patch":[{"ch":1,"val":100},{"ch":2,"val":120}]}
 
-```typescript
-interface DMXChannel {
-  id: string
-  number: number
-  name: string
-  value: number
-}
+WS broadcast:
+{"type":"state.update","rev":42,"ts":...,"universe":1,
+  "delta":[{"ch":1,"val":100},{"ch":2,"val":120}],"full":false}
 ```
 
-**Properties:**
-- `id` - Jedinečný identifikátor kanálu
-- `number` - Číslo kanálu v rámci fixture (1-based)
-- `name` - Jméno kanálu (např. "Dimmer", "Red", "Pan")
-- `value` - Aktuální DMX hodnota (0-255)
+Note on fades (if enabled): `dmx.patch` has LTP (last‑takes‑precedence) priority per channel over running `dmx.fade` commands.
 
-**Validation:**
-- `value` musí být mezi 0-255 (inclusive)
-- `number` musí být pozitivní integer
+## MQTT
 
-### Scene
+Topics (JSON payloads):
 
-Uložený snapshot všech kanálů a pozic.
+- `dmx/command` – Command
+- `dmx/ack` – Ack
+- `dmx/state` – StateUpdate
 
-```typescript
-interface Scene {
-  id: string
-  name: string
-  channelValues: Record<string, number>
-  motorPositions?: Record<string, number>
-  servoAngles?: Record<string, number>
-  timestamp: number
-}
-```
+## Schemas
 
-**Properties:**
-- `id` - Jedinečný identifikátor scény
-- `name` - Uživatelské jméno scény
-- `channelValues` - Mapa channelId → DMX value
-- `motorPositions` - Mapa motorId → position (0-65535)
-- `servoAngles` - Mapa servoId → angle (0-180)
-- `timestamp` - Unix timestamp vytvoření
+JSON Schemas live in `shared/schema/*.json` and mirror TypeScript types from `src/shared/types.ts`.
 
-**Example:**
-```typescript
-const scene: Scene = {
-  id: 'scene-1',
-  name: 'Red Wash',
-  channelValues: {
-    'ch1': 255,  // Red channel
-    'ch2': 0,    // Green channel
-    'ch3': 0     // Blue channel
-  },
-  timestamp: Date.now()
-}
-```
+- `command.schema.json`
+- `ack.schema.json`
+- `state.schema.json` (REST snapshot)
 
-### Effect
+A dedicated schema for WS `state.update` may be added in v1.2.
 
-Automatizovaný lighting effect.
+## Ack semantics and error codes
 
-```typescript
-interface Effect {
-  id: string
-  name: string
-  type: EffectType
-  fixtureIds: string[]
-  speed: number
-  intensity: number
-  isActive: boolean
-  parameters: Record<string, number>
-  blocks?: EffectBlock[]
-}
+- Ack means the command was accepted into the processing queue (single-writer engine). Final state is confirmed via `state.update` or snapshot `/state`.
+- Error codes are stable for automation/tests:
+  - `VALIDATION_FAILED` – schema/semantic validation failed (range, empty patch, etc.)
+  - `PATCH_TOO_LARGE` – canonicalized patch exceeds the server limit (default 64)
+  - `RATE_LIMITED` – per-source rate exceeded (default 60 cmds/sec per proto/ip/universe)
+  - `NOT_SUPPORTED` – command type not implemented by the server
+  - `INTERNAL` – unexpected server error
 
-type EffectType = 
-  | 'chase' | 'strobe' | 'rainbow' | 'fade' 
-  | 'sweep' | 'sparkle' | 'wipe' | 'bounce'
-  | 'theater-chase' | 'fire' | 'wave' | 'pulse'
-  | 'color-fade' | 'block-program'
-```
+## Dedupe window
 
-**Properties:**
-- `id` - Jedinečný identifikátor efektu
-- `name` - Uživatelské jméno efektu
-- `type` - Typ efektu
-- `fixtureIds` - Array fixture IDs které efekt ovlivňuje
-- `speed` - Rychlost efektu (0-100)
-- `intensity` - Intenzita efektu (0-100)
-- `isActive` - Zda efekt právě běží
-- `parameters` - Extra parametry specifické pro typ
-- `blocks` - Pro block-program efekty
+The server deduplicates commands by ULID for 15 minutes (TTL). For legacy `{type:'set'}` it uses `cmdId`; for unified `Command` it uses `id`. Duplicate commands across paths (REST/WS) are ignored.
 
-**Effect types:**
-- `chase` - Postupné zapínání fixtures
-- `strobe` - Rychlé blikání
-- `rainbow` - Rainbow color cycle
-- `fade` - Smooth fade in/out
-- `sweep` - Pohyb napříč fixtures
-- `sparkle` - Náhodné blikání
-- `wipe` - Wipe přechod
-- `bounce` - Bounce efekt tam a zpět
-- `theater-chase` - Theater chase pattern
-- `fire` - Simulace ohně
-- `wave` - Wave pattern
-- `pulse` - Pulse efekt
-- `color-fade` - Fade mezi barvami
-- `block-program` - Custom block program
+## Diagnostics
 
-### EffectBlock
+- GET `/universes/:u/frame` → JSON snapshot 512 hodnot pro universe `u` (pouze pokud je `OUTPUT_MODE=ola`).
 
-Building block pro vizuální programování efektů.
+### Fade metriky
 
-```typescript
-interface EffectBlock {
-  id: string
-  type: BlockType
-  parameters: BlockParameters
-  order: number
-}
+Pokud je zapnuté `FADES_ENABLED=true`, backend exportuje metriky plánovače fade (per‑kanál):
 
-type BlockType = 
-  | 'set-color'
-  | 'fade'
-  | 'wait'
-  | 'chase-step'
-  | 'strobe-pulse'
-  | 'loop-start'
-  | 'loop-end'
-  | 'set-intensity'
-  | 'rainbow-shift'
-  | 'random-color'
-  | 'pan-tilt'
-
-interface BlockParameters {
-  color?: string
-  red?: number
-  green?: number
-  blue?: number
-  white?: number
-  intensity?: number
-  duration?: number
-  waitTime?: number
-  fixtureIndex?: number
-  loopCount?: number
-  hueShift?: number
-  pan?: number
-  tilt?: number
-}
-```
-
-**Block types:**
-- `set-color` - Nastavit RGB barvu
-- `fade` - Fade přechod k barvě
-- `wait` - Čekat zadanou dobu
-- `chase-step` - Jeden krok chase
-- `strobe-pulse` - Jeden strobe puls
-- `loop-start` - Začátek smyčky
-- `loop-end` - Konec smyčky
-- `set-intensity` - Nastavit intenzitu
-- `rainbow-shift` - Posunout hue
-- `random-color` - Náhodná barva
-- `pan-tilt` - Nastavit Pan/Tilt
-
-### StepperMotor
-
-Stepper motor s 16-bit pozicováním.
-
-```typescript
-interface StepperMotor {
-  id: string
-  name: string
-  dmxAddress: number
-  universeId: string
-  channelCount: number
-  channels: DMXChannel[]
-  currentPosition: number
-  targetPosition: number
-  speed: number
-  acceleration: number
-  maxSteps: number
-}
-```
-
-**Properties:**
-- `id` - Jedinečný identifikátor
-- `name` - Jméno motoru
-- `dmxAddress` - Start DMX adresa
-- `universeId` - Universe reference
-- `channelCount` - Počet kanálů (obvykle 4)
-- `channels` - DMX kanály [high byte, low byte, speed, accel]
-- `currentPosition` - Aktuální pozice (0-65535)
-- `targetPosition` - Cílová pozice (0-65535)
-- `speed` - Rychlost (0-255)
-- `acceleration` - Zrychlení (0-255)
-- `maxSteps` - Maximální počet kroků
-
-**Position calculation:**
-```typescript
-// Konverze 16-bit pozice na high/low bytes
-const highByte = Math.floor(position / 256)
-const lowByte = position % 256
-```
-
-### Servo
-
-Servomotor s úhlovým pozicováním.
-
-```typescript
-interface Servo {
-  id: string
-  name: string
-  dmxAddress: number
-  universeId: string
-  channelId: string
-  currentAngle: number
-  targetAngle: number
-  minAngle: number
-  maxAngle: number
-  speed: number
-}
-```
-
-**Properties:**
-- `id` - Jedinečný identifikátor
-- `name` - Jméno serva
-- `dmxAddress` - DMX adresa
-- `universeId` - Universe reference
-- `channelId` - DMX channel ID
-- `currentAngle` - Aktuální úhel (0-180°)
-- `targetAngle` - Cílový úhel (0-180°)
-- `minAngle` - Minimální úhel (default 0)
-- `maxAngle` - Maximální úhel (default 180)
-- `speed` - Rychlost pohybu (0-255)
-
-**Angle to DMX conversion:**
-```typescript
-const dmxValue = Math.round((angle / 180) * 255)
-```
-
-### Universe
-
-DMX universe (512 kanálů).
-
-```typescript
-interface Universe {
-  id: string
-  name: string
-  number: number
-}
-```
-
-**Properties:**
-- `id` - Jedinečný identifikátor
-- `name` - Jméno universa
-- `number` - Číslo universa (1-based)
-
-**Constraints:**
-- Maximálně 512 DMX kanálů per universe
-- DMX adresy 1-512
-
-## 🎨 Component Props
-
-### ChannelSliderBlock
-
-```typescript
-interface ChannelSliderBlockProps {
-  label: string
-  value: number
-  onChange: (value: number) => void
-  min?: number
-  max?: number
-  step?: number
-  disabled?: boolean
-  showInput?: boolean
-  icon?: ReactNode
-  variant?: 'default' | 'compact' | 'large'
-  color?: 'primary' | 'accent' | 'secondary'
-}
-```
-
-### ColorPickerBlock
-
-```typescript
-interface ColorPickerBlockProps {
-  red: number
-  green: number
-  blue: number
-  white?: number
-  onColorChange: (color: RGBColor) => void
-  hasWhite?: boolean
-  variant?: 'default' | 'compact'
-}
-
-interface RGBColor {
-  red: number
-  green: number
-  blue: number
-  white?: number
-}
-```
-
-### ToggleButtonBlock
-
-```typescript
-interface ToggleButtonBlockProps {
-  label: string
-  active: boolean
-  onToggle: () => void
-  icon?: ReactNode
-  activeIcon?: ReactNode
-  variant?: 'default' | 'large' | 'minimal'
-  disabled?: boolean
-  showStatus?: boolean
-}
-```
-
-### ButtonPadBlock
-
-```typescript
-interface ButtonPadBlockProps {
-  title?: string
-  items: ButtonPadItem[]
-  activeId?: string | null
-  onItemClick: (id: string) => void
-  columns?: 2 | 3 | 4 | 6
-  variant?: 'default' | 'compact'
-}
-
-interface ButtonPadItem {
-  id: string
-  label: string
-  icon?: ReactNode
-  color?: 'default' | 'accent' | 'secondary' | 'destructive'
-  badge?: string
-}
-```
-
-### PositionControlBlock
-
-```typescript
-interface PositionControlBlockProps {
-  panValue: number
-  tiltValue: number
-  onPanChange: (value: number) => void
-  onTiltChange: (value: number) => void
-  title?: string
-  showReset?: boolean
-  variant?: 'default' | 'compact'
-}
-```
-
-### IntensityFaderBlock
-
-```typescript
-interface IntensityFaderBlockProps {
-  value: number
-  onChange: (value: number) => void
-  label?: string
-  variant?: 'default' | 'vertical' | 'compact'
-  showPresets?: boolean
-}
-```
-
-## 🛠️ Utility Functions
-
-### cn (className utility)
-
-Sloučí conditional class names s Tailwind merge.
-
-```typescript
-function cn(...inputs: ClassValue[]): string
-
-// Usage:
-const className = cn(
-  "base-class",
-  isActive && "active-class",
-  "another-class"
-)
-```
-
-### DMX value utilities
-
-```typescript
-// Validace DMX hodnoty (0-255)
-function isValidDMXValue(value: number): boolean {
-  return Number.isInteger(value) && value >= 0 && value <= 255
-}
-
-// Clamp hodnoty do DMX rozsahu
-function clampDMX(value: number): number {
-  return Math.max(0, Math.min(255, Math.round(value)))
-}
-
-// 16-bit pozice na DMX bytes
-function positionToBytes(position: number): [number, number] {
-  const clamped = Math.max(0, Math.min(65535, position))
-  return [
-    Math.floor(clamped / 256),  // High byte
-    clamped % 256                // Low byte
-  ]
-}
-
-// DMX bytes na 16-bit pozici
-function bytesToPosition(high: number, low: number): number {
-  return high * 256 + low
-}
-
-// Úhel na DMX hodnotu
-function angleToDMX(angle: number): number {
-  return Math.round((angle / 180) * 255)
-}
-
-// DMX hodnota na úhel
-function dmxToAngle(dmx: number): number {
-  return (dmx / 255) * 180
-}
-```
-
-### Color utilities
-
-```typescript
-// RGB na hex string
-function rgbToHex(r: number, g: number, b: number): string {
-  return `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')}`
-}
-
-// Hex string na RGB
-function hexToRgb(hex: string): { r: number, g: number, b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null
-}
-```
-
-## 🪝 Hooks
-
-### useKV
-
-Persistent key-value storage hook z @github/spark.
-
-```typescript
-function useKV<T>(
-  key: string,
-  defaultValue: T
-): [T, (value: T) => void]
-
-// Usage:
-const [fixtures, setFixtures] = useKV<Fixture[]>('dmx-fixtures', [])
-
-// Data jsou automaticky persistována do IndexedDB
-setFixtures([...fixtures, newFixture])
-```
-
-## 🔢 Constants
-
-### DMX Constants
-
-```typescript
-const DMX_MIN_VALUE = 0
-const DMX_MAX_VALUE = 255
-const DMX_CHANNELS_PER_UNIVERSE = 512
-const DMX_MIN_ADDRESS = 1
-const DMX_MAX_ADDRESS = 512
-```
-
-### Effect Constants
-
-```typescript
-const MIN_EFFECT_SPEED = 0
-const MAX_EFFECT_SPEED = 100
-const MIN_EFFECT_INTENSITY = 0
-const MAX_EFFECT_INTENSITY = 100
-const DEFAULT_EFFECT_SPEED = 50
-const DEFAULT_EFFECT_INTENSITY = 100
-```
-
-### Motor Constants
-
-```typescript
-const STEPPER_MIN_POSITION = 0
-const STEPPER_MAX_POSITION = 65535
-const SERVO_MIN_ANGLE = 0
-const SERVO_MAX_ANGLE = 180
-const DEFAULT_MOTOR_SPEED = 128
-```
-
-## 📊 Type Guards
-
-```typescript
-// Type guard pro fixture type
-function isRGBFixture(fixture: Fixture): boolean {
-  return fixture.fixtureType === 'rgb' || fixture.fixtureType === 'rgbw'
-}
-
-function isMovingHead(fixture: Fixture): boolean {
-  return fixture.fixtureType === 'moving-head'
-}
-
-// Type guard pro effect type
-function isBlockProgramEffect(effect: Effect): effect is Effect & { blocks: EffectBlock[] } {
-  return effect.type === 'block-program' && Array.isArray(effect.blocks)
-}
-```
-
-## 🔄 Event Types
-
-### Channel change event
-
-```typescript
-type ChannelChangeHandler = (channelId: string, value: number) => void
-
-// Usage:
-const handleChannelChange: ChannelChangeHandler = (channelId, value) => {
-  // Update channel value
-}
-```
-
-### Scene activation event
-
-```typescript
-type SceneActivationHandler = (sceneId: string) => void
-
-// Usage:
-const handleSceneActivate: SceneActivationHandler = (sceneId) => {
-  // Apply scene
-}
-```
-
-### Effect toggle event
-
-```typescript
-type EffectToggleHandler = (effectId: string, isActive: boolean) => void
-
-// Usage:
-const handleEffectToggle: EffectToggleHandler = (effectId, isActive) => {
-  // Start/stop effect
-}
-```
-
-## 📚 Further Reading
-
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-- [Architecture Documentation](./ARCHITECTURE.md)
-
----
-
-**API Reference pro DMX 512 Kontrolér**  
-Poslední aktualizace: 2024
+- `dmx_core_fade_active{universe}` – aktivní kanály (gauge)
+- `dmx_core_fade_jobs_active{universe}` – aktivní fade joby (gauge)
+- `dmx_core_fades_started_total{universe}` – starty (inkrement o počet kanálů)
+- `dmx_core_fades_cancelled_total{universe,reason="ltp|done"}` – zrušené/dokončené kanály
+- `dmx_core_fade_ticks_total{universe}` – počet zpracovaných ticků
+- `dmx_core_fade_tick_ms_bucket{universe,le=...}` – histogram doby zpracování ticku v ms
+- `dmx_core_fade_queue_delay_ms_bucket{universe,le=...}` – histogram zpoždění od zařazení po první tick kanálu
