@@ -130,7 +130,7 @@ export default function EffectsView({
                 )
                 break
 
-            case 'chase-step':
+            case 'chase-step': {
                 const fixtureIndex = params.fixtureIndex || 0
                 setFixtures((current) =>
                     current.map((fixture) => {
@@ -146,8 +146,9 @@ export default function EffectsView({
                     })
                 )
                 break
+            }
 
-            case 'strobe-pulse':
+            case 'strobe-pulse': {
                 const strobeValue = Math.random() > 0.5 ? 255 : 0
                 setFixtures((current) =>
                     current.map((fixture) => {
@@ -161,8 +162,9 @@ export default function EffectsView({
                     })
                 )
                 break
+            }
 
-            case 'rainbow-shift':
+            case 'rainbow-shift': {
                 const hue = ((Date.now() / 10) % 360)
                 const rgb = hslToRgb(hue / 360, 1, 0.5)
                 setFixtures((current) =>
@@ -182,8 +184,9 @@ export default function EffectsView({
                     })
                 )
                 break
+            }
 
-            case 'random-color':
+            case 'random-color': {
                 const randomRgb = {
                     r: Math.floor(Math.random() * 256),
                     g: Math.floor(Math.random() * 256),
@@ -206,6 +209,7 @@ export default function EffectsView({
                     })
                 )
                 break
+            }
 
             case 'pan-tilt':
                 setFixtures((current) =>

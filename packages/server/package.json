@@ -21,7 +21,9 @@
   "author": "atrep123",
   "license": "MIT",
   "dependencies": {
-    "@dmx-controller/protocol": "workspace:*"
+  },
+  "peerDependencies": {
+    "@dmx-controller/protocol": "*"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

@@ -58,7 +58,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`setIntensity(${block.parameters.intensity}%)`)
         break
 
-      case 'fade':
+      case 'fade': {
         const fadeDuration = block.parameters.duration || 0
         instructions.push({
           type: 'action',
@@ -68,8 +68,9 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`fade(duration: ${fadeDuration}ms)`)
         estimatedDuration += fadeDuration
         break
+      }
 
-      case 'wait':
+      case 'wait': {
         const waitTime = block.parameters.waitTime || 0
         instructions.push({
           type: 'wait',
@@ -78,8 +79,9 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`wait(${waitTime}ms)`)
         estimatedDuration += waitTime
         break
+      }
 
-      case 'chase-step':
+      case 'chase-step': {
         const chaseDuration = block.parameters.duration || 0
         instructions.push({
           type: 'action',
@@ -90,8 +92,9 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`chaseStep(fixture: ${block.parameters.fixtureIndex}, ${chaseDuration}ms)`)
         estimatedDuration += chaseDuration
         break
+      }
 
-      case 'strobe-pulse':
+      case 'strobe-pulse': {
         const strobeDuration = block.parameters.duration || 0
         instructions.push({
           type: 'action',
@@ -101,8 +104,9 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`strobeFlash(${strobeDuration}ms)`)
         estimatedDuration += strobeDuration
         break
+      }
 
-      case 'rainbow-shift':
+      case 'rainbow-shift': {
         const rainbowDuration = block.parameters.duration || 0
         instructions.push({
           type: 'action',
@@ -113,6 +117,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`rainbowShift(hue: +${block.parameters.hueShift}°, ${rainbowDuration}ms)`)
         estimatedDuration += rainbowDuration
         break
+      }
 
       case 'random-color':
         instructions.push({
@@ -134,7 +139,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         codeLines.push(`panTilt(pan: ${block.parameters.pan}, tilt: ${block.parameters.tilt})`)
         break
 
-      case 'loop-start':
+      case 'loop-start': {
         loopStarts.push(index)
         loopCount++
         const iterations = block.parameters.loopCount || 1
@@ -145,8 +150,9 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
         })
         codeLines.push(`loop(${iterations}x) {`)
         break
+      }
 
-      case 'loop-end':
+      case 'loop-end': {
         const startIdx = loopStarts.pop()
         if (startIdx !== undefined) {
           instructions.push({
@@ -156,6 +162,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
           codeLines.push(`}`)
         }
         break
+      }
     }
   })
 
