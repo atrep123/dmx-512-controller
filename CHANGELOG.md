@@ -7,6 +7,24 @@ a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
+## [1.1.1] - 2025-11-04
+
+### Added
+- Odolnější WebSocket klient s jitter backoffem, heartbeatem a frontou zpráv pro příkazy v UI.
+- ConnectionView nově zobrazuje offline banner, prométheovské metriky (`cmds_total`, `queue_depth`, `ws_clients`, `apply_latency`) a nabízí ruční refresh bez zobrazování API klíče.
+- Nové testy pokrývají reconnect chování a REST fallback při vypnutém WebSocketu.
+- CI pipeline cache-uje npm/pip artefakty a testy používají MQTT service name (`MQTT_HOST=mqtt`).
+
+### Changed
+- Service worker ignoruje dynamické endpointy a nechává `/` i `index.html` vždy načíst ze sítě.
+- Vite proxy sjednocena do jednoho pravidla a vendor knihovny se bundlují do samostatného chunku.
+- Docker Compose + Caddy používají relativní `VITE_WS_URL=/ws` a správně forwardují WebSocket hlavičky.
+- Těžké React view komponenty se načítají lazy (React.lazy + Suspense), čímž se zmenšil úvodní bundle.
+
+### Fixed
+- ConnectionView korektně uklízí socket při unmountu a nikdy nevypisuje API klíč v UI.
+- README a Deployment Guide doplněny o dev proxy, env proměnné, compose/Caddy a smoke test postupy.
+
 ### Plánované funkce
 - Export/Import konfigurace a scén
 - MIDI kontrolér podpora

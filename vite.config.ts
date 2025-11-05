@@ -1,5 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { defineConfig, PluginOption } from "vite";
 
 import sparkPlugin from "@github/spark/spark-vite-plugin";
@@ -17,6 +17,26 @@ export default defineConfig({
     createIconImportProxy() as PluginOption,
     sparkPlugin() as PluginOption,
   ],
+  server: {
+    proxy: {
+      '^/(ws|rgb|healthz|readyz|metrics|version|debug)': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor'
+          }
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': resolve(projectRoot, 'src')

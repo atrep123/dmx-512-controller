@@ -55,6 +55,7 @@ export default function EffectsView({
     const [editingBlocks, setEditingBlocks] = useState<EffectBlock[]>([])
     const blockExecutionRefs = useRef<Map<string, { currentIndex: number, loopStack: Array<{ startIndex: number, remainingLoops: number }> }>>(new Map())
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- applyEffect/executeBlockProgram jsou stabilní reference
     useEffect(() => {
         const interval = setInterval(() => {
             const activeEffects = effects.filter((e) => e.isActive)

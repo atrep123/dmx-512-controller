@@ -60,11 +60,22 @@ netlify deploy --prod
 3. Vyberte branch `main` a složku `/root`
 4. GitHub automaticky vytvoří HTTPS URL
 
+**Možnost D: Docker Compose (UI + server)**
+```bash
+cd infra
+docker-compose up --build
+```
+- `ui` publikuje build na portu `5173`
+- `server` naslouchá na `8080` (REST + WS)
+- `broker` poskytuje MQTT pro DMX zařízení
+- `infra/Caddyfile` přeposílá `/rgb*`, `/metrics`, aj. na `server:8080` a `/ws` s korektními `Upgrade/Connection` hlavičkami.
+- Frontend používá relativní `VITE_WS_URL=/ws`, takže UI i backend běží pod jedním originem.
+
 ### Krok 2: Build aplikace
 
 ```bash
 # Instalace závislostí (pokud ještě není)
-npm install
+npm ci
 
 # Build pro produkci
 npm run build

@@ -40,7 +40,7 @@ def create_context(settings: Settings) -> AppContext:
 
 
 @asynccontextmanager
-def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_logging()
     settings = get_settings()
     context = create_context(settings)

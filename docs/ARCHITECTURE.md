@@ -255,6 +255,13 @@ Všechna persistovaná data v KV store:
 - **Props drilling** - Pro většinu komponent (preferováno pro jednoduchost)
 - **Context** - Zatím nepoužíváno, zvážit pro budoucí scaling
 
+### Serverová komunikace
+
+- `src/lib/serverClient.ts` sjednocuje REST (`/rgb`) a WebSocket (`/ws`) komunikaci a automaticky přidává token z `VITE_API_KEY`.
+- `ConnectionView` přes klienta načítá počáteční stav (`GET /rgb`), naslouchá změnám přes WebSocket a posílá příkazy (`POST /rgb` nebo WS fallback).
+- Auto‑reconnect se řídí na úrovni komponenty (zohledňuje volbu „automaticky připojit“), aby bylo možné zobrazovat přesný status uživateli.
+- Vite dev proxy mapuje všechny API cesty na backend (`localhost:8080`), takže klient volá pouze relativní URL.
+
 ## 📊 Datové modely
 
 ### Core typy

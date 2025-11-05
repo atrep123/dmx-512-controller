@@ -29,6 +29,20 @@ services:
     volumes:
       - server_state:/app/data
 
+  ui:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.ui
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_started
+    environment:
+      - VITE_WS_URL=/ws
+      - VITE_API_KEY=${VITE_API_KEY:-demo-key}
+    ports:
+      - "5173:80"
+
 volumes:
   mosquitto_data:
   server_state:

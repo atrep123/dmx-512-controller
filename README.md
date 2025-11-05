@@ -64,23 +64,82 @@ Mobilní aplikace pro řízení DMX 512 stage osvětlení, stepper motorů a ser
 git clone https://github.com/atrep123/dmx-512-controller.git
 cd dmx-512-controller
 
-# Instalace závislostí
-npm install
+# Instalace závislostí (respektuje package-lock.json)
+npm ci
+```
 
-# Spuštění dev serveru
+### Lokální vývoj
+
+```bash
+# PWA + proxy na backend server
 npm run dev
 ```
 
-Aplikace poběží na `http://localhost:5173`
+- Vite server poslouchá na `http://localhost:5173`.
+- Proxy přesměruje `/ws`, `/rgb`, `/healthz`, `/readyz`, `/metrics`, `/version` a `/debug` na backend (`http://localhost:8080`), takže není nutné řešit CORS během vývoje.
+- WebSocket klient posílá token jako `?token=<VITE_API_KEY>`; REST požadavky přidávají hlavičku `x-api-key`.
 
-### Production build
+#### Kontrola kódu a build
 
 ```bash
-# Build pro produkci
-npm run build
+npm run lint   # ESLint (TS/JS)
+npm run test   # Vitest + React Testing Library
+npm run build  # Production bundle přes Vite
+npm run preview  # Statický náhled build artefaktů
+```
 
-# Preview production buildu
-npm run preview
+### Proměnné prostředí
+
+| Název           | Výchozí hodnota          | Popis |
+| --------------- | ------------------------ | ----- |
+| `VITE_API_KEY`  | `demo-key`               | Token připojovaný k REST/WS požadavkům z klienta. |
+| `VITE_WS_URL`   | `ws://localhost:5173/ws` | URL pro WebSocket klienta – v dev režimu prochází přes Vite proxy. |
+| `DMX_*`         | viz `server/config.py`   | Backend konfigurace (MQTT, OLA, limity). |
+
+Pro lokální nastavení můžete vytvořit `.env.local` nebo exportovat proměnné přímo v shellu.
+
+### Docker Compose (volitelné)
+
+```bash
+cd infra
+docker-compose up --build
+```
+
+- `broker` – Mosquitto MQTT broker.
+- `server` – FastAPI backend (exponuje port `8080`).
+- `ui` – staticky servírovaná PWA (Caddy, port `5173`), build z `infra/Dockerfile.ui`.
+
+Frontend v kontejneru očekává, že backend běží jako `server:8080`; proměnné lze přepsat v `docker-compose.yml`.
+
+### Monitoring a provoz
+
+- Sekce **Připojení** zobrazuje aktuální RGB stav, sekvenci a metriky (`cmds_total`, `queue_depth`, `ws_clients`, `last_ms`). Tlačítko „Refresh metrics“ načítá `/metrics` bez cache.
+- Pokud `navigator.onLine === false`, klient zobrazí offline banner; socket se při ztrátě sítě korektně uzavře a po obnovení se automaticky připojí.
+- Tlačítko „Testovací příkaz“ odešle demo RGB příkaz; očekávané zvýšení `seq` lze ověřit v metrikách.
+- API key (`VITE_API_KEY`) se používá pouze pro podpis požadavků (`x-api-key`, `?token=`); UI jej nikdy nevypisuje.
+
+### Smoke test (manuální)
+
+```bash
+# Compose
+cd infra && docker compose up --build -d
+curl -sf http://localhost:8080/healthz && echo HEALTH OK
+curl -sf http://localhost:8080/readyz  && echo READY OK
+
+# MQTT retained
+mosquitto_sub -h localhost -t v1/demo/rgb/state -C 1 -v
+
+# CMD → STATE
+mosquitto_pub -h localhost -t v1/demo/rgb/cmd -q 1 \
+  -m '{"schema":"demo.rgb.cmd.v1","cmdId":"smk-1","src":"cli","r":10,"g":20,"b":30}'
+mosquitto_sub -h localhost -t v1/demo/rgb/state -C 1 -v
+
+# WS
+# npx wscat -c ws://localhost:5173/ws?token=demo-key
+# očekávej initial {"type":"state",...}
+
+# Metrics
+curl -s http://localhost:8080/metrics | grep -E 'dmx_core_(cmds_total|queue_depth|ws_clients|apply_latency_ms_last)'
 ```
 
 ---

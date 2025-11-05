@@ -1,19 +1,20 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
-import FixturesView from '@/components/FixturesView'
-import ScenesView from '@/components/ScenesView'
-import SetupView from '@/components/SetupView'
-import MotorsView from '@/components/MotorsView'
-import EffectsView from '@/components/EffectsView'
-import ConnectionView from '@/components/ConnectionView'
-import LiveControlView from '@/components/LiveControlView'
-import ControlBlocksDemo from '@/components/ControlBlocksDemo'
-import CustomPageBuilder from '@/components/CustomPageBuilder'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { Toaster } from '@/components/ui/sonner'
+
+const FixturesView = lazy(() => import('@/components/FixturesView'))
+const ScenesView = lazy(() => import('@/components/ScenesView'))
+const SetupView = lazy(() => import('@/components/SetupView'))
+const MotorsView = lazy(() => import('@/components/MotorsView'))
+const EffectsView = lazy(() => import('@/components/EffectsView'))
+const ConnectionView = lazy(() => import('@/components/ConnectionView'))
+const LiveControlView = lazy(() => import('@/components/LiveControlView'))
+const ControlBlocksDemo = lazy(() => import('@/components/ControlBlocksDemo'))
+const CustomPageBuilder = lazy(() => import('@/components/CustomPageBuilder'))
 
 function App() {
     const [universes, setUniverses] = useKV<Universe[]>('dmx-universes', [])
@@ -76,86 +77,104 @@ function App() {
                     </TabsList>
 
                     <TabsContent value="custom" className="mt-0">
-                        <CustomPageBuilder
-                            effects={effects || []}
-                            fixtures={fixtures || []}
-                            stepperMotors={stepperMotors || []}
-                            servos={servos || []}
-                            setEffects={setEffects}
-                            setFixtures={setFixtures}
-                            setStepperMotors={setStepperMotors}
-                            setServos={setServos}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <CustomPageBuilder
+                                effects={effects || []}
+                                fixtures={fixtures || []}
+                                stepperMotors={stepperMotors || []}
+                                servos={servos || []}
+                                setEffects={setEffects}
+                                setFixtures={setFixtures}
+                                setStepperMotors={setStepperMotors}
+                                setServos={setServos}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="blocks" className="mt-0">
-                        <ControlBlocksDemo />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <ControlBlocksDemo />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="live" className="mt-0">
-                        <LiveControlView
-                            fixtures={fixtures || []}
-                            setFixtures={setFixtures}
-                            effects={effects || []}
-                            setEffects={setEffects}
-                            universes={universes || []}
-                            stepperMotors={stepperMotors || []}
-                            setStepperMotors={setStepperMotors}
-                            servos={servos || []}
-                            setServos={setServos}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <LiveControlView
+                                fixtures={fixtures || []}
+                                setFixtures={setFixtures}
+                                effects={effects || []}
+                                setEffects={setEffects}
+                                universes={universes || []}
+                                stepperMotors={stepperMotors || []}
+                                setStepperMotors={setStepperMotors}
+                                servos={servos || []}
+                                setServos={setServos}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="fixtures" className="mt-0">
-                        <FixturesView
-                            fixtures={fixtures || []}
-                            setFixtures={setFixtures}
-                            universes={universes || []}
-                            activeScene={activeScene}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <FixturesView
+                                fixtures={fixtures || []}
+                                setFixtures={setFixtures}
+                                universes={universes || []}
+                                activeScene={activeScene}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="motors" className="mt-0">
-                        <MotorsView
-                            stepperMotors={stepperMotors || []}
-                            setStepperMotors={setStepperMotors}
-                            servos={servos || []}
-                            setServos={setServos}
-                            universes={universes || []}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <MotorsView
+                                stepperMotors={stepperMotors || []}
+                                setStepperMotors={setStepperMotors}
+                                servos={servos || []}
+                                setServos={setServos}
+                                universes={universes || []}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="effects" className="mt-0">
-                        <EffectsView
-                            effects={effects || []}
-                            setEffects={setEffects}
-                            fixtures={fixtures || []}
-                            setFixtures={setFixtures}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <EffectsView
+                                effects={effects || []}
+                                setEffects={setEffects}
+                                fixtures={fixtures || []}
+                                setFixtures={setFixtures}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="scenes" className="mt-0">
-                        <ScenesView
-                            scenes={scenes || []}
-                            setScenes={setScenes}
-                            fixtures={fixtures || []}
-                            setFixtures={setFixtures}
-                            activeScene={activeScene}
-                            setActiveScene={setActiveScene}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <ScenesView
+                                scenes={scenes || []}
+                                setScenes={setScenes}
+                                fixtures={fixtures || []}
+                                setFixtures={setFixtures}
+                                activeScene={activeScene}
+                                setActiveScene={setActiveScene}
+                            />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="connection" className="mt-0">
-                        <ConnectionView />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <ConnectionView />
+                        </Suspense>
                     </TabsContent>
 
                     <TabsContent value="setup" className="mt-0">
-                        <SetupView
-                            universes={universes || []}
-                            setUniverses={setUniverses}
-                            fixtures={fixtures || []}
-                            setFixtures={setFixtures}
-                        />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <SetupView
+                                universes={universes || []}
+                                setUniverses={setUniverses}
+                                fixtures={fixtures || []}
+                                setFixtures={setFixtures}
+                            />
+                        </Suspense>
                     </TabsContent>
                 </Tabs>
             </div>

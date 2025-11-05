@@ -88,6 +88,8 @@ Mount `server_state` volume if you need durability between runs.
   * `v1/demo/rgb/state` – retained canonical state, QoS 1
   * `v1/devices/<id>/state` – device LWT online/offline (server publishes its own LWT)
 
+PWA klient přidává `?token=<VITE_API_KEY>` do WebSocket URL a k REST požadavkům přikládá hlavičku `x-api-key`. Backend v1.1.0 token nevaliduje, ale hodnotu logujeme pro audit a budoucí rozšíření autentizace.
+
 All command payloads must contain a ULID `cmdId`.  Duplicates within 15 minutes are ignored.
 JSON Schemas for the command and state payloads live in `server/schemas/`.
 
@@ -160,4 +162,3 @@ pytest server/tests -k "not mqtt"  # skip MQTT integration if broker unavailable
 For production hardening turn off anonymous MQTT access, configure ACL/TLS, restrict CORS origins,
 and require REST authentication.  The engine already supports credentialed MQTT via
 `DMX_MQTT_USERNAME`/`DMX_MQTT_PASSWORD`.
-
