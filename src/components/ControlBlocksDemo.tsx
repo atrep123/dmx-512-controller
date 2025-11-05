@@ -41,7 +41,7 @@ export default function ControlBlocksDemo() {
         { id: 'strobe', label: 'Stroboskop', icon: <Lightning weight="fill" />, color: 'accent' as const },
         { id: 'chase', label: 'Chase', icon: <Sparkle weight="fill" />, color: 'default' as const },
         { id: 'rainbow', label: 'Duha', icon: <Palette weight="fill" />, color: 'secondary' as const },
-        { id: 'fire', label: 'Oheň', icon: <Fire weight="fill" />, color: 'accent' as const },
+        { id: 'fire', label: 'Ohen', icon: <Fire weight="fill" />, color: 'accent' as const },
         { id: 'wave', label: 'Vlna', icon: <Waves weight="fill" />, color: 'default' as const },
         { id: 'fade', label: 'Fade', icon: <Lightbulb weight="fill" />, color: 'secondary' as const },
     ]
@@ -49,9 +49,9 @@ export default function ControlBlocksDemo() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-2">Ovládací bloky UI</h1>
+                <h1 className="text-3xl font-bold mb-2">Ovladaci bloky UI</h1>
                 <p className="text-muted-foreground">
-                    Knihovna reusable ovládacích komponent pro DMX kontrolér
+                    Knihovna reusable ovladacich komponent pro DMX kontroler
                 </p>
             </div>
 
@@ -67,11 +67,11 @@ export default function ControlBlocksDemo() {
                     </TabsTrigger>
                     <TabsTrigger value="toggles">
                         <Lightning className="mr-2" />
-                        Přepínače
+                        Prepinace
                     </TabsTrigger>
                     <TabsTrigger value="buttons">
                         <Play className="mr-2" />
-                        Tlačítka
+                        Tlacitka
                     </TabsTrigger>
                     <TabsTrigger value="position">
                         <Target className="mr-2" />
@@ -87,12 +87,12 @@ export default function ControlBlocksDemo() {
                     <Card className="p-6">
                         <h2 className="text-xl font-semibold mb-4">Channel Slider Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Univerzální slider pro ovládání DMX kanálů s různými variantami
+                            Univerzalni slider pro ovladani DMX kanalu s ruznymi variantami
                         </p>
 
                         <div className="space-y-8">
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Výchozí varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Vychozi varianta</h3>
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <ChannelSliderBlock
                                         label="Ch 1: Dimmer"
@@ -112,7 +112,7 @@ export default function ControlBlocksDemo() {
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Kompaktní varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Kompaktni varianta</h3>
                                 <div className="grid gap-3 md:grid-cols-3">
                                     <ChannelSliderBlock
                                         label="Red"
@@ -139,7 +139,7 @@ export default function ControlBlocksDemo() {
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velká varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velka varianta</h3>
                                 <ChannelSliderBlock
                                     label="Master Dimmer"
                                     value={intensity}
@@ -156,7 +156,7 @@ export default function ControlBlocksDemo() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Color Picker Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Ovládání RGB a RGBW kanálů s předvolbami barev
+                            Ovladani RGB a RGBW kanalu s predvolbami barev
                         </p>
 
                         <div className="grid gap-6 lg:grid-cols-2">
@@ -187,7 +187,7 @@ export default function ControlBlocksDemo() {
                         </div>
 
                         <div className="mt-6">
-                            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Kompaktní varianta</h3>
+                            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Kompaktni varianta</h3>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <ColorPickerBlock
                                     red={red}
@@ -223,12 +223,12 @@ export default function ControlBlocksDemo() {
                     <Card className="p-6">
                         <h2 className="text-xl font-semibold mb-4">Toggle Button Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Přepínače pro zapínání/vypínání funkcí
+                            Prepinace pro zapinani/vypinani funkci
                         </p>
 
                         <div className="space-y-8">
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Výchozí varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Vychozi varianta</h3>
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <ToggleButtonBlock
                                         label="Stroboskop"
@@ -237,7 +237,7 @@ export default function ControlBlocksDemo() {
                                         icon={<Lightning size={24} />}
                                         activeIcon={<Lightning size={24} weight="fill" />}
                                         showEdit={true}
-                                        onEffectChange={() => toast.info('Otevřít nastavení efektu')}
+                                        onEffectChange={() => toast.info('Otevrit nastaveni efektu')}
                                     />
                                     <ToggleButtonBlock
                                         label="Efekt zapnut"
@@ -246,13 +246,13 @@ export default function ControlBlocksDemo() {
                                         icon={<Sparkle size={24} />}
                                         activeIcon={<Sparkle size={24} weight="fill" />}
                                         showEdit={true}
-                                        onEffectChange={() => toast.info('Změnit efekt')}
+                                        onEffectChange={() => toast.info('Zmenit efekt')}
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velká varianta s editací</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Velka varianta s editaci</h3>
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <ToggleButtonBlock
                                         label="Play"
@@ -262,7 +262,7 @@ export default function ControlBlocksDemo() {
                                         activeIcon={<Play size={32} weight="fill" />}
                                         variant="large"
                                         showEdit={true}
-                                        onEffectChange={() => toast.success('Otevřít editor efektu')}
+                                        onEffectChange={() => toast.success('Otevrit editor efektu')}
                                     />
                                     <ToggleButtonBlock
                                         label="Pause"
@@ -272,7 +272,7 @@ export default function ControlBlocksDemo() {
                                         activeIcon={<Pause size={32} weight="fill" />}
                                         variant="large"
                                         showEdit={true}
-                                        onEffectChange={() => toast.success('Změnit nastavení')}
+                                        onEffectChange={() => toast.success('Zmenit nastaveni')}
                                     />
                                     <ToggleButtonBlock
                                         label="Stop"
@@ -286,7 +286,7 @@ export default function ControlBlocksDemo() {
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Minimální varianta</h3>
+                                <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Minimalni varianta</h3>
                                 <div className="flex gap-2 flex-wrap">
                                     <ToggleButtonBlock
                                         label="Stroboskop"
@@ -320,7 +320,7 @@ export default function ControlBlocksDemo() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Button Pad Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Mřížka tlačítek pro rychlý přístup k efektům a scénám
+                            Mrizka tlacitek pro rychly pristup k efektum a scenam
                         </p>
 
                         <div className="space-y-6">
@@ -333,12 +333,12 @@ export default function ControlBlocksDemo() {
                             />
 
                             <ButtonPadBlock
-                                title="Scény (kompaktní)"
+                                title="Sceny (kompaktni)"
                                 items={[
-                                    { id: 'scene1', label: 'Scéna 1', badge: 'RGB' },
-                                    { id: 'scene2', label: 'Scéna 2', badge: '5x' },
-                                    { id: 'scene3', label: 'Scéna 3' },
-                                    { id: 'scene4', label: 'Scéna 4' },
+                                    { id: 'scene1', label: 'Scena 1', badge: 'RGB' },
+                                    { id: 'scene2', label: 'Scena 2', badge: '5x' },
+                                    { id: 'scene3', label: 'Scena 3' },
+                                    { id: 'scene4', label: 'Scena 4' },
                                 ]}
                                 activeId={activeButton}
                                 onItemClick={setActiveButton}
@@ -353,7 +353,7 @@ export default function ControlBlocksDemo() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Position Control Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Ovládání Pan/Tilt pro moving heads a pozicionéry
+                            Ovladani Pan/Tilt pro moving heads a pozicionery
                         </p>
 
                         <div className="grid gap-6 lg:grid-cols-2">
@@ -380,7 +380,7 @@ export default function ControlBlocksDemo() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Intensity Fader Block</h2>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Vertikální fader pro přesné ovládání intenzity
+                            Vertikalni fader pro presne ovladani intenzity
                         </p>
 
                         <div className="grid gap-6 lg:grid-cols-3">

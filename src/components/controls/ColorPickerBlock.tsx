@@ -15,14 +15,14 @@ interface ColorPickerBlockProps {
 }
 
 const presetColors = [
-    { name: 'Červená', r: 255, g: 0, b: 0 },
-    { name: 'Zelená', r: 0, g: 255, b: 0 },
-    { name: 'Modrá', r: 0, g: 0, b: 255 },
-    { name: 'Žlutá', r: 255, g: 255, b: 0 },
+    { name: 'Cervena', r: 255, g: 0, b: 0 },
+    { name: 'Zelena', r: 0, g: 255, b: 0 },
+    { name: 'Modra', r: 0, g: 0, b: 255 },
+    { name: 'Zluta', r: 255, g: 255, b: 0 },
     { name: 'Cyan', r: 0, g: 255, b: 255 },
     { name: 'Magenta', r: 255, g: 0, b: 255 },
-    { name: 'Bílá', r: 255, g: 255, b: 255 },
-    { name: 'Teplá bílá', r: 255, g: 200, b: 150 },
+    { name: 'Bila', r: 255, g: 255, b: 255 },
+    { name: 'Tepla bila', r: 255, g: 200, b: 150 },
 ]
 
 export function ColorPickerBlock({
@@ -119,7 +119,7 @@ export function ColorPickerBlock({
                         <div>
                             <h3 className="font-semibold flex items-center gap-2">
                                 <Palette size={18} />
-                                RGB{hasWhite ? 'W' : ''} Ovládání
+                                RGB{hasWhite ? 'W' : ''} Ovladani
                             </h3>
                             <p className="text-xs text-muted-foreground">
                                 {red}, {green}, {blue}{hasWhite ? `, ${white}` : ''}
@@ -133,7 +133,7 @@ export function ColorPickerBlock({
                         className="gap-2"
                     >
                         <Drop size={16} />
-                        Předvolby
+                        Predvolby
                     </Button>
                 </div>
 
@@ -156,7 +156,7 @@ export function ColorPickerBlock({
                         <div className="flex items-center justify-between text-sm">
                             <label className="text-muted-foreground flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                                Červená
+                                Cervena
                             </label>
                             <span className="font-mono text-red-500 font-semibold">{red}</span>
                         </div>
@@ -172,7 +172,7 @@ export function ColorPickerBlock({
                         <div className="flex items-center justify-between text-sm">
                             <label className="text-muted-foreground flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                                Zelená
+                                Zelena
                             </label>
                             <span className="font-mono text-green-500 font-semibold">{green}</span>
                         </div>
@@ -188,7 +188,7 @@ export function ColorPickerBlock({
                         <div className="flex items-center justify-between text-sm">
                             <label className="text-muted-foreground flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                                Modrá
+                                Modra
                             </label>
                             <span className="font-mono text-blue-500 font-semibold">{blue}</span>
                         </div>
@@ -205,7 +205,7 @@ export function ColorPickerBlock({
                             <div className="flex items-center justify-between text-sm">
                                 <label className="text-muted-foreground flex items-center gap-2">
                                     <div className="w-3 h-3 rounded-full bg-white border" />
-                                    Bílá
+                                    Bila
                                 </label>
                                 <span className="font-mono text-primary font-semibold">{white}</span>
                             </div>

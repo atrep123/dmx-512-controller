@@ -1,50 +1,50 @@
 # Contributor Covenant Code of Conduct
 
-## Náš závazek
+## Nas zavazek
 
-V zájmu podpory otevřeného a přívětivého prostředí se my jako přispěvatelé a správci zavazujeme, že účast na našem projektu a naší komunitě bude bez obtěžování pro každého, bez ohledu na věk, tělesnou konstituci, postižení, etnickou příslušnost, pohlavní charakteristiky, genderovou identitu a vyjádření, úroveň zkušeností, vzdělání, socioekonomický status, národnost, osobní vzhled, rasu, náboženství nebo sexuální identitu a orientaci.
+V zajmu podpory otevreneho a privetiveho prostredi se my jako prispevatele a spravci zavazujeme, ze ucast na nasem projektu a nasi komunite bude bez obtezovani pro kazdeho, bez ohledu na vek, telesnou konstituci, postizeni, etnickou prislusnost, pohlavni charakteristiky, genderovou identitu a vyjadreni, uroven zkusenosti, vzdelani, socioekonomicky status, narodnost, osobni vzhled, rasu, nabozenstvi nebo sexualni identitu a orientaci.
 
-## Naše standardy
+## Nase standardy
 
-Příklady chování, které přispívá k vytváření pozitivního prostředí:
+Priklady chovani, ktere prispiva k vytvareni pozitivniho prostredi:
 
-* Používání vstřícného a inkluzivního jazyka
-* Respektování odlišných názorů a zkušeností
-* Graceful přijímání konstruktivní kritiky
-* Zaměření na to, co je nejlepší pro komunitu
-* Projevování empatie vůči ostatním členům komunity
+* Pouzivani vstricneho a inkluzivniho jazyka
+* Respektovani odlisnych nazoru a zkusenosti
+* Graceful prijimani konstruktivni kritiky
+* Zamereni na to, co je nejlepsi pro komunitu
+* Projevovani empatie vuci ostatnim clenum komunity
 
-Příklady nepřijatelného chování účastníků:
+Priklady neprijatelneho chovani ucastniku:
 
-* Používání sexualizovaného jazyka nebo obrazů a nevítaná sexuální pozornost nebo avances
-* Trolling, urážlivé/hanlivé komentáře a osobní nebo politické útoky
-* Veřejné nebo soukromé obtěžování
-* Zveřejňování soukromých informací jiných osob, jako je fyzická nebo elektronická adresa, bez výslovného svolení
-* Jiné chování, které by mohlo být přiměřeně považováno za nevhodné v profesionálním prostředí
+* Pouzivani sexualizovaneho jazyka nebo obrazu a nevitana sexualni pozornost nebo avances
+* Trolling, urazlive/hanlive komentare a osobni nebo politicke utoky
+* Verejne nebo soukrome obtezovani
+* Zverejnovani soukromych informaci jinych osob, jako je fyzicka nebo elektronicka adresa, bez vyslovneho svoleni
+* Jine chovani, ktere by mohlo byt primerene povazovano za nevhodne v profesionalnim prostredi
 
-## Naše odpovědnosti
+## Nase odpovednosti
 
-Správci projektu jsou zodpovědní za vyjasnění standardů přijatelného chování a očekává se, že budou přijímat vhodná a spravedlivá nápravná opatření v reakci na jakékoli případy nepřijatelného chování.
+Spravci projektu jsou zodpovedni za vyjasneni standardu prijatelneho chovani a ocekava se, ze budou prijimat vhodna a spravedliva napravna opatreni v reakci na jakekoli pripady neprijatelneho chovani.
 
-Správci projektu mají právo a odpovědnost odstraňovat, upravovat nebo odmítat komentáře, commity, kód, wiki úpravy, issues a další příspěvky, které nejsou v souladu s tímto Code of Conduct, nebo dočasně nebo trvale zakázat jakéhokoli přispěvatele za jiné chování, které považují za nevhodné, výhružné, urážlivé nebo škodlivé.
+Spravci projektu maji pravo a odpovednost odstranovat, upravovat nebo odmitat komentare, commity, kod, wiki upravy, issues a dalsi prispevky, ktere nejsou v souladu s timto Code of Conduct, nebo docasne nebo trvale zakazat jakehokoli prispevatele za jine chovani, ktere povazuji za nevhodne, vyhruzne, urazlive nebo skodlive.
 
 ## Rozsah
 
-Tento Code of Conduct platí jak v rámci projektových prostorů, tak ve veřejných prostorech, když jednotlivec reprezentuje projekt nebo jeho komunitu. Příklady reprezentace projektu nebo komunity zahrnují použití oficiální e-mailové adresy projektu, zveřejnění prostřednictvím oficiálního účtu na sociálních médiích nebo jednání jako jmenovaný zástupce na online nebo offline akci.
+Tento Code of Conduct plati jak v ramci projektovych prostoru, tak ve verejnych prostorech, kdyz jednotlivec reprezentuje projekt nebo jeho komunitu. Priklady reprezentace projektu nebo komunity zahrnuji pouziti oficialni e-mailove adresy projektu, zverejneni prostrednictvim oficialniho uctu na socialnich mediich nebo jednani jako jmenovany zastupce na online nebo offline akci.
 
-## Vymáhání
+## Vymahani
 
-Případy zneužívání, obtěžování nebo jinak nepřijatelného chování mohou být nahlášeny kontaktováním týmu projektu prostřednictvím GitHub Issues. Všechny stížnosti budou přezkoumány a vyšetřeny a povedou k odpovědi, která je považována za nezbytnou a přiměřenou okolnostem. Projektový tým je povinen zachovávat důvěrnost ve vztahu k nahlašovateli incidentu. Další podrobnosti o konkrétních vymáhacích zásadách mohou být zveřejněny samostatně.
+Pripady zneuzivani, obtezovani nebo jinak neprijatelneho chovani mohou byt nahlaseny kontaktovanim tymu projektu prostrednictvim GitHub Issues. Vsechny stiznosti budou prezkoumany a vysetreny a povedou k odpovedi, ktera je povazovana za nezbytnou a primerenou okolnostem. Projektovy tym je povinen zachovavat duvernost ve vztahu k nahlasovateli incidentu. Dalsi podrobnosti o konkretnich vymahacich zasadach mohou byt zverejneny samostatne.
 
-Správci projektu, kteří nedodržují nebo nevymáhají Code of Conduct v dobré víře, mohou čelit dočasným nebo trvalým důsledkům, jak určí ostatní členové vedení projektu.
+Spravci projektu, kteri nedodrzuji nebo nevymahaji Code of Conduct v dobre vire, mohou celit docasnym nebo trvalym dusledkum, jak urci ostatni clenove vedeni projektu.
 
 ## Zdroj
 
-Tento Code of Conduct je adaptován z [Contributor Covenant][homepage], verze 2.0,
+Tento Code of Conduct je adaptovan z [Contributor Covenant][homepage], verze 2.0,
 k dispozici na https://www.contributor-covenant.org/version/2/0/code_of_conduct.html
 
 [homepage]: https://www.contributor-covenant.org
 
-Pro odpovědi na běžné otázky o tomto code of conduct viz FAQ na
-https://www.contributor-covenant.org/faq. Překlady jsou k dispozici na
+Pro odpovedi na bezne otazky o tomto code of conduct viz FAQ na
+https://www.contributor-covenant.org/faq. Preklady jsou k dispozici na
 https://www.contributor-covenant.org/translations.

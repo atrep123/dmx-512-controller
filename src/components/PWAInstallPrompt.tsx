@@ -70,7 +70,7 @@ export function PWAInstallPrompt() {
           </Button>
           <CardTitle className="text-lg">Instalovat aplikaci</CardTitle>
           <CardDescription>
-            Přidejte DMX 512 Kontrolér na domovskou obrazovku pro rychlý přístup
+            Pridejte DMX 512 Kontroler na domovskou obrazovku pro rychly pristup
           </CardDescription>
         </CardHeader>
         <CardContent>

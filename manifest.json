@@ -1,7 +1,7 @@
 {
-  "name": "DMX 512 Kontrolér",
+  "name": "DMX 512 Kontroler",
   "short_name": "DMX 512",
-  "description": "Profesionální DMX 512 světelný kontrolér",
+  "description": "Profesionalni DMX 512 svetelny kontroler",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -46,9 +46,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Živá Kontrola",
+      "name": "Ziva Kontrola",
       "short_name": "Kontrola",
-      "description": "Otevřít živou kontrolu světel",
+      "description": "Otevrit zivou kontrolu svetel",
       "url": "/?tab=live",
       "icons": [
         {
@@ -58,9 +58,9 @@
       ]
     },
     {
-      "name": "Scény",
-      "short_name": "Scény",
-      "description": "Spravovat scény osvětlení",
+      "name": "Sceny",
+      "short_name": "Sceny",
+      "description": "Spravovat sceny osvetleni",
       "url": "/?tab=scenes",
       "icons": [
         {

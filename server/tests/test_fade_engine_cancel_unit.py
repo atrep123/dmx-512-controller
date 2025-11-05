@@ -37,7 +37,7 @@ async def test_cancel_channels_accounts_only_existing(monkeypatch):
     now_ms = int(time.time() * 1000)
     # Add a fade on channels 1,2
     fe.add_fade(universe=0, patch=[{"ch": 1, "val": 100}, {"ch": 2, "val": 100}], duration_ms=1000, now_ms=now_ms, get_current=get_current, easing="linear", metrics=metrics)
-    # Cancel channels [2,5] – only channel 2 exists
+    # Cancel channels [2,5]  only channel 2 exists
     fe.cancel_channels(0, [2, 5], metrics=metrics)
     # Run one tick to process metric updates
     task = asyncio.create_task(fe.run(apply_patch=apply_patch, broadcast=broadcast, ola_apply=None, metrics=metrics))

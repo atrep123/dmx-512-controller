@@ -8,8 +8,8 @@ This project exposes a unified control plane used by REST, WebSocket, and MQTT.
 
 ## REST
 
-- GET `/state` → snapshot
-- POST `/command` → ack
+- GET `/state`  snapshot
+- POST `/command`  ack
 
 Example:
 
@@ -34,12 +34,12 @@ Ack (validation failed):
   "errors":[{"path":"/patch/0/ch","msg":"out of range"}], "ts":1730850000123 }
 ```
 
-### GET /state – ETag a volitelný sparse režim
+### GET /state  ETag a volitelny sparse rezim
 
-- Server přidává hlavičku `ETag: W/"rev-<rev>"`. Pokud klient pošle `If-None-Match` se stejnou hodnotou, vrací `304 Not Modified`.
-- Volitelný parametr `sparse=1` přidá do odpovědi klíče `universesSparse` (jen nenulové kanály) a `sparse: true`. Výchozí `universes` zůstává beze změny.
+- Server pridava hlavicku `ETag: W/"rev-<rev>"`. Pokud klient posle `If-None-Match` se stejnou hodnotou, vraci `304 Not Modified`.
+- Volitelny parametr `sparse=1` prida do odpovedi klice `universesSparse` (jen nenulove kanaly) a `sparse: true`. Vychozi `universes` zustava beze zmeny.
 
-Příklad:
+Priklad:
 
 ```
 GET /state?sparse=1
@@ -54,8 +54,8 @@ GET /state?sparse=1
 ## WebSocket
 
 - URL: `/ws?token=...`
-- Client→Server: `Command` JSON
-- Server→Client: `Ack` and `state.update`
+- ClientServer: `Command` JSON
+- ServerClient: `Ack` and `state.update`
 
 Example session:
 
@@ -66,7 +66,7 @@ Example session:
     "universe":0,"delta":[{"ch":1,"val":5}],"full":false}
 ```
 
-Multi‑universe example:
+Multiuniverse example:
 
 ```
 POST /command
@@ -78,15 +78,15 @@ WS broadcast:
   "delta":[{"ch":1,"val":100},{"ch":2,"val":120}],"full":false}
 ```
 
-Note on fades (if enabled): `dmx.patch` has LTP (last‑takes‑precedence) priority per channel over running `dmx.fade` commands.
+Note on fades (if enabled): `dmx.patch` has LTP (lasttakesprecedence) priority per channel over running `dmx.fade` commands.
 
 ## MQTT
 
 Topics (JSON payloads):
 
-- `dmx/command` – Command
-- `dmx/ack` – Ack
-- `dmx/state` – StateUpdate
+- `dmx/command`  Command
+- `dmx/ack`  Ack
+- `dmx/state`  StateUpdate
 
 ## Schemas
 
@@ -102,11 +102,11 @@ A dedicated schema for WS `state.update` may be added in v1.2.
 
 - Ack means the command was accepted into the processing queue (single-writer engine). Final state is confirmed via `state.update` or snapshot `/state`.
 - Error codes are stable for automation/tests:
-  - `VALIDATION_FAILED` – schema/semantic validation failed (range, empty patch, etc.)
-  - `PATCH_TOO_LARGE` – canonicalized patch exceeds the server limit (default 64)
-  - `RATE_LIMITED` – per-source rate exceeded (default 60 cmds/sec per proto/ip/universe)
-  - `NOT_SUPPORTED` – command type not implemented by the server
-  - `INTERNAL` – unexpected server error
+  - `VALIDATION_FAILED`  schema/semantic validation failed (range, empty patch, etc.)
+  - `PATCH_TOO_LARGE`  canonicalized patch exceeds the server limit (default 64)
+  - `RATE_LIMITED`  per-source rate exceeded (default 60 cmds/sec per proto/ip/universe)
+  - `NOT_SUPPORTED`  command type not implemented by the server
+  - `INTERNAL`  unexpected server error
 
 ## Dedupe window
 
@@ -114,16 +114,16 @@ The server deduplicates commands by ULID for 15 minutes (TTL). For legacy `{type
 
 ## Diagnostics
 
-- GET `/universes/:u/frame` → JSON snapshot 512 hodnot pro universe `u` (pouze pokud je `OUTPUT_MODE=ola`).
+- GET `/universes/:u/frame`  JSON snapshot 512 hodnot pro universe `u` (pouze pokud je `OUTPUT_MODE=ola`).
 
 ### Fade metriky
 
-Pokud je zapnuté `FADES_ENABLED=true`, backend exportuje metriky plánovače fade (per‑kanál):
+Pokud je zapnute `FADES_ENABLED=true`, backend exportuje metriky planovace fade (perkanal):
 
-- `dmx_core_fade_active{universe}` – aktivní kanály (gauge)
-- `dmx_core_fade_jobs_active{universe}` – aktivní fade joby (gauge)
-- `dmx_core_fades_started_total{universe}` – starty (inkrement o počet kanálů)
-- `dmx_core_fades_cancelled_total{universe,reason="ltp|done"}` – zrušené/dokončené kanály
-- `dmx_core_fade_ticks_total{universe}` – počet zpracovaných ticků
-- `dmx_core_fade_tick_ms_bucket{universe,le=...}` – histogram doby zpracování ticku v ms
-- `dmx_core_fade_queue_delay_ms_bucket{universe,le=...}` – histogram zpoždění od zařazení po první tick kanálu
+- `dmx_core_fade_active{universe}`  aktivni kanaly (gauge)
+- `dmx_core_fade_jobs_active{universe}`  aktivni fade joby (gauge)
+- `dmx_core_fades_started_total{universe}`  starty (inkrement o pocet kanalu)
+- `dmx_core_fades_cancelled_total{universe,reason="ltp|done"}`  zrusene/dokoncene kanaly
+- `dmx_core_fade_ticks_total{universe}`  pocet zpracovanych ticku
+- `dmx_core_fade_tick_ms_bucket{universe,le=...}`  histogram doby zpracovani ticku v ms
+- `dmx_core_fade_queue_delay_ms_bucket{universe,le=...}`  histogram zpozdeni od zarazeni po prvni tick kanalu

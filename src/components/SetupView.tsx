@@ -30,7 +30,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
 
     const addUniverse = () => {
         if (!universeName.trim()) {
-            toast.error('Zadejte název univerza')
+            toast.error('Zadejte nazev univerza')
             return
         }
 
@@ -44,7 +44,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         setUniverseName('')
         setUniverseNumber('1')
         setIsUniverseDialogOpen(false)
-        toast.success(`Univerzum "${newUniverse.name}" vytvořeno`)
+        toast.success(`Univerzum "${newUniverse.name}" vytvoreno`)
     }
 
     const deleteUniverse = (universeId: string) => {
@@ -52,19 +52,19 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         const universeFixtures = fixtures.filter((f) => f.universeId === universeId)
 
         if (universeFixtures.length > 0) {
-            toast.error('Nelze smazat univerzum se světly')
+            toast.error('Nelze smazat univerzum se svetly')
             return
         }
 
         setUniverses((currentUniverses) => currentUniverses.filter((u) => u.id !== universeId))
         if (universe) {
-            toast.success(`Univerzum "${universe.name}" smazáno`)
+            toast.success(`Univerzum "${universe.name}" smazano`)
         }
     }
 
     const addFixture = () => {
         if (!fixtureName.trim()) {
-            toast.error('Zadejte název světla')
+            toast.error('Zadejte nazev svetla')
             return
         }
 
@@ -77,17 +77,17 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         const channelCount = parseInt(fixtureChannelCount)
 
         if (dmxAddress < 1 || dmxAddress > 512) {
-            toast.error('DMX adresa musí být mezi 1 a 512')
+            toast.error('DMX adresa musi byt mezi 1 a 512')
             return
         }
 
         if (channelCount < 1 || channelCount > 32) {
-            toast.error('Počet kanálů musí být mezi 1 a 32')
+            toast.error('Pocet kanalu musi byt mezi 1 a 32')
             return
         }
 
         if (dmxAddress + channelCount - 1 > 512) {
-            toast.error('Světlo překračuje limit DMX univerza (512 kanálů)')
+            toast.error('Svetlo prekracuje limit DMX univerza (512 kanalu)')
             return
         }
 
@@ -99,7 +99,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         })
 
         if (overlapping) {
-            toast.error(`Adresa koliduje se světlem "${overlapping.name}"`)
+            toast.error(`Adresa koliduje se svetlem "${overlapping.name}"`)
             return
         }
 
@@ -131,31 +131,31 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         setFixtureChannelCount('1')
         setFixtureType('generic')
         setIsFixtureDialogOpen(false)
-        toast.success(`Světlo "${newFixture.name}" přidáno`)
+        toast.success(`Svetlo "${newFixture.name}" pridano`)
     }
 
     const deleteFixture = (fixtureId: string) => {
         const fixture = fixtures.find((f) => f.id === fixtureId)
         setFixtures((currentFixtures) => currentFixtures.filter((f) => f.id !== fixtureId))
         if (fixture) {
-            toast.success(`Světlo "${fixture.name}" smazáno`)
+            toast.success(`Svetlo "${fixture.name}" smazano`)
         }
     }
 
     const getChannelNames = (type: Fixture['fixtureType'], count: number): string[] => {
         switch (type) {
             case 'rgb':
-                return ['Červená', 'Zelená', 'Modrá']
+                return ['Cervena', 'Zelena', 'Modra']
             case 'rgbw':
-                return ['Červená', 'Zelená', 'Modrá', 'Bílá']
+                return ['Cervena', 'Zelena', 'Modra', 'Bila']
             case 'moving-head':
-                return ['Intenzita', 'Pan', 'Tilt', 'Barva', 'Gobo', 'Závěrka', 'Hranol', 'Zaostření']
+                return ['Intenzita', 'Pan', 'Tilt', 'Barva', 'Gobo', 'Zaverka', 'Hranol', 'Zaostreni']
             case 'stepper-motor':
-                return ['Pozice horní', 'Pozice dolní', 'Rychlost']
+                return ['Pozice horni', 'Pozice dolni', 'Rychlost']
             case 'servo':
-                return ['Úhel']
+                return ['Uhel']
             default:
-                return Array.from({ length: count }, (_, i) => `Kanál ${i + 1}`)
+                return Array.from({ length: count }, (_, i) => `Kanal ${i + 1}`)
         }
     }
 
@@ -165,31 +165,31 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h2 className="text-xl font-semibold">Univerza</h2>
-                        <p className="text-sm text-muted-foreground">Správa DMX univerzí</p>
+                        <p className="text-sm text-muted-foreground">Sprava DMX univerzi</p>
                     </div>
                     <Dialog open={isUniverseDialogOpen} onOpenChange={setIsUniverseDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2">
                                 <Plus weight="bold" />
-                                Přidat univerzum
+                                Pridat univerzum
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Přidat DMX univerzum</DialogTitle>
+                                <DialogTitle>Pridat DMX univerzum</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="universe-name">Název univerza</Label>
+                                    <Label htmlFor="universe-name">Nazev univerza</Label>
                                     <Input
                                         id="universe-name"
                                         value={universeName}
                                         onChange={(e) => setUniverseName(e.target.value)}
-                                        placeholder="např. Hlavní jeviště, Zadní světlo"
+                                        placeholder="napr. Hlavni jeviste, Zadni svetlo"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="universe-number">Číslo univerza</Label>
+                                    <Label htmlFor="universe-number">Cislo univerza</Label>
                                     <Input
                                         id="universe-number"
                                         type="number"
@@ -200,7 +200,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addUniverse}>Přidat univerzum</Button>
+                                <Button onClick={addUniverse}>Pridat univerzum</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -208,7 +208,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
 
                 {universes.length === 0 ? (
                     <Card className="p-8 text-center">
-                        <p className="text-sm text-muted-foreground">Žádná nastavená univerza</p>
+                        <p className="text-sm text-muted-foreground">Zadna nastavena univerza</p>
                     </Card>
                 ) : (
                     <div className="grid gap-3 md:grid-cols-2">
@@ -238,28 +238,28 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h2 className="text-xl font-semibold">Světla</h2>
-                        <p className="text-sm text-muted-foreground">Konfigurace světelných zařízení</p>
+                        <h2 className="text-xl font-semibold">Svetla</h2>
+                        <p className="text-sm text-muted-foreground">Konfigurace svetelnych zarizeni</p>
                     </div>
                     <Dialog open={isFixtureDialogOpen} onOpenChange={setIsFixtureDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2" disabled={universes.length === 0}>
                                 <Plus weight="bold" />
-                                Přidat světlo
+                                Pridat svetlo
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Přidat světlo</DialogTitle>
+                                <DialogTitle>Pridat svetlo</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="fixture-name">Název světla</Label>
+                                    <Label htmlFor="fixture-name">Nazev svetla</Label>
                                     <Input
                                         id="fixture-name"
                                         value={fixtureName}
                                         onChange={(e) => setFixtureName(e.target.value)}
-                                        placeholder="např. Přední zálivka, Moving Head 1"
+                                        placeholder="napr. Predni zalivka, Moving Head 1"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -278,7 +278,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="fixture-type">Typ světla</Label>
+                                    <Label htmlFor="fixture-type">Typ svetla</Label>
                                     <Select
                                         value={fixtureType}
                                         onValueChange={(value) =>
@@ -289,11 +289,11 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="generic">Obecné</SelectItem>
+                                            <SelectItem value="generic">Obecne</SelectItem>
                                             <SelectItem value="rgb">RGB</SelectItem>
                                             <SelectItem value="rgbw">RGBW</SelectItem>
                                             <SelectItem value="moving-head">Moving Head</SelectItem>
-                                            <SelectItem value="stepper-motor">Krokový motor</SelectItem>
+                                            <SelectItem value="stepper-motor">Krokovy motor</SelectItem>
                                             <SelectItem value="servo">Servo</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -311,7 +311,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="channel-count">Kanály</Label>
+                                        <Label htmlFor="channel-count">Kanaly</Label>
                                         <Input
                                             id="channel-count"
                                             type="number"
@@ -324,7 +324,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addFixture}>Přidat světlo</Button>
+                                <Button onClick={addFixture}>Pridat svetlo</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -336,11 +336,11 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                             <div className="rounded-full bg-muted p-6 mb-4">
                                 <Lightbulb size={48} className="text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">Zatím žádná světla</h3>
+                            <h3 className="text-lg font-semibold mb-2">Zatim zadna svetla</h3>
                             <p className="text-sm text-muted-foreground max-w-md">
                                 {universes.length === 0
-                                    ? 'Nejprve vytvořte univerzum, pak přidejte světla pro ovládání DMX kanálů'
-                                    : 'Přidejte první světlo pro ovládání DMX kanálů'}
+                                    ? 'Nejprve vytvorte univerzum, pak pridejte svetla pro ovladani DMX kanalu'
+                                    : 'Pridejte prvni svetlo pro ovladani DMX kanalu'}
                             </p>
                         </div>
                     </Card>
@@ -368,7 +368,7 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                         </div>
                                         <div className="flex gap-2 flex-wrap">
                                             <Badge variant="outline">@{fixture.dmxAddress}</Badge>
-                                            <Badge variant="outline">{fixture.channelCount} kanálů</Badge>
+                                            <Badge variant="outline">{fixture.channelCount} kanalu</Badge>
                                             <Badge variant="secondary">{fixture.fixtureType}</Badge>
                                         </div>
                                     </div>

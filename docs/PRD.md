@@ -16,63 +16,63 @@ A mobile-first DMX 512 lighting and motion controller web application optimized 
 - **Functionality**: PWA manifest and meta tags for mobile installation
 - **Purpose**: Enable "Add to Home Screen" functionality on Android/iOS for app-like experience
 - **Trigger**: User opens app in mobile browser and receives install prompt
-- **Progression**: Access web app → Browser shows install prompt → Add to home screen → App launches full-screen like native app
+- **Progression**: Access web app  Browser shows install prompt  Add to home screen  App launches full-screen like native app
 - **Success criteria**: App installable on Android/iOS, launches without browser chrome, works offline with cached assets
 
 ### Fixture Channel Control
 - **Functionality**: Individual DMX channel faders (0-255 values) for controlling fixture parameters
 - **Purpose**: Direct control over individual lighting parameters (intensity, color, position)
 - **Trigger**: User taps on a fixture or channel group
-- **Progression**: Select fixture → View channels → Adjust faders → Values update in real-time → State persists
+- **Progression**: Select fixture  View channels  Adjust faders  Values update in real-time  State persists
 - **Success criteria**: Smooth fader interaction with immediate value display, values persist between sessions
 
 ### Scene Management
 - **Functionality**: Save and recall complete lighting states across all fixtures
 - **Purpose**: Quickly switch between pre-programmed looks during performances
 - **Trigger**: User taps scene save/recall button
-- **Progression**: Create scene → Set all desired channel values → Save with name → Recall instantly applies all values
+- **Progression**: Create scene  Set all desired channel values  Save with name  Recall instantly applies all values
 - **Success criteria**: Scenes load within 100ms, all channel values restore accurately
 
 ### Universe/Fixture Setup
 - **Functionality**: Configure DMX universes and add fixtures with DMX addresses and channel counts
 - **Purpose**: Define the lighting rig layout and address mapping
 - **Trigger**: User opens setup/configuration panel
-- **Progression**: Add universe → Add fixture → Set DMX address → Choose fixture type/channel count → Fixture appears in control view
+- **Progression**: Add universe  Add fixture  Set DMX address  Choose fixture type/channel count  Fixture appears in control view
 - **Success criteria**: Configuration persists, fixtures display correctly in control interface
 
 ### Color Picker
 - **Functionality**: Visual RGB/HSV color selection for RGB fixtures
 - **Purpose**: Intuitive color selection instead of manually adjusting individual color channels
 - **Trigger**: User taps color control on RGB-capable fixture
-- **Progression**: Tap color button → Color wheel appears → Select color → RGB channels auto-calculate → Color applies
+- **Progression**: Tap color button  Color wheel appears  Select color  RGB channels auto-calculate  Color applies
 - **Success criteria**: Color translates accurately to DMX values, picker feels responsive
 
 ### Stepper Motor Control
 - **Functionality**: Precise positioning control for stepper motors via DMX (16-bit position + speed control)
 - **Purpose**: Control motorized movement systems (pan, tilt, linear actuators) with precise positioning
 - **Trigger**: User adjusts motor position or speed sliders
-- **Progression**: Select motor → Set target position → Adjust speed → Motor moves to position → Values persist
+- **Progression**: Select motor  Set target position  Adjust speed  Motor moves to position  Values persist
 - **Success criteria**: Position accurately converts to DMX high/low byte values, smooth control response
 
 ### Servo Control
 - **Functionality**: Angle-based control for servo motors (0-180 degrees mapped to DMX 0-255)
 - **Purpose**: Simple angular positioning for spotlights, mirrors, or moving elements
 - **Trigger**: User adjusts servo angle slider
-- **Progression**: Select servo → Set angle → DMX value updates → Servo moves → State persists
+- **Progression**: Select servo  Set angle  DMX value updates  Servo moves  State persists
 - **Success criteria**: Angle accurately maps to DMX values, intuitive degree-based control
 
 ### Automated Effects
 - **Functionality**: Pre-programmed lighting effects (chase, strobe, rainbow, fade, sweep) with visual type selection, speed/intensity control, quick fixture selection (All/Clear buttons), effect editing, and duplication. Advanced visual block programming for custom effects with drag-and-drop block composition, parameter editing, and loop controls.
 - **Purpose**: Create dynamic lighting sequences without manual programming, with simplified creation workflow and powerful visual programming for complex custom effects
 - **Trigger**: User creates effect with tabbed interface for type selection OR uses visual block programming, edits existing effects, or duplicates effects for quick variations
-- **Progression**: Create effect → Choose preset type via tabs OR select "Blocks" for visual programming → For blocks: drag blocks from library → arrange in sequence → configure each block's parameters → add loops/conditions → preview → save → Set initial speed/intensity → Select fixtures (All/Clear shortcuts) → Start/stop effect → Edit anytime → Duplicate for variations → Effects run in real-time
+- **Progression**: Create effect  Choose preset type via tabs OR select "Blocks" for visual programming  For blocks: drag blocks from library  arrange in sequence  configure each block's parameters  add loops/conditions  preview  save  Set initial speed/intensity  Select fixtures (All/Clear shortcuts)  Start/stop effect  Edit anytime  Duplicate for variations  Effects run in real-time
 - **Success criteria**: Effects run smoothly at specified speeds, multiple effects can run simultaneously, effects stop cleanly, editing is intuitive, duplication creates independent copies, block programs execute sequentially with proper timing and loops
 
 ### Network Connection
 - **Functionality**: Configure and connect to DMX networks via Art-Net, sACN, or USB DMX interfaces with connection profiles, real-time status monitoring, packet counting, and visual connection states
 - **Purpose**: Output DMX data to physical lighting equipment with easy profile switching for different venues
 - **Trigger**: User configures network settings, saves/loads profiles, and connects
-- **Progression**: Select protocol → Enter IP/port → Configure universe/send rate → Save as profile (optional) → Connect → Monitor connection status with live packet counter → Quick-switch between saved profiles
+- **Progression**: Select protocol  Enter IP/port  Configure universe/send rate  Save as profile (optional)  Connect  Monitor connection status with live packet counter  Quick-switch between saved profiles
 - **Success criteria**: Connection establishes successfully (with connecting animation), data transmission rate visible, packet counter increments, auto-connect option works, profiles load instantly, status clearly indicates connected/disconnected/connecting states
 
 ## Edge Case Handling
@@ -100,12 +100,12 @@ Triadic color scheme with deep blacks and vibrant accent colors that pop against
 - **Secondary Colors**: Dark charcoal backgrounds (oklch(0.15 0 0)) with slightly lighter panels (oklch(0.20 0 0)) for depth and layering
 - **Accent Color**: Magenta (oklch(0.65 0.20 330)) - Theatrical lighting magenta for call-to-action buttons, active states, and important highlights
 - **Foreground/Background Pairings**:
-  - Background (Dark Charcoal oklch(0.15 0 0)): Light text oklch(0.95 0 0) - Ratio 11.8:1 ✓
-  - Card (Darker Panel oklch(0.20 0 0)): Light text oklch(0.95 0 0) - Ratio 10.2:1 ✓
-  - Primary (Deep Cyan oklch(0.65 0.15 210)): White text oklch(1 0 0) - Ratio 5.1:1 ✓
-  - Secondary (Medium Gray oklch(0.30 0 0)): Light text oklch(0.95 0 0) - Ratio 7.8:1 ✓
-  - Accent (Magenta oklch(0.65 0.20 330)): White text oklch(1 0 0) - Ratio 4.9:1 ✓
-  - Muted (Subtle Gray oklch(0.25 0 0)): Muted text oklch(0.65 0 0) - Ratio 4.6:1 ✓
+  - Background (Dark Charcoal oklch(0.15 0 0)): Light text oklch(0.95 0 0) - Ratio 11.8:1 
+  - Card (Darker Panel oklch(0.20 0 0)): Light text oklch(0.95 0 0) - Ratio 10.2:1 
+  - Primary (Deep Cyan oklch(0.65 0.15 210)): White text oklch(1 0 0) - Ratio 5.1:1 
+  - Secondary (Medium Gray oklch(0.30 0 0)): Light text oklch(0.95 0 0) - Ratio 7.8:1 
+  - Accent (Magenta oklch(0.65 0.20 330)): White text oklch(1 0 0) - Ratio 4.9:1 
+  - Muted (Subtle Gray oklch(0.25 0 0)): Muted text oklch(0.65 0 0) - Ratio 4.6:1 
 
 ## Font Selection
 The typeface should feel technical and precise but remain highly legible, with good distinction between numbers for DMX values. Inter font family provides excellent legibility at all sizes with tabular numbers perfect for channel values.

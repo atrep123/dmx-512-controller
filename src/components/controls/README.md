@@ -1,26 +1,26 @@
-# Ovládací bloky UI
+# Ovladaci bloky UI
 
-Tato knihovna obsahuje reusable komponenty pro vytváření ovládacích prvků DMX kontroléru. Každý blok je samostatný, plně funkční a připravený k použití.
+Tato knihovna obsahuje reusable komponenty pro vytvareni ovladacich prvku DMX kontroleru. Kazdy blok je samostatny, plne funkcni a pripraveny k pouziti.
 
-## Instalované komponenty
+## Instalovane komponenty
 
 ### 1. ChannelSliderBlock
-Univerzální slider pro ovládání DMX kanálů s různými variantami zobrazení.
+Univerzalni slider pro ovladani DMX kanalu s ruznymi variantami zobrazeni.
 
 **Props:**
-- `label` (string) - Popisek kanálu
-- `value` (number) - Aktuální hodnota (0-255)
-- `onChange` (function) - Callback při změně hodnoty
-- `min` (number, optional) - Minimální hodnota (výchozí: 0)
-- `max` (number, optional) - Maximální hodnota (výchozí: 255)
-- `step` (number, optional) - Krok změny (výchozí: 1)
-- `disabled` (boolean, optional) - Zakázat ovládání
-- `showInput` (boolean, optional) - Zobrazit číselný vstup (výchozí: true)
+- `label` (string) - Popisek kanalu
+- `value` (number) - Aktualni hodnota (0-255)
+- `onChange` (function) - Callback pri zmene hodnoty
+- `min` (number, optional) - Minimalni hodnota (vychozi: 0)
+- `max` (number, optional) - Maximalni hodnota (vychozi: 255)
+- `step` (number, optional) - Krok zmeny (vychozi: 1)
+- `disabled` (boolean, optional) - Zakazat ovladani
+- `showInput` (boolean, optional) - Zobrazit ciselny vstup (vychozi: true)
 - `icon` (ReactNode, optional) - Ikona vedle popisku
-- `variant` ('default' | 'compact' | 'large', optional) - Varianta zobrazení
+- `variant` ('default' | 'compact' | 'large', optional) - Varianta zobrazeni
 - `color` ('primary' | 'accent' | 'secondary', optional) - Barva hodnoty
 
-**Použití:**
+**Pouziti:**
 ```tsx
 <ChannelSliderBlock
     label="Ch 1: Dimmer"
@@ -32,18 +32,18 @@ Univerzální slider pro ovládání DMX kanálů s různými variantami zobraze
 ```
 
 ### 2. ColorPickerBlock
-Kompletní ovládání RGB a RGBW kanálů s předvolbami barev.
+Kompletni ovladani RGB a RGBW kanalu s predvolbami barev.
 
 **Props:**
-- `red` (number) - Hodnota červeného kanálu (0-255)
-- `green` (number) - Hodnota zeleného kanálu (0-255)
-- `blue` (number) - Hodnota modrého kanálu (0-255)
-- `white` (number, optional) - Hodnota bílého kanálu (0-255)
-- `onColorChange` (function) - Callback při změně barvy
-- `hasWhite` (boolean, optional) - Zobrazit ovládání bílého kanálu
-- `variant` ('default' | 'compact', optional) - Varianta zobrazení
+- `red` (number) - Hodnota cerveneho kanalu (0-255)
+- `green` (number) - Hodnota zeleneho kanalu (0-255)
+- `blue` (number) - Hodnota modreho kanalu (0-255)
+- `white` (number, optional) - Hodnota bileho kanalu (0-255)
+- `onColorChange` (function) - Callback pri zmene barvy
+- `hasWhite` (boolean, optional) - Zobrazit ovladani bileho kanalu
+- `variant` ('default' | 'compact', optional) - Varianta zobrazeni
 
-**Použití:**
+**Pouziti:**
 ```tsx
 <ColorPickerBlock
     red={red}
@@ -61,19 +61,19 @@ Kompletní ovládání RGB a RGBW kanálů s předvolbami barev.
 ```
 
 ### 3. ToggleButtonBlock
-Přepínač pro zapínání/vypínání funkcí s různými styly zobrazení.
+Prepinac pro zapinani/vypinani funkci s ruznymi styly zobrazeni.
 
 **Props:**
-- `label` (string) - Popisek přepínače
-- `active` (boolean) - Aktivní stav
-- `onToggle` (function) - Callback při přepnutí
-- `icon` (ReactNode, optional) - Ikona v neaktivním stavu
-- `activeIcon` (ReactNode, optional) - Ikona v aktivním stavu
-- `variant` ('default' | 'large' | 'minimal', optional) - Varianta zobrazení
-- `disabled` (boolean, optional) - Zakázat ovládání
-- `showStatus` (boolean, optional) - Zobrazit textový status (výchozí: true)
+- `label` (string) - Popisek prepinace
+- `active` (boolean) - Aktivni stav
+- `onToggle` (function) - Callback pri prepnuti
+- `icon` (ReactNode, optional) - Ikona v neaktivnim stavu
+- `activeIcon` (ReactNode, optional) - Ikona v aktivnim stavu
+- `variant` ('default' | 'large' | 'minimal', optional) - Varianta zobrazeni
+- `disabled` (boolean, optional) - Zakazat ovladani
+- `showStatus` (boolean, optional) - Zobrazit textovy status (vychozi: true)
 
-**Použití:**
+**Pouziti:**
 ```tsx
 <ToggleButtonBlock
     label="Stroboskop"
@@ -86,24 +86,24 @@ Přepínač pro zapínání/vypínání funkcí s různými styly zobrazení.
 ```
 
 ### 4. ButtonPadBlock
-Mřížka tlačítek pro rychlý přístup k efektům, scénám nebo funkcím.
+Mrizka tlacitek pro rychly pristup k efektum, scenam nebo funkcim.
 
 **Props:**
-- `title` (string, optional) - Nadpis mřížky
-- `items` (ButtonPadItem[]) - Pole tlačítek
-- `activeId` (string | null, optional) - ID aktivního tlačítka
-- `onItemClick` (function) - Callback při kliknutí na tlačítko
-- `columns` (2 | 3 | 4 | 6, optional) - Počet sloupců (výchozí: 3)
-- `variant` ('default' | 'compact', optional) - Varianta zobrazení
+- `title` (string, optional) - Nadpis mrizky
+- `items` (ButtonPadItem[]) - Pole tlacitek
+- `activeId` (string | null, optional) - ID aktivniho tlacitka
+- `onItemClick` (function) - Callback pri kliknuti na tlacitko
+- `columns` (2 | 3 | 4 | 6, optional) - Pocet sloupcu (vychozi: 3)
+- `variant` ('default' | 'compact', optional) - Varianta zobrazeni
 
 **ButtonPadItem:**
-- `id` (string) - Jedinečný identifikátor
-- `label` (string) - Text tlačítka
+- `id` (string) - Jedinecny identifikator
+- `label` (string) - Text tlacitka
 - `icon` (ReactNode, optional) - Ikona
 - `color` ('default' | 'accent' | 'secondary' | 'destructive', optional) - Barva
-- `badge` (string, optional) - Badge v rohu tlačítka
+- `badge` (string, optional) - Badge v rohu tlacitka
 
-**Použití:**
+**Pouziti:**
 ```tsx
 const effectButtons = [
     { id: 'strobe', label: 'Stroboskop', icon: <Lightning />, color: 'accent' },
@@ -120,18 +120,18 @@ const effectButtons = [
 ```
 
 ### 5. PositionControlBlock
-Ovládání Pan/Tilt pro moving heads a pozicionéry pomocí směrových tlačítek.
+Ovladani Pan/Tilt pro moving heads a pozicionery pomoci smerovych tlacitek.
 
 **Props:**
 - `panValue` (number) - Hodnota Pan (0-255)
 - `tiltValue` (number) - Hodnota Tilt (0-255)
-- `onPanChange` (function) - Callback při změně Pan
-- `onTiltChange` (function) - Callback při změně Tilt
-- `title` (string, optional) - Nadpis (výchozí: "Pan / Tilt")
-- `showReset` (boolean, optional) - Zobrazit reset tlačítko (výchozí: true)
-- `variant` ('default' | 'compact', optional) - Varianta zobrazení
+- `onPanChange` (function) - Callback pri zmene Pan
+- `onTiltChange` (function) - Callback pri zmene Tilt
+- `title` (string, optional) - Nadpis (vychozi: "Pan / Tilt")
+- `showReset` (boolean, optional) - Zobrazit reset tlacitko (vychozi: true)
+- `variant` ('default' | 'compact', optional) - Varianta zobrazeni
 
-**Použití:**
+**Pouziti:**
 ```tsx
 <PositionControlBlock
     panValue={pan}
@@ -143,16 +143,16 @@ Ovládání Pan/Tilt pro moving heads a pozicionéry pomocí směrových tlačí
 ```
 
 ### 6. IntensityFaderBlock
-Vertikální fader s vizuálním znázorněním pro přesné ovládání intenzity.
+Vertikalni fader s vizualnim znazornenim pro presne ovladani intenzity.
 
 **Props:**
-- `value` (number) - Aktuální hodnota (0-255)
-- `onChange` (function) - Callback při změně hodnoty
-- `label` (string, optional) - Popisek (výchozí: "Intenzita")
-- `variant` ('default' | 'vertical' | 'compact', optional) - Varianta zobrazení
-- `showPresets` (boolean, optional) - Zobrazit rychlá tlačítka (výchozí: true)
+- `value` (number) - Aktualni hodnota (0-255)
+- `onChange` (function) - Callback pri zmene hodnoty
+- `label` (string, optional) - Popisek (vychozi: "Intenzita")
+- `variant` ('default' | 'vertical' | 'compact', optional) - Varianta zobrazeni
+- `showPresets` (boolean, optional) - Zobrazit rychla tlacitka (vychozi: true)
 
-**Použití:**
+**Pouziti:**
 ```tsx
 <IntensityFaderBlock
     value={intensity}
@@ -164,7 +164,7 @@ Vertikální fader s vizuálním znázorněním pro přesné ovládání intenzi
 
 ## Import
 
-Všechny komponenty lze importovat z jednoho místa:
+Vsechny komponenty lze importovat z jednoho mista:
 
 ```tsx
 import {
@@ -179,20 +179,20 @@ import {
 
 ## Demonstrace
 
-Pro zobrazení všech komponent v akci, navštivte záložku "UI Bloky" v aplikaci nebo se podívejte na `ControlBlocksDemo.tsx`.
+Pro zobrazeni vsech komponent v akci, navstivte zalozku "UI Bloky" v aplikaci nebo se podivejte na `ControlBlocksDemo.tsx`.
 
-## Vlastní styling
+## Vlastni styling
 
-Všechny komponenty používají shadcn/ui komponenty a Tailwind CSS, takže můžete snadno upravit barvy a styly pomocí CSS proměnných v `index.css`.
+Vsechny komponenty pouzivaji shadcn/ui komponenty a Tailwind CSS, takze muzete snadno upravit barvy a styly pomoci CSS promennych v `index.css`.
 
-## Tipy pro použití
+## Tipy pro pouziti
 
-1. **Kompaktní varianta** - Ideální pro panely s více kanály vedle sebe
-2. **Velká varianta** - Použijte pro hlavní ovládací prvky
-3. **Minimální varianta** - Vhodná pro panely nástrojů a rychlé přepínače
-4. **Kombinace** - Můžete kombinovat různé varianty v jednom layoutu
+1. **Kompaktni varianta** - Idealni pro panely s vice kanaly vedle sebe
+2. **Velka varianta** - Pouzijte pro hlavni ovladaci prvky
+3. **Minimalni varianta** - Vhodna pro panely nastroju a rychle prepinace
+4. **Kombinace** - Muzete kombinovat ruzne varianty v jednom layoutu
 
-## Příklad komplexního layoutu
+## Priklad komplexniho layoutu
 
 ```tsx
 <div className="grid gap-6 lg:grid-cols-2">
@@ -220,7 +220,7 @@ Všechny komponenty používají shadcn/ui komponenty a Tailwind CSS, takže mů
         />
         
         <ButtonPadBlock
-            title="Rychlé efekty"
+            title="Rychle efekty"
             items={effectButtons}
             activeId={activeEffect}
             onItemClick={setActiveEffect}

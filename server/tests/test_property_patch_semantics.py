@@ -57,12 +57,12 @@ patch_list = st.lists(patch_item, min_size=1, max_size=8)
 @settings(deadline=None, max_examples=30)
 @given(seq=st.lists(patch_list, min_size=1, max_size=20))
 async def test_patch_sequence_last_write_wins(live_server_url: str, seq: list[list[dict]]):
-    # Vezmi výchozí stav a spočítej očekávané hodnoty aplikací LWW
+    # Vezmi vchoz stav a spotej oekvan hodnoty aplikac LWW
     initial = _uni0_channels(_get_state(live_server_url))
     expected = {1: initial.get(1, 0), 2: initial.get(2, 0), 3: initial.get(3, 0)}
 
     for patch in seq:
-        # LWW uvnitř patche – poslední výskyt kanálu vyhrává
+        # LWW uvnit patche  posledn vskyt kanlu vyhrv
         temp = expected.copy()
         for it in patch:
             ch = int(it["ch"])
@@ -70,10 +70,10 @@ async def test_patch_sequence_last_write_wins(live_server_url: str, seq: list[li
             if ch in (1, 2, 3):
                 temp[ch] = val
         expected = temp
-        # Pošli příkaz s unikátním id, aby nezasáhl dedupe
+        # Poli pkaz s uniktnm id, aby nezashl dedupe
         _post_cmd(live_server_url, f"prop-{uuid.uuid4()}", patch)
 
-    # Pošli lehce „naháněcí“ smyčku, než engine dorovná stav
+    # Poli lehce nahnc smyku, ne engine dorovn stav
     deadline = time.perf_counter() + 2.0
     ok = False
     while time.perf_counter() < deadline:

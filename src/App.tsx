@@ -1,10 +1,11 @@
 import { useState, lazy, Suspense } from 'react'
-import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { Toaster } from '@/components/ui/sonner'
+import { useKVStore } from '@/state/kvProvider'
+import { ScenesStoreProvider } from '@/state/scenesStore'
 
 const FixturesView = lazy(() => import('@/components/FixturesView'))
 const ScenesView = lazy(() => import('@/components/ScenesView'))
@@ -17,12 +18,12 @@ const ControlBlocksDemo = lazy(() => import('@/components/ControlBlocksDemo'))
 const CustomPageBuilder = lazy(() => import('@/components/CustomPageBuilder'))
 
 function App() {
-    const [universes, setUniverses] = useKV<Universe[]>('dmx-universes', [])
-    const [fixtures, setFixtures] = useKV<Fixture[]>('dmx-fixtures', [])
-    const [scenes, setScenes] = useKV<Scene[]>('dmx-scenes', [])
-    const [stepperMotors, setStepperMotors] = useKV<StepperMotor[]>('dmx-stepper-motors', [])
-    const [servos, setServos] = useKV<Servo[]>('dmx-servos', [])
-    const [effects, setEffects] = useKV<Effect[]>('dmx-effects', [])
+    const [universes, setUniverses] = useKVStore<Universe[]>('dmx-universes', [])
+    const [fixtures, setFixtures] = useKVStore<Fixture[]>('dmx-fixtures', [])
+    const [scenes, setScenes] = useKVStore<Scene[]>('dmx-scenes', [])
+    const [stepperMotors, setStepperMotors] = useKVStore<StepperMotor[]>('dmx-stepper-motors', [])
+    const [servos, setServos] = useKVStore<Servo[]>('dmx-servos', [])
+    const [effects, setEffects] = useKVStore<Effect[]>('dmx-effects', [])
     const [activeScene, setActiveScene] = useState<string | null>(null)
 
     return (
@@ -32,15 +33,15 @@ function App() {
             
             <div className="container mx-auto px-4 py-6 max-w-7xl">
                 <header className="mb-6">
-                    <h1 className="text-2xl font-bold tracking-tight">DMX 512 Kontrolér</h1>
-                    <p className="text-sm text-muted-foreground mt-1">Profesionální řízení osvětlení a motorů</p>
+                    <h1 className="text-2xl font-bold tracking-tight">DMX 512 Kontroler</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Profesionalni rizeni osvetleni a motoru</p>
                 </header>
 
                 <Tabs defaultValue="custom" className="w-full">
                     <TabsList className="grid w-full grid-cols-9 mb-6 h-auto">
                         <TabsTrigger value="custom" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <SquaresFour weight="fill" />
-                            <span className="text-xs sm:text-sm">Moje stránka</span>
+                            <span className="text-xs sm:text-sm">Moje stranka</span>
                         </TabsTrigger>
                         <TabsTrigger value="blocks" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Cube weight="fill" />
@@ -52,7 +53,7 @@ function App() {
                         </TabsTrigger>
                         <TabsTrigger value="fixtures" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Lightbulb />
-                            <span className="text-xs sm:text-sm">Světla</span>
+                            <span className="text-xs sm:text-sm">Svetla</span>
                         </TabsTrigger>
                         <TabsTrigger value="motors" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <GearSix />
@@ -64,20 +65,20 @@ function App() {
                         </TabsTrigger>
                         <TabsTrigger value="scenes" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Palette />
-                            <span className="text-xs sm:text-sm">Scény</span>
+                            <span className="text-xs sm:text-sm">Sceny</span>
                         </TabsTrigger>
                         <TabsTrigger value="connection" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Plugs />
-                            <span className="text-xs sm:text-sm">Připojení</span>
+                            <span className="text-xs sm:text-sm">Pripojeni</span>
                         </TabsTrigger>
                         <TabsTrigger value="setup" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2">
                             <Gear />
-                            <span className="text-xs sm:text-sm">Nastavení</span>
+                            <span className="text-xs sm:text-sm">Nastaveni</span>
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="custom" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <CustomPageBuilder
                                 effects={effects || []}
                                 fixtures={fixtures || []}
@@ -92,13 +93,13 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="blocks" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <ControlBlocksDemo />
                         </Suspense>
                     </TabsContent>
 
                     <TabsContent value="live" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <LiveControlView
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
@@ -114,7 +115,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="fixtures" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <FixturesView
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
@@ -125,7 +126,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="motors" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <MotorsView
                                 stepperMotors={stepperMotors || []}
                                 setStepperMotors={setStepperMotors}
@@ -137,7 +138,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="effects" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <EffectsView
                                 effects={effects || []}
                                 setEffects={setEffects}
@@ -148,27 +149,31 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="scenes" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
-                            <ScenesView
-                                scenes={scenes || []}
-                                setScenes={setScenes}
-                                fixtures={fixtures || []}
-                                setFixtures={setFixtures}
-                                universes={universes || []}
-                                activeScene={activeScene}
-                                setActiveScene={setActiveScene}
-                            />
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
+                            <ScenesStoreProvider
+                                value={{
+                                    scenes: scenes || [],
+                                    setScenes,
+                                    fixtures: fixtures || [],
+                                    setFixtures,
+                                    universes: universes || [],
+                                    activeSceneId: activeScene,
+                                    setActiveSceneId: setActiveScene,
+                                }}
+                            >
+                                <ScenesView />
+                            </ScenesStoreProvider>
                         </Suspense>
                     </TabsContent>
 
                     <TabsContent value="connection" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <ConnectionView />
                         </Suspense>
                     </TabsContent>
 
                     <TabsContent value="setup" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Nacitam...</div>}>
                             <SetupView
                                 universes={universes || []}
                                 setUniverses={setUniverses}
@@ -184,3 +189,7 @@ function App() {
 }
 
 export default App
+
+
+
+

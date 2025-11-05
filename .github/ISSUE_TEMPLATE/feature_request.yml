@@ -1,67 +1,67 @@
-name: ✨ Feature Request
-description: Navrhnout novou funkci nebo vylepšení
+name: * Feature Request
+description: Navrhnout novou funkci nebo vylepseni
 title: "[Feature]: "
 labels: ["enhancement", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Děkujeme za váš návrh! Prosím popište co byste chtěli vidět v aplikaci.
+        Dekujeme za vas navrh! Prosim popiste co byste chteli videt v aplikaci.
 
   - type: textarea
     id: problem
     attributes:
-      label: Problém který feature řeší
-      description: Je váš feature request spojený s problémem? Popište ho.
-      placeholder: Jsem frustrovaný když... / Neexistuje způsob jak...
+      label: Problem ktery feature resi
+      description: Je vas feature request spojeny s problemem? Popiste ho.
+      placeholder: Jsem frustrovany kdyz... / Neexistuje zpusob jak...
     validations:
       required: true
 
   - type: textarea
     id: solution
     attributes:
-      label: Navrhované řešení
-      description: Jasný a stručný popis toho, co byste chtěli implementovat.
-      placeholder: Chtěl bych aby aplikace...
+      label: Navrhovane reseni
+      description: Jasny a strucny popis toho, co byste chteli implementovat.
+      placeholder: Chtel bych aby aplikace...
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternativní řešení
-      description: Zvažovali jste nějaká alternativní řešení nebo funkce?
-      placeholder: Alternativně by se mohlo...
+      label: Alternativni reseni
+      description: Zvazovali jste nejaka alternativni reseni nebo funkce?
+      placeholder: Alternativne by se mohlo...
 
   - type: dropdown
     id: category
     attributes:
       label: Kategorie
-      description: Do které kategorie feature patří?
+      description: Do ktere kategorie feature patri?
       options:
-        - UI/UX vylepšení
-        - Nová funkce - Ovládání světel
-        - Nová funkce - Efekty
-        - Nová funkce - Scény
-        - Nová funkce - Motory
-        - Nová funkce - Připojení
+        - UI/UX vylepseni
+        - Nova funkce - Ovladani svetel
+        - Nova funkce - Efekty
+        - Nova funkce - Sceny
+        - Nova funkce - Motory
+        - Nova funkce - Pripojeni
         - Performance optimalizace
         - Accessibility
         - Dokumentace
-        - Jiné
+        - Jine
     validations:
       required: true
 
   - type: dropdown
     id: priority
     attributes:
-      label: Priorita (vaše názor)
-      description: Jak důležitá je pro vás tato funkce?
+      label: Priorita (vase nazor)
+      description: Jak dulezita je pro vas tato funkce?
       options:
-        - Nízká - Nice to have
-        - Střední - Bylo by to užitečné
-        - Vysoká - Velmi potřebné
-        - Kritická - Bez toho nelze pracovat
+        - Nizka - Nice to have
+        - Stredni - Bylo by to uzitecne
+        - Vysoka - Velmi potrebne
+        - Kriticka - Bez toho nelze pracovat
     validations:
       required: true
 
@@ -69,10 +69,10 @@ body:
     id: usecase
     attributes:
       label: Use case
-      description: Jak byste tuto funkci používali? Konkrétní příklad.
+      description: Jak byste tuto funkci pouzivali? Konkretni priklad.
       placeholder: |
-        Když ovládám show, potřebuji...
-        Jako lighting designer používám...
+        Kdyz ovladam show, potrebuji...
+        Jako lighting designer pouzivam...
     validations:
       required: true
 
@@ -80,24 +80,24 @@ body:
     id: mockups
     attributes:
       label: Mockups / Screenshots
-      description: Máte nějaké návrhy vzhledu? Přidejte obrázky nebo popište.
-      placeholder: Přetáhněte obrázky sem nebo popište textově.
+      description: Mate nejake navrhy vzhledu? Pridejte obrazky nebo popiste.
+      placeholder: Pretahnete obrazky sem nebo popiste textove.
 
   - type: textarea
     id: additional
     attributes:
-      label: Další kontext
-      description: Jakékoliv další informace o feature requestu.
-      placeholder: Související funkce v jiných aplikacích, technické detaily, atd.
+      label: Dalsi kontext
+      description: Jakekoliv dalsi informace o feature requestu.
+      placeholder: Souvisejici funkce v jinych aplikacich, technicke detaily, atd.
 
   - type: checkboxes
     id: terms
     attributes:
       label: Checklist
       options:
-        - label: Prohledal jsem existující issues a toto není duplikát
+        - label: Prohledal jsem existujici issues a toto neni duplikat
           required: true
-        - label: Četl jsem dokumentaci a tato funkce tam není
+        - label: Cetl jsem dokumentaci a tato funkce tam neni
           required: true
-        - label: Jsem ochoten pomoci s implementací (optional)
+        - label: Jsem ochoten pomoci s implementaci (optional)
           required: false

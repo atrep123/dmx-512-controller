@@ -33,45 +33,45 @@ const BLOCK_TYPES = [
     },
     { 
         type: 'fade' as const, 
-        name: 'Přechod', 
+        name: 'Prechod', 
         icon: Sparkle, 
         color: 'bg-purple-500/20 border-purple-500',
-        description: 'Plynulý přechod'
+        description: 'Plynuly prechod'
     },
     { 
         type: 'wait' as const, 
-        name: 'Čekat', 
+        name: 'Cekat', 
         icon: Clock, 
         color: 'bg-gray-500/20 border-gray-500',
-        description: 'Pozastavit provádění'
+        description: 'Pozastavit provadeni'
     },
     { 
         type: 'chase-step' as const, 
         name: 'Krok Chase', 
         icon: ArrowsClockwise, 
         color: 'bg-green-500/20 border-green-500',
-        description: 'Aktivovat jedno světlo'
+        description: 'Aktivovat jedno svetlo'
     },
     { 
         type: 'strobe-pulse' as const, 
         name: 'Stroboskop', 
         icon: Lightning, 
         color: 'bg-red-500/20 border-red-500',
-        description: 'Rychlý záblesk'
+        description: 'Rychly zablesk'
     },
     { 
         type: 'rainbow-shift' as const, 
         name: 'Duha', 
         icon: Palette, 
         color: 'bg-pink-500/20 border-pink-500',
-        description: 'Posunutí odstínu'
+        description: 'Posunuti odstinu'
     },
     { 
         type: 'random-color' as const, 
-        name: 'Náhodná barva', 
+        name: 'Nahodna barva', 
         icon: Shuffle, 
         color: 'bg-orange-500/20 border-orange-500',
-        description: 'Náhodná RGB'
+        description: 'Nahodna RGB'
     },
     { 
         type: 'pan-tilt' as const, 
@@ -82,17 +82,17 @@ const BLOCK_TYPES = [
     },
     { 
         type: 'loop-start' as const, 
-        name: 'Začátek smyčky', 
+        name: 'Zacatek smycky', 
         icon: ArrowsClockwise, 
         color: 'bg-indigo-500/20 border-indigo-500',
-        description: 'Začít smyčku'
+        description: 'Zacit smycku'
     },
     { 
         type: 'loop-end' as const, 
-        name: 'Konec smyčky', 
+        name: 'Konec smycky', 
         icon: ArrowsClockwise, 
         color: 'bg-indigo-500/20 border-indigo-500',
-        description: 'Ukončit smyčku'
+        description: 'Ukoncit smycku'
     },
 ]
 

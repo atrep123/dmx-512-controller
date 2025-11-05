@@ -1,270 +1,270 @@
-# Dokumentace DMX 512 Kontrolér
+# Dokumentace DMX 512 Kontroler
 
-Vítejte v dokumentaci DMX 512 Kontrolér projektu! Zde najdete veškeré informace potřebné k používání, vývoji a nasazení aplikace.
+Vitejte v dokumentaci DMX 512 Kontroler projektu! Zde najdete veskere informace potrebne k pouzivani, vyvoji a nasazeni aplikace.
 
-## 📚 Přehled dokumentace
+##  Prehled dokumentace
 
-### Pro uživatele
+### Pro uzivatele
 
-| Dokument | Popis | Úroveň |
+| Dokument | Popis | Uroven |
 |----------|-------|--------|
-| [**User Guide**](USER_GUIDE.md) | Kompletní návod k použití aplikace | Začátečník |
-| [**Quick Start Android**](QUICKSTART_ANDROID.md) | Rychlý start pro Android zařízení | Začátečník |
-| [**Android Setup**](ANDROID_SETUP.md) | Detailní instalace na Android | Pokročilý |
-| [**FAQ**](FAQ.md) | Často kladené otázky | Všichni |
-| [**Troubleshooting**](TROUBLESHOOTING.md) | Řešení problémů | Všichni |
-| [**Glossary**](GLOSSARY.md) | Vysvětlení pojmů a terminologie | Začátečník |
+| [**User Guide**](USER_GUIDE.md) | Kompletni navod k pouziti aplikace | Zacatecnik |
+| [**Quick Start Android**](QUICKSTART_ANDROID.md) | Rychly start pro Android zarizeni | Zacatecnik |
+| [**Android Setup**](ANDROID_SETUP.md) | Detailni instalace na Android | Pokrocily |
+| [**FAQ**](FAQ.md) | Casto kladene otazky | Vsichni |
+| [**Troubleshooting**](TROUBLESHOOTING.md) | Reseni problemu | Vsichni |
+| [**Glossary**](GLOSSARY.md) | Vysvetleni pojmu a terminologie | Zacatecnik |
 
-### Pro vývojáře
+### Pro vyvojare
 
-| Dokument | Popis | Úroveň |
+| Dokument | Popis | Uroven |
 |----------|-------|--------|
-| [**Contributing Guide**](../CONTRIBUTING.md) | Jak přispět do projektu | Začátečník |
-| [**Architecture**](ARCHITECTURE.md) | Architektura a design aplikace | Středně pokročilý |
-| [**API Reference**](API.md) | TypeScript typy a rozhraní | Středně pokročilý |
-| [**PRD**](PRD.md) | Product Requirements Document | Pokročilý |
+| [**Contributing Guide**](../CONTRIBUTING.md) | Jak prispet do projektu | Zacatecnik |
+| [**Architecture**](ARCHITECTURE.md) | Architektura a design aplikace | Stredne pokrocily |
+| [**API Reference**](API.md) | TypeScript typy a rozhrani | Stredne pokrocily |
+| [**PRD**](PRD.md) | Product Requirements Document | Pokrocily |
 
 ### Pro deployment
 
-| Dokument | Popis | Úroveň |
+| Dokument | Popis | Uroven |
 |----------|-------|--------|
-| [**Deployment Guide**](DEPLOYMENT_GUIDE.md) | Nasazení do produkce | Středně pokročilý |
-| [**Icons Guide**](ICONS_README.md) | Vytvoření PWA ikon | Začátečník |
-| [**Security Guide**](SECURITY.md) | Bezpečnostní best practices | Pokročilý |
+| [**Deployment Guide**](DEPLOYMENT_GUIDE.md) | Nasazeni do produkce | Stredne pokrocily |
+| [**Icons Guide**](ICONS_README.md) | Vytvoreni PWA ikon | Zacatecnik |
+| [**Security Guide**](SECURITY.md) | Bezpecnostni best practices | Pokrocily |
 
-### Plánování a vize
+### Planovani a vize
 
-| Dokument | Popis | Úroveň |
+| Dokument | Popis | Uroven |
 |----------|-------|--------|
-| [**Roadmap**](ROADMAP.md) | Plánované funkce a timeline | Všichni |
+| [**Roadmap**](ROADMAP.md) | Planovane funkce a timeline | Vsichni |
 
-## 🚀 Rychlé odkazy
+## Rocket Rychle odkazy
 
-### Začínám s aplikací
-1. 📱 [Instalace na Android](QUICKSTART_ANDROID.md)
-2. 👤 [První kroky](USER_GUIDE.md#začínáme)
-3. ⚙️ [Základní nastavení](USER_GUIDE.md#nastavení)
+### Zacinam s aplikaci
+1.  [Instalace na Android](QUICKSTART_ANDROID.md)
+2.  [Prvni kroky](USER_GUIDE.md#zaciname)
+3.  [Zakladni nastaveni](USER_GUIDE.md#nastaveni)
 
-### Začínám s vývojem
-1. 🤝 [Contributing Guide](../CONTRIBUTING.md)
-2. 💻 [Vývojové prostředí](../CONTRIBUTING.md#vývojové-prostředí)
-3. 🏗️ [Architektura přehled](ARCHITECTURE.md#přehled)
+### Zacinam s vyvojem
+1. Handshake [Contributing Guide](../CONTRIBUTING.md)
+2. Computer [Vyvojove prostredi](../CONTRIBUTING.md#vyvojove-prostredi)
+3. Build [Architektura prehled](ARCHITECTURE.md#prehled)
 
-### Nasazení aplikace
-1. 🚀 [Deployment kroky](DEPLOYMENT_GUIDE.md#jak-nasadit-aplikaci)
-2. 🎨 [Vytvoření ikon](ICONS_README.md)
-3. ✅ [Kontrolní seznam](DEPLOYMENT_GUIDE.md#kontrolní-seznam-před-spuštěním)
+### Nasazeni aplikace
+1. Rocket [Deployment kroky](DEPLOYMENT_GUIDE.md#jak-nasadit-aplikaci)
+2.  [Vytvoreni ikon](ICONS_README.md)
+3. [x] [Kontrolni seznam](DEPLOYMENT_GUIDE.md#kontrolni-seznam-pred-spustenim)
 
-## 📖 Průvodce podle role
+## Book Pruvodce podle role
 
-### 🎭 Jsem lighting designer / operátor
+### Theater Jsem lighting designer / operator
 
-**Co potřebuji:**
-1. [User Guide](USER_GUIDE.md) - Naučte se ovládat aplikaci
+**Co potrebuji:**
+1. [User Guide](USER_GUIDE.md) - Naucte se ovladat aplikaci
 2. [Quick Start](QUICKSTART_ANDROID.md) - Instalace na mobil
-3. [User Guide - Scény](USER_GUIDE.md#scény) - Práce se scénami
-4. [User Guide - Efekty](USER_GUIDE.md#efekty) - Vytváření efektů
+3. [User Guide - Sceny](USER_GUIDE.md#sceny) - Prace se scenami
+4. [User Guide - Efekty](USER_GUIDE.md#efekty) - Vytvareni efektu
 
-**Nejčastější úkoly:**
-- [Přidání fixtures](USER_GUIDE.md#přidání-fixture-světla)
-- [Vytvoření scény](USER_GUIDE.md#vytvoření-scény)
-- [Spuštění efektu](USER_GUIDE.md#spuštění-efektu)
-- [Připojení k DMX](USER_GUIDE.md#konfigurace-art-net)
+**Nejcastejsi ukoly:**
+- [Pridani fixtures](USER_GUIDE.md#pridani-fixture-svetla)
+- [Vytvoreni sceny](USER_GUIDE.md#vytvoreni-sceny)
+- [Spusteni efektu](USER_GUIDE.md#spusteni-efektu)
+- [Pripojeni k DMX](USER_GUIDE.md#konfigurace-art-net)
 
-### 💻 Jsem vývojář
+### Computer Jsem vyvojar
 
-**Co potřebuji:**
-1. [Contributing Guide](../CONTRIBUTING.md) - Začněte zde
+**Co potrebuji:**
+1. [Contributing Guide](../CONTRIBUTING.md) - Zacnete zde
 2. [Architecture](ARCHITECTURE.md) - Pochopte strukturu
 3. [API Reference](API.md) - TypeScript typy
 4. [README](../README.md) - Tech stack a setup
 
-**Nejčastější úkoly:**
-- [Setup vývojového prostředí](../CONTRIBUTING.md#setup)
-- [Přidání nové komponenty](../CONTRIBUTING.md#struktura-projektu)
-- [Vytvoření Pull Requestu](../CONTRIBUTING.md#pull-request-process)
+**Nejcastejsi ukoly:**
+- [Setup vyvojoveho prostredi](../CONTRIBUTING.md#setup)
+- [Pridani nove komponenty](../CONTRIBUTING.md#struktura-projektu)
+- [Vytvoreni Pull Requestu](../CONTRIBUTING.md#pull-request-process)
 - [Code review](../CONTRIBUTING.md#review-proces)
 
-### 🚀 Jsem DevOps / deployer
+### Rocket Jsem DevOps / deployer
 
-**Co potřebuji:**
-1. [Deployment Guide](DEPLOYMENT_GUIDE.md) - Nasazení
-2. [Security Guide](SECURITY.md) - Bezpečnost
+**Co potrebuji:**
+1. [Deployment Guide](DEPLOYMENT_GUIDE.md) - Nasazeni
+2. [Security Guide](SECURITY.md) - Bezpecnost
 3. [Icons Guide](ICONS_README.md) - PWA ikony
-4. [Android Setup](ANDROID_SETUP.md) - Testování
+4. [Android Setup](ANDROID_SETUP.md) - Testovani
 
-**Nejčastější úkoly:**
+**Nejcastejsi ukoly:**
 - [Build aplikace](DEPLOYMENT_GUIDE.md#krok-2-build-aplikace)
-- [Hosting setup](DEPLOYMENT_GUIDE.md#krok-1-hosting-povinné)
-- [PWA testování](DEPLOYMENT_GUIDE.md#krok-3-testování-pwa)
+- [Hosting setup](DEPLOYMENT_GUIDE.md#krok-1-hosting-povinne)
+- [PWA testovani](DEPLOYMENT_GUIDE.md#krok-3-testovani-pwa)
 - [Google Play publishing](DEPLOYMENT_GUIDE.md#publikace-do-google-play-store)
 
-### 🎨 Jsem designer
+###  Jsem designer
 
-**Co potřebuji:**
+**Co potrebuji:**
 1. [PRD](PRD.md) - Design direction
-2. [Architecture - Design](ARCHITECTURE.md#📱-pwa-architektura)
+2. [Architecture - Design](ARCHITECTURE.md#-pwa-architektura)
 3. [Icons Guide](ICONS_README.md) - Ikony
 4. [PRD - Design](PRD.md#design-direction)
 
-**Nejčastější úkoly:**
-- [Barevné schéma](PRD.md#color-selection)
+**Nejcastejsi ukoly:**
+- [Barevne schema](PRD.md#color-selection)
 - [Typografie](PRD.md#font-selection)
 - [Komponenty](PRD.md#component-selection)
 - [Animace](PRD.md#animations)
 
-## 🎯 Průvodce podle úkolu
+## Target Pruvodce podle ukolu
 
-### Ovládání světel
-→ [User Guide - Ovládání světel](USER_GUIDE.md#ovládání-světel)
+### Ovladani svetel
+ [User Guide - Ovladani svetel](USER_GUIDE.md#ovladani-svetel)
 
-### Vytváření efektů
-→ [User Guide - Efekty](USER_GUIDE.md#efekty)
+### Vytvareni efektu
+ [User Guide - Efekty](USER_GUIDE.md#efekty)
 
-### Přidání nové funkce
-→ [Contributing Guide - Feature Development](../CONTRIBUTING.md#feature-development-guidelines)
+### Pridani nove funkce
+ [Contributing Guide - Feature Development](../CONTRIBUTING.md#feature-development-guidelines)
 
 ### Oprava bugu
-→ [Contributing Guide - Bug Fix](../CONTRIBUTING.md#bug-fix-guidelines)
+ [Contributing Guide - Bug Fix](../CONTRIBUTING.md#bug-fix-guidelines)
 
-### Nasazení na web
-→ [Deployment Guide](DEPLOYMENT_GUIDE.md)
+### Nasazeni na web
+ [Deployment Guide](DEPLOYMENT_GUIDE.md)
 
 ### Publikace do Google Play
-→ [Deployment Guide - TWA](DEPLOYMENT_GUIDE.md#publikace-do-google-play-store)
+ [Deployment Guide - TWA](DEPLOYMENT_GUIDE.md#publikace-do-google-play-store)
 
-## 📊 Dokumentace podle priority
+##  Dokumentace podle priority
 
-### ⭐⭐⭐ Must Read (Povinné)
+###  Must Read (Povinne)
 
-Pro uživatele:
+Pro uzivatele:
 - [User Guide](USER_GUIDE.md)
 
-Pro vývojáře:
+Pro vyvojare:
 - [Contributing Guide](../CONTRIBUTING.md)
 - [Architecture](ARCHITECTURE.md)
 
 Pro deployment:
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
 
-### ⭐⭐ Should Read (Doporučené)
+###  Should Read (Doporucene)
 
 - [API Reference](API.md)
 - [Android Setup](ANDROID_SETUP.md)
 - [Security Guide](SECURITY.md)
 
-### ⭐ Nice to Read (Užitečné)
+###  Nice to Read (Uzitecne)
 
 - [PRD](PRD.md)
 - [Icons Guide](ICONS_README.md)
 - [Quick Start](QUICKSTART_ANDROID.md)
 
-## 🔍 Hledání v dokumentaci
+##  Hledani v dokumentaci
 
-### Podle klíčových slov
+### Podle klicovych slov
 
 **DMX**
 - [DMX typy](API.md#fixture)
 - [DMX hodnoty](API.md#dmx-value-utilities)
-- [DMX universa](USER_GUIDE.md#vytvoření-universe)
+- [DMX universa](USER_GUIDE.md#vytvoreni-universe)
 
 **Fixtures**
 - [Fixture typy](API.md#fixture)
-- [Přidání fixture](USER_GUIDE.md#přidání-fixture-světla)
+- [Pridani fixture](USER_GUIDE.md#pridani-fixture-svetla)
 - [Fixture komponenta](ARCHITECTURE.md#view-komponenty)
 
-**Scény**
+**Sceny**
 - [Scene type](API.md#scene)
-- [Práce se scénami](USER_GUIDE.md#scény)
+- [Prace se scenami](USER_GUIDE.md#sceny)
 - [Scene management](ARCHITECTURE.md#state-management)
 
 **Efekty**
 - [Effect types](API.md#effect)
-- [Vytváření efektů](USER_GUIDE.md#efekty)
-- [Block programming](USER_GUIDE.md#vizuální-blokové-programování)
+- [Vytvareni efektu](USER_GUIDE.md#efekty)
+- [Block programming](USER_GUIDE.md#vizualni-blokove-programovani)
 
 **PWA**
-- [PWA architektura](ARCHITECTURE.md#📱-pwa-architektura)
-- [PWA instalace](USER_GUIDE.md#první-spuštění)
+- [PWA architektura](ARCHITECTURE.md#-pwa-architektura)
+- [PWA instalace](USER_GUIDE.md#prvni-spusteni)
 - [Service Worker](ARCHITECTURE.md#service-worker)
 
-## 🆘 Potřebujete pomoc?
+##  Potrebujete pomoc?
 
-### Nenašli jste odpověď?
+### Nenasli jste odpoved?
 
-1. 🔍 **Prohledejte dokumentaci** - Použijte Ctrl+F
-2. 💬 **GitHub Discussions** - [Zeptejte se komunity](https://github.com/atrep123/dmx-512-controller/discussions)
-3. 🐛 **GitHub Issues** - [Nahlaste problém](https://github.com/atrep123/dmx-512-controller/issues)
-4. 📧 **Kontaktujte maintainers** - Viz README
+1.  **Prohledejte dokumentaci** - Pouzijte Ctrl+F
+2. Chat **GitHub Discussions** - [Zeptejte se komunity](https://github.com/atrep123/dmx-512-controller/discussions)
+3. Bug **GitHub Issues** - [Nahlaste problem](https://github.com/atrep123/dmx-512-controller/issues)
+4. Email **Kontaktujte maintainers** - Viz README
 
-### Často kladené otázky
+### Casto kladene otazky
 
-Nejčastější otázky najdete v:
-- [User Guide - FAQ](USER_GUIDE.md#často-kladené-otázky)
-- [Deployment Guide - Troubleshooting](DEPLOYMENT_GUIDE.md#řešení-problémů)
-- [Android Setup - Známé problémy](ANDROID_SETUP.md#známé-problémy-a-řešení)
+Nejcastejsi otazky najdete v:
+- [User Guide - FAQ](USER_GUIDE.md#casto-kladene-otazky)
+- [Deployment Guide - Troubleshooting](DEPLOYMENT_GUIDE.md#reseni-problemu)
+- [Android Setup - Zname problemy](ANDROID_SETUP.md#zname-problemy-a-reseni)
 
-## 🔄 Aktualizace dokumentace
+## Refresh Aktualizace dokumentace
 
-Dokumentace je živý dokument a je pravidelně aktualizována.
+Dokumentace je zivy dokument a je pravidelne aktualizovana.
 
-**Poslední velká aktualizace**: 2024-11-01
+**Posledni velka aktualizace**: 2024-11-01
 
-**Co je nového:**
-- ✅ Kompletní restructuring dokumentace
-- ✅ Nový User Guide
-- ✅ Architecture dokumentace
-- ✅ API Reference
-- ✅ Contributing Guide
-- ✅ Tento index
+**Co je noveho:**
+- [x] Kompletni restructuring dokumentace
+- [x] Novy User Guide
+- [x] Architecture dokumentace
+- [x] API Reference
+- [x] Contributing Guide
+- [x] Tento index
 
-### Jak přispět do dokumentace
+### Jak prispet do dokumentace
 
-1. Našli jste chybu nebo chybějící informaci?
-2. Otevřete Pull Request s opravou
-3. Přečtěte si [Contributing Guide](../CONTRIBUTING.md)
+1. Nasli jste chybu nebo chybejici informaci?
+2. Otevrete Pull Request s opravou
+3. Prectete si [Contributing Guide](../CONTRIBUTING.md)
 
-## 📋 Checklist pro nové uživatele
+## Clipboard Checklist pro nove uzivatele
 
-Pro uživatele aplikace:
-- [ ] Přečíst [Quick Start](QUICKSTART_ANDROID.md)
+Pro uzivatele aplikace:
+- [ ] Precist [Quick Start](QUICKSTART_ANDROID.md)
 - [ ] Nainstalovat aplikaci na mobil
-- [ ] Projít [User Guide - Začínáme](USER_GUIDE.md#začínáme)
-- [ ] Vytvořit první fixture
-- [ ] Uložit první scénu
+- [ ] Projit [User Guide - Zaciname](USER_GUIDE.md#zaciname)
+- [ ] Vytvorit prvni fixture
+- [ ] Ulozit prvni scenu
 
-Pro vývojáře:
-- [ ] Přečíst [Contributing Guide](../CONTRIBUTING.md)
-- [ ] Setup vývojového prostředí
+Pro vyvojare:
+- [ ] Precist [Contributing Guide](../CONTRIBUTING.md)
+- [ ] Setup vyvojoveho prostredi
 - [ ] Pochopit [Architecture](ARCHITECTURE.md)
-- [ ] Prohlédnout [API Reference](API.md)
-- [ ] Vytvořit testovací branch
+- [ ] Prohlednout [API Reference](API.md)
+- [ ] Vytvorit testovaci branch
 
 Pro deployers:
-- [ ] Přečíst [Deployment Guide](DEPLOYMENT_GUIDE.md)
+- [ ] Precist [Deployment Guide](DEPLOYMENT_GUIDE.md)
 - [ ] Setup hosting (Vercel/Netlify)
-- [ ] Vytvořit PWA ikony
-- [ ] Testovat na reálných zařízeních
-- [ ] Projít [Security Guide](SECURITY.md)
+- [ ] Vytvorit PWA ikony
+- [ ] Testovat na realnych zarizenich
+- [ ] Projit [Security Guide](SECURITY.md)
 
-## 🌟 Doporučené další kroky
+##  Doporucene dalsi kroky
 
-Po přečtení relevantní dokumentace:
+Po precteni relevantni dokumentace:
 
-**Pro uživatele:**
-→ Začněte používat aplikaci!  
-→ Podělte se o feedback v [Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
+**Pro uzivatele:**
+ Zacnete pouzivat aplikaci!  
+ Podelte se o feedback v [Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
 
-**Pro vývojáře:**
-→ Najděte [good first issue](https://github.com/atrep123/dmx-512-controller/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)  
-→ Připojte se k vývoji!
+**Pro vyvojare:**
+ Najdete [good first issue](https://github.com/atrep123/dmx-512-controller/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)  
+ Pripojte se k vyvoji!
 
 **Pro deployers:**
-→ Nasaďte testovací instanci  
-→ Sdílejte zkušenosti s komunitou
+ Nasadte testovaci instanci  
+ Sdilejte zkusenosti s komunitou
 
 ---
 
-**Dokumentační hub pro DMX 512 Kontrolér**  
-Vytvořeno s ❤️ pro lighting community  
-Poslední aktualizace: 2024-11-01
+**Dokumentacni hub pro DMX 512 Kontroler**  
+Vytvoreno s  pro lighting community  
+Posledni aktualizace: 2024-11-01

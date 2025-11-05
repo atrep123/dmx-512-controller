@@ -80,7 +80,7 @@ export function ToggleButtonBlock({
                         <h3 className="font-semibold text-lg">{label}</h3>
                         {showStatus && (
                             <Badge variant={active ? 'default' : 'outline'} className="mt-2">
-                                {active ? 'AKTIVNÍ' : 'NEAKTIVNÍ'}
+                                {active ? 'AKTIVNI' : 'NEAKTIVNI'}
                             </Badge>
                         )}
                     </div>
@@ -117,7 +117,7 @@ export function ToggleButtonBlock({
                         <h3 className="font-semibold">{label}</h3>
                         {showStatus && (
                             <p className="text-xs text-muted-foreground">
-                                {active ? 'Aktivní' : 'Neaktivní'}
+                                {active ? 'Aktivni' : 'Neaktivni'}
                             </p>
                         )}
                     </div>

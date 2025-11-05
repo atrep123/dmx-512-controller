@@ -125,7 +125,7 @@ export default function JoystickControl({
         }
     }, [position, isDragging])
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- setFixtures/setStepperMotors/setServos jsou stabilní updatery
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setFixtures/setStepperMotors/setServos jsou stabilni updatery
     useEffect(() => {
         const x = mapping.invertX ? -position.x : position.x
         const y = mapping.invertY ? -position.y : position.y
@@ -261,13 +261,13 @@ export default function JoystickControl({
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <GameController className="w-5 h-5" />
-                        Joystick Ovládání
+                        Joystick Ovladani
                     </CardTitle>
                     <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                                 <Crosshair className="mr-2" />
-                                Nastavení
+                                Nastaveni
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -279,7 +279,7 @@ export default function JoystickControl({
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="fixtures">
                                             <Lightbulb className="mr-2" />
-                                            Světla
+                                            Svetla
                                         </TabsTrigger>
                                         <TabsTrigger value="motors">
                                             <GearSix className="mr-2" />
@@ -294,7 +294,7 @@ export default function JoystickControl({
                                     <TabsContent value="fixtures" className="space-y-3">
                                         {fixtures.length === 0 ? (
                                             <p className="text-sm text-muted-foreground text-center py-4">
-                                                Žádná světla k dispozici
+                                                Zadna svetla k dispozici
                                             </p>
                                         ) : (
                                             fixtures.map((fixture) => (
@@ -324,7 +324,7 @@ export default function JoystickControl({
                                     <TabsContent value="motors" className="space-y-3">
                                         {stepperMotors.length === 0 ? (
                                             <p className="text-sm text-muted-foreground text-center py-4">
-                                                Žádné motory k dispozici
+                                                Zadne motory k dispozici
                                             </p>
                                         ) : (
                                             stepperMotors.map((motor) => (
@@ -343,7 +343,7 @@ export default function JoystickControl({
                                                     >
                                                         <div className="font-medium">{motor.name}</div>
                                                         <div className="text-xs text-muted-foreground">
-                                                            DMX: {motor.dmxAddress} | Max kroků: {motor.maxSteps}
+                                                            DMX: {motor.dmxAddress} | Max kroku: {motor.maxSteps}
                                                         </div>
                                                     </Label>
                                                 </div>
@@ -354,7 +354,7 @@ export default function JoystickControl({
                                     <TabsContent value="servos" className="space-y-3">
                                         {servos.length === 0 ? (
                                             <p className="text-sm text-muted-foreground text-center py-4">
-                                                Žádná serva k dispozici
+                                                Zadna serva k dispozici
                                             </p>
                                         ) : (
                                             servos.map((servo) => (
@@ -373,8 +373,8 @@ export default function JoystickControl({
                                                     >
                                                         <div className="font-medium">{servo.name}</div>
                                                         <div className="text-xs text-muted-foreground">
-                                                            DMX: {servo.dmxAddress} | Rozsah: {servo.minAngle}°-
-                                                            {servo.maxAngle}°
+                                                            DMX: {servo.dmxAddress} | Rozsah: {servo.minAngle}deg-
+                                                            {servo.maxAngle}deg
                                                         </div>
                                                     </Label>
                                                 </div>
@@ -469,7 +469,7 @@ export default function JoystickControl({
                         mapping.motorIds.length > 0 ||
                         mapping.servoIds.length > 0) && (
                         <div className="w-full">
-                            <div className="text-xs text-muted-foreground mb-2">Přiřazená zařízení:</div>
+                            <div className="text-xs text-muted-foreground mb-2">Prirazena zarizeni:</div>
                             <div className="flex flex-wrap gap-2">
                                 {mapping.fixtureIds.map((id) => {
                                     const fixture = fixtures.find((f) => f.id === id)

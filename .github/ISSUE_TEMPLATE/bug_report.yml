@@ -1,19 +1,19 @@
-name: 🐛 Bug Report
-description: Nahlásit chybu nebo problém v aplikaci
+name: Bug Bug Report
+description: Nahlasit chybu nebo problem v aplikaci
 title: "[Bug]: "
 labels: ["bug", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Děkujeme za nahlášení bugu! Prosím vyplňte co nejvíce informací.
+        Dekujeme za nahlaseni bugu! Prosim vyplnte co nejvice informaci.
 
   - type: textarea
     id: description
     attributes:
-      label: Popis problému
-      description: Jaký je problém? Co se stalo?
-      placeholder: Jasný a stručný popis problému.
+      label: Popis problemu
+      description: Jaky je problem? Co se stalo?
+      placeholder: Jasny a strucny popis problemu.
     validations:
       required: true
 
@@ -21,28 +21,28 @@ body:
     id: steps
     attributes:
       label: Kroky k reprodukci
-      description: Jak můžeme problém reprodukovat?
+      description: Jak muzeme problem reprodukovat?
       placeholder: |
-        1. Jděte na '...'
-        2. Klikněte na '...'
-        3. Scrollujte dolů na '...'
-        4. Vidíte chybu
+        1. Jdete na '...'
+        2. Kliknete na '...'
+        3. Scrollujte dolu na '...'
+        4. Vidite chybu
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: Očekávané chování
-      description: Co jste očekávali, že se stane?
+      label: Ocekavane chovani
+      description: Co jste ocekavali, ze se stane?
     validations:
       required: true
 
   - type: textarea
     id: actual
     attributes:
-      label: Aktuální chování
-      description: Co se skutečně stalo?
+      label: Aktualni chovani
+      description: Co se skutecne stalo?
     validations:
       required: true
 
@@ -50,14 +50,14 @@ body:
     id: screenshots
     attributes:
       label: Screenshots
-      description: Pokud je to relevantní, přidejte screenshots.
-      placeholder: Přetáhněte obrázky sem nebo vložte.
+      description: Pokud je to relevantni, pridejte screenshots.
+      placeholder: Pretahnete obrazky sem nebo vlozte.
 
   - type: dropdown
     id: browser
     attributes:
-      label: Prohlížeč
-      description: V jakém prohlížeči k problému dochází?
+      label: Prohlizec
+      description: V jakem prohlizeci k problemu dochazi?
       multiple: true
       options:
         - Chrome
@@ -65,54 +65,54 @@ body:
         - Safari
         - Edge
         - Samsung Internet
-        - Jiný
+        - Jiny
     validations:
       required: true
 
   - type: input
     id: browser-version
     attributes:
-      label: Verze prohlížeče
-      placeholder: např. 119.0.6045.105
+      label: Verze prohlizece
+      placeholder: napr. 119.0.6045.105
 
   - type: dropdown
     id: device
     attributes:
-      label: Zařízení
-      description: Na jakém zařízení k problému dochází?
+      label: Zarizeni
+      description: Na jakem zarizeni k problemu dochazi?
       options:
         - Desktop/Laptop
         - Android Smartphone
         - Android Tablet
         - iPhone
         - iPad
-        - Jiné
+        - Jine
     validations:
       required: true
 
   - type: input
     id: os
     attributes:
-      label: Operační systém
-      placeholder: např. Android 13, iOS 17, Windows 11
+      label: Operacni system
+      placeholder: napr. Android 13, iOS 17, Windows 11
     validations:
       required: true
 
   - type: dropdown
     id: pwa
     attributes:
-      label: Používáte PWA?
-      description: Je aplikace nainstalovaná jako PWA?
+      label: Pouzivate PWA?
+      description: Je aplikace nainstalovana jako PWA?
       options:
         - "Ano"
         - "Ne"
-        - "Nevím"
+        - "Nevim"
 
   - type: textarea
     id: additional
     attributes:
-      label: Další kontext
-      description: Jakékoliv další informace které by mohly pomoci.
+      label: Dalsi kontext
+      description: Jakekoliv dalsi informace ktere by mohly pomoci.
       placeholder: Console errors, network logs, atd.
 
   - type: checkboxes
@@ -120,7 +120,7 @@ body:
     attributes:
       label: Checklist
       options:
-        - label: Prohledal jsem existující issues a toto není duplikát
+        - label: Prohledal jsem existujici issues a toto neni duplikat
           required: true
-        - label: Zkusil jsem problém reprodukovat na nejnovější verzi
+        - label: Zkusil jsem problem reprodukovat na nejnovejsi verzi
           required: true

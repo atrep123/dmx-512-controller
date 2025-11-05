@@ -311,7 +311,7 @@ async def post_command(request: Request, context: AppContext = Depends(get_conte
 
 @router.get("/state")
 async def get_state(request: Request, sparse: int = 0, context: AppContext = Depends(get_context)) -> Response:
-    # Unified snapshot from DMX engine (default beze změny), s volitelným sparse přívěskem a ETagem
+    # Unified snapshot from DMX engine (default beze zmny), s volitelnm sparse pvskem a ETagem
     dmx = context.dmx
     etag = f'W/"rev-{dmx.rev}"'
     inm = request.headers.get("if-none-match")

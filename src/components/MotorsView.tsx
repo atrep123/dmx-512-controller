@@ -40,7 +40,7 @@ export default function MotorsView({
 
     const addStepperMotor = () => {
         if (!motorName.trim()) {
-            toast.error('Zadejte název motoru')
+            toast.error('Zadejte nazev motoru')
             return
         }
         if (!selectedUniverseId) {
@@ -52,7 +52,7 @@ export default function MotorsView({
         const maxSteps = parseInt(motorMaxSteps)
 
         if (dmxAddress < 1 || dmxAddress > 510) {
-            toast.error('DMX adresa musí být mezi 1 a 510')
+            toast.error('DMX adresa musi byt mezi 1 a 510')
             return
         }
 
@@ -60,13 +60,13 @@ export default function MotorsView({
             {
                 id: `${Date.now()}-position-high`,
                 number: dmxAddress,
-                name: 'Pozice horní',
+                name: 'Pozice horni',
                 value: 0,
             },
             {
                 id: `${Date.now()}-position-low`,
                 number: dmxAddress + 1,
-                name: 'Pozice dolní',
+                name: 'Pozice dolni',
                 value: 0,
             },
             {
@@ -96,12 +96,12 @@ export default function MotorsView({
         setMotorDmxAddress('1')
         setMotorMaxSteps('10000')
         setIsMotorDialogOpen(false)
-        toast.success(`Krokový motor "${newMotor.name}" přidán`)
+        toast.success(`Krokovy motor "${newMotor.name}" pridan`)
     }
 
     const addServo = () => {
         if (!servoName.trim()) {
-            toast.error('Zadejte název serva')
+            toast.error('Zadejte nazev serva')
             return
         }
         if (!selectedUniverseId) {
@@ -114,7 +114,7 @@ export default function MotorsView({
         const maxAngle = parseInt(servoMaxAngle)
 
         if (dmxAddress < 1 || dmxAddress > 512) {
-            toast.error('DMX adresa musí být mezi 1 a 512')
+            toast.error('DMX adresa musi byt mezi 1 a 512')
             return
         }
 
@@ -137,7 +137,7 @@ export default function MotorsView({
         setServoMinAngle('0')
         setServoMaxAngle('180')
         setIsServoDialogOpen(false)
-        toast.success(`Servo "${newServo.name}" přidáno`)
+        toast.success(`Servo "${newServo.name}" pridano`)
     }
 
     const updateMotorPosition = (motorId: string, position: number) => {
@@ -150,8 +150,8 @@ export default function MotorsView({
                         ...motor,
                         targetPosition: position,
                         channels: motor.channels.map((ch) => {
-                            if (ch.name === 'Pozice horní') return { ...ch, value: positionHigh }
-                            if (ch.name === 'Pozice dolní') return { ...ch, value: positionLow }
+                            if (ch.name === 'Pozice horni') return { ...ch, value: positionHigh }
+                            if (ch.name === 'Pozice dolni') return { ...ch, value: positionLow }
                             return ch
                         }),
                     }
@@ -195,7 +195,7 @@ export default function MotorsView({
         const motor = stepperMotors.find((m) => m.id === motorId)
         setStepperMotors((current) => current.filter((m) => m.id !== motorId))
         if (motor) {
-            toast.success(`Motor "${motor.name}" smazán`)
+            toast.success(`Motor "${motor.name}" smazan`)
         }
     }
 
@@ -203,7 +203,7 @@ export default function MotorsView({
         const servo = servos.find((s) => s.id === servoId)
         setServos((current) => current.filter((s) => s.id !== servoId))
         if (servo) {
-            toast.success(`Servo "${servo.name}" smazáno`)
+            toast.success(`Servo "${servo.name}" smazano`)
         }
     }
 
@@ -212,7 +212,7 @@ export default function MotorsView({
             <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="steppers" className="flex items-center gap-2">
                     <GearSix />
-                    Krokové motory
+                    Krokove motory
                 </TabsTrigger>
                 <TabsTrigger value="servos" className="flex items-center gap-2">
                     <ArrowsOutCardinal />
@@ -223,28 +223,28 @@ export default function MotorsView({
             <TabsContent value="steppers">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h2 className="text-xl font-semibold">Krokové motory</h2>
-                        <p className="text-sm text-muted-foreground">Ovládání pozice a rychlosti krokových motorů</p>
+                        <h2 className="text-xl font-semibold">Krokove motory</h2>
+                        <p className="text-sm text-muted-foreground">Ovladani pozice a rychlosti krokovych motoru</p>
                     </div>
                     <Dialog open={isMotorDialogOpen} onOpenChange={setIsMotorDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2" disabled={universes.length === 0}>
                                 <Plus weight="bold" />
-                                Přidat motor
+                                Pridat motor
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Přidat krokový motor</DialogTitle>
+                                <DialogTitle>Pridat krokovy motor</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="motor-name">Název motoru</Label>
+                                    <Label htmlFor="motor-name">Nazev motoru</Label>
                                     <Input
                                         id="motor-name"
                                         value={motorName}
                                         onChange={(e) => setMotorName(e.target.value)}
-                                        placeholder="např. Pan motor, Tilt motor"
+                                        placeholder="napr. Pan motor, Tilt motor"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -275,7 +275,7 @@ export default function MotorsView({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="motor-steps">Max kroků</Label>
+                                        <Label htmlFor="motor-steps">Max kroku</Label>
                                         <Input
                                             id="motor-steps"
                                             type="number"
@@ -287,7 +287,7 @@ export default function MotorsView({
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addStepperMotor}>Přidat motor</Button>
+                                <Button onClick={addStepperMotor}>Pridat motor</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -299,9 +299,9 @@ export default function MotorsView({
                             <div className="rounded-full bg-muted p-6 mb-4">
                                 <GearSix size={48} className="text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">Žádné krokové motory</h3>
+                            <h3 className="text-lg font-semibold mb-2">Zadne krokove motory</h3>
                             <p className="text-sm text-muted-foreground max-w-md">
-                                Přidejte krokové motory pro přesné polohování přes DMX
+                                Pridejte krokove motory pro presne polohovani pres DMX
                             </p>
                         </div>
                     </Card>
@@ -386,27 +386,27 @@ export default function MotorsView({
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h2 className="text-xl font-semibold">Serva</h2>
-                        <p className="text-sm text-muted-foreground">Ovládání pozic serv (0-180°)</p>
+                        <p className="text-sm text-muted-foreground">Ovladani pozic serv (0-180deg)</p>
                     </div>
                     <Dialog open={isServoDialogOpen} onOpenChange={setIsServoDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="gap-2" disabled={universes.length === 0}>
                                 <Plus weight="bold" />
-                                Přidat servo
+                                Pridat servo
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Přidat servo</DialogTitle>
+                                <DialogTitle>Pridat servo</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="servo-name">Název serva</Label>
+                                    <Label htmlFor="servo-name">Nazev serva</Label>
                                     <Input
                                         id="servo-name"
                                         value={servoName}
                                         onChange={(e) => setServoName(e.target.value)}
-                                        placeholder="např. Spot 1, Zrcadlo 2"
+                                        placeholder="napr. Spot 1, Zrcadlo 2"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -437,7 +437,7 @@ export default function MotorsView({
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="servo-min">Min úhel (°)</Label>
+                                        <Label htmlFor="servo-min">Min uhel (deg)</Label>
                                         <Input
                                             id="servo-min"
                                             type="number"
@@ -448,7 +448,7 @@ export default function MotorsView({
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="servo-max">Max úhel (°)</Label>
+                                        <Label htmlFor="servo-max">Max uhel (deg)</Label>
                                         <Input
                                             id="servo-max"
                                             type="number"
@@ -461,7 +461,7 @@ export default function MotorsView({
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button onClick={addServo}>Přidat servo</Button>
+                                <Button onClick={addServo}>Pridat servo</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -473,9 +473,9 @@ export default function MotorsView({
                             <div className="rounded-full bg-muted p-6 mb-4">
                                 <ArrowsOutCardinal size={48} className="text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold mb-2">Žádná serva</h3>
+                            <h3 className="text-lg font-semibold mb-2">Zadna serva</h3>
                             <p className="text-sm text-muted-foreground max-w-md">
-                                Přidejte serva pro úhlové polohování přes DMX
+                                Pridejte serva pro uhlove polohovani pres DMX
                             </p>
                         </div>
                     </Card>
@@ -509,9 +509,9 @@ export default function MotorsView({
 
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between text-sm">
-                                                <label className="text-muted-foreground">Úhel</label>
+                                                <label className="text-muted-foreground">Uhel</label>
                                                 <span className="font-mono text-primary font-semibold">
-                                                    {servo.targetAngle}°
+                                                    {servo.targetAngle}deg
                                                 </span>
                                             </div>
                                             <Slider
@@ -525,8 +525,8 @@ export default function MotorsView({
                                                 className="cursor-pointer"
                                             />
                                             <div className="flex justify-between text-xs text-muted-foreground">
-                                                <span>{servo.minAngle}°</span>
-                                                <span>{servo.maxAngle}°</span>
+                                                <span>{servo.minAngle}deg</span>
+                                                <span>{servo.maxAngle}deg</span>
                                             </div>
                                         </div>
                                     </div>

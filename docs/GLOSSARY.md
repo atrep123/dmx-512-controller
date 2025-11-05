@@ -1,83 +1,83 @@
-# Glosář pojmů
+# Glosar pojmu
 
-Vysvětlení klíčových pojmů a terminologie používané v DMX 512 Kontrolér aplikaci a v oblasti stage osvětlení.
+Vysvetleni klicovych pojmu a terminologie pouzivane v DMX 512 Kontroler aplikaci a v oblasti stage osvetleni.
 
-## 📋 Obsah
+## Clipboard Obsah
 
 - [DMX a protokoly](#dmx-a-protokoly)
-- [Hardware a zařízení](#hardware-a-zařízení)
-- [Osvětlení](#osvětlení)
-- [Efekty a programování](#efekty-a-programování)
-- [Aplikační termíny](#aplikační-termíny)
+- [Hardware a zarizeni](#hardware-a-zarizeni)
+- [Osvetleni](#osvetleni)
+- [Efekty a programovani](#efekty-a-programovani)
+- [Aplikacni terminy](#aplikacni-terminy)
 
-## 🔌 DMX a protokoly
+##  DMX a protokoly
 
 ### DMX 512
 
 **Digital Multiplex with 512 pieces of information**
 
-Průmyslový standard pro řízení stage osvětlení. Jeden DMX "universe" přenáší 512 kanálů dat, každý s hodnotou 0-255. Přenosová rychlost je 250 kbit/s s obnovovací frekvencí až 44 Hz.
+Prumyslovy standard pro rizeni stage osvetleni. Jeden DMX "universe" prenasi 512 kanalu dat, kazdy s hodnotou 0-255. Prenosova rychlost je 250 kbit/s s obnovovaci frekvenci az 44 Hz.
 
-**Příklad:** Par LED s 4 kanály (R, G, B, Dimmer) na DMX adrese 1 zabírá kanály 1-4.
+**Priklad:** Par LED s 4 kanaly (R, G, B, Dimmer) na DMX adrese 1 zabira kanaly 1-4.
 
 ### Universe
 
-Sada 512 DMX kanálů. Velké instalace používají více univerzí (Universe 1, Universe 2, atd.). Každé universe je nezávislé.
+Sada 512 DMX kanalu. Velke instalace pouzivaji vice univerzi (Universe 1, Universe 2, atd.). Kazde universe je nezavisle.
 
-**Příklad:** 
-- Universe 1: Par LEDs (kanály 1-100)
-- Universe 2: Moving heads (kanály 1-200)
+**Priklad:** 
+- Universe 1: Par LEDs (kanaly 1-100)
+- Universe 2: Moving heads (kanaly 1-200)
 
 ### DMX Adresa
 
-Start pozice fixture v rámci universe. Určuje první kanál, který fixture používá.
+Start pozice fixture v ramci universe. Urcuje prvni kanal, ktery fixture pouziva.
 
-**Příklad:** Fixture s 4 kanály na DMX adrese 5 zabírá kanály 5, 6, 7, 8.
+**Priklad:** Fixture s 4 kanaly na DMX adrese 5 zabira kanaly 5, 6, 7, 8.
 
-### DMX Kanál
+### DMX Kanal
 
-Jeden ze 512 kanálů v universe. Každý kanál má hodnotu 0-255.
+Jeden ze 512 kanalu v universe. Kazdy kanal ma hodnotu 0-255.
 
-**Typické použití:**
+**Typicke pouziti:**
 - 0 = Vypnuto/Minimum
 - 127 = 50%
-- 255 = Maximum/Plná intenzita
+- 255 = Maximum/Plna intenzita
 
 ### Art-Net
 
-DMX over Ethernet protokol. Umožňuje přenášet až 32,768 univerzí přes standardní Ethernet síť. Port: 6454 (UDP).
+DMX over Ethernet protokol. Umoznuje prenaset az 32,768 univerzi pres standardni Ethernet sit. Port: 6454 (UDP).
 
-**Výhody:**
-- Dlouhá kabeláž (100m+ pomocí switche)
-- Více univerzí na jeden kabel
+**Vyhody:**
+- Dlouha kabelaz (100m+ pomoci switche)
+- Vice univerzi na jeden kabel
 - WiFi podpora
-- Nižší náklady než DMX kabely
+- Nizsi naklady nez DMX kabely
 
 ### sACN (E1.31)
 
 **Streaming Architecture for Control Networks**
 
-Profesionální DMX over Ethernet protokol standardizovaný ANSI. Podobný Art-Net, ale s lepšími enterprise features.
+Profesionalni DMX over Ethernet protokol standardizovany ANSI. Podobny Art-Net, ale s lepsimi enterprise features.
 
-**Použití:**
-- Velké instalace
-- Broadcast/multicast mód
+**Pouziti:**
+- Velke instalace
+- Broadcast/multicast mod
 - Priority handling
 
 ### USB DMX Interface
 
-Hardware zařízení převádějící USB na DMX512. Umožňuje počítači komunikovat přímo s DMX zařízeními.
+Hardware zarizeni prevadejici USB na DMX512. Umoznuje pocitaci komunikovat primo s DMX zarizenimi.
 
 **Typy:**
 - Enttec DMX USB PRO
 - DMXking ultraDMX
-- Generic USB-DMX adaptéry
+- Generic USB-DMX adaptery
 
-## 🎛️ Hardware a zařízení
+##  Hardware a zarizeni
 
 ### Fixture
 
-Jakékoliv zařízení ovládané pomocí DMX. Může to být světlo, motor, smoke machine, atd.
+Jakekoliv zarizeni ovladane pomoci DMX. Muze to byt svetlo, motor, smoke machine, atd.
 
 **Typy:**
 - Static lights (par, wash)
@@ -87,9 +87,9 @@ Jakékoliv zařízení ovládané pomocí DMX. Může to být světlo, motor, sm
 
 ### Par LED
 
-Jednoduchý světelný reflektor s LED diodami. Obvykle RGB nebo RGBW.
+Jednoduchy svetelny reflektor s LED diodami. Obvykle RGB nebo RGBW.
 
-**Typické kanály:**
+**Typicke kanaly:**
 - Ch 1: Red (0-255)
 - Ch 2: Green (0-255)
 - Ch 3: Blue (0-255)
@@ -97,11 +97,11 @@ Jednoduchý světelný reflektor s LED diodami. Obvykle RGB nebo RGBW.
 
 ### Moving Head
 
-Inteligentní světlo s motorickým pohybem hlavy (Pan/Tilt) a často mnoha dalšími funkcemi (gobo, prism, zoom).
+Inteligentni svetlo s motorickym pohybem hlavy (Pan/Tilt) a casto mnoha dalsimi funkcemi (gobo, prism, zoom).
 
-**Typické kanály:**
-- Pan (horizontální pohyb)
-- Tilt (vertikální pohyb)
+**Typicke kanaly:**
+- Pan (horizontalni pohyb)
+- Tilt (vertikalni pohyb)
 - Dimmer
 - Color wheel
 - Gobo wheel
@@ -110,17 +110,17 @@ Inteligentní světlo s motorickým pohybem hlavy (Pan/Tilt) a často mnoha dal�
 
 ### RGB / RGBW Fixture
 
-Světlo s adresovatelnou barevnou LED.
+Svetlo s adresovatelnou barevnou LED.
 
-- **RGB**: 3 kanály (Red, Green, Blue)
-- **RGBW**: 4 kanály (RGB + White pro vyšší jas)
-- **RGBA**: 4 kanály (RGB + Amber pro teplé barvy)
+- **RGB**: 3 kanaly (Red, Green, Blue)
+- **RGBW**: 4 kanaly (RGB + White pro vyssi jas)
+- **RGBA**: 4 kanaly (RGB + Amber pro teple barvy)
 
 ### Stepper Motor
 
-Krokový motor používaný pro přesné polohování. Řízen pomocí high/low byte (16-bit pozice = 0-65535 kroků).
+Krokovy motor pouzivany pro presne polohovani. Rizen pomoci high/low byte (16-bit pozice = 0-65535 kroku).
 
-**DMX kanály:**
+**DMX kanaly:**
 - Ch 1: Position High Byte
 - Ch 2: Position Low Byte
 - Ch 3: Speed
@@ -128,115 +128,115 @@ Krokový motor používaný pro přesné polohování. Řízen pomocí high/low 
 
 ### Servo Motor
 
-Servomotor s úhlovým polohováním 0-180°. Jednodušší než stepper, používá pouze 1 DMX kanál.
+Servomotor s uhlovym polohovanim 0-180. Jednodussi nez stepper, pouziva pouze 1 DMX kanal.
 
-**Mapování:**
-- DMX 0 = 0°
-- DMX 127 = 90°
-- DMX 255 = 180°
+**Mapovani:**
+- DMX 0 = 0
+- DMX 127 = 90
+- DMX 255 = 180
 
-## 💡 Osvětlení
+##  Osvetleni
 
 ### Dimmer
 
-Funkce nebo kanál ovládající intenzitu světla.
+Funkce nebo kanal ovladajici intenzitu svetla.
 
 **Hodnoty:**
 - 0 = Vypnuto
 - 127 = 50% intenzita
-- 255 = Plná intenzita
+- 255 = Plna intenzita
 
 ### Color Temperature
 
-Teplota barvy světla měřená v Kelvinech.
+Teplota barvy svetla merena v Kelvinech.
 
-- **Warm White**: 2700-3200K (teplé, žluté)
-- **Neutral White**: 3500-4500K (neutrální)
-- **Cool White**: 5000-6500K (studené, modravé)
+- **Warm White**: 2700-3200K (teple, zlute)
+- **Neutral White**: 3500-4500K (neutralni)
+- **Cool White**: 5000-6500K (studene, modrave)
 
 ### Pan / Tilt
 
-**Pan**: Horizontální rotace (vlevo-vpravo)  
-**Tilt**: Vertikální rotace (nahoru-dolů)
+**Pan**: Horizontalni rotace (vlevo-vpravo)  
+**Tilt**: Vertikalni rotace (nahoru-dolu)
 
-Používáno u moving heads a scannerů. Obvykle 16-bit (2 kanály pro vysokou přesnost).
+Pouzivano u moving heads a scanneru. Obvykle 16-bit (2 kanaly pro vysokou presnost).
 
 ### Gobo
 
-Kovová nebo skleněná šablona umístěná před světelným zdrojem pro vytvoření vzoru nebo obrazu.
+Kovova nebo sklenena sablona umistena pred svetelnym zdrojem pro vytvoreni vzoru nebo obrazu.
 
-**Příklady:**
-- Stars (hvězdy)
-- Breakup patterns (rozbité vzory)
+**Priklady:**
+- Stars (hvezdy)
+- Breakup patterns (rozbite vzory)
 - Custom logos
 
 ### Strobe
 
-Rychlé blikání světla. Používáno pro dramatický efekt.
+Rychle blikani svetla. Pouzivano pro dramaticky efekt.
 
-**Frekvence:** Obvykle 1-25 bliknutí za sekundu.
+**Frekvence:** Obvykle 1-25 bliknuti za sekundu.
 
 ### Wash Light
 
-Světlo vytvářející široký, rovnoměrný světelný kužel. Používáno pro osvětlení velkých ploch.
+Svetlo vytvarejici siroky, rovnomerny svetelny kuzel. Pouzivano pro osvetleni velkych ploch.
 
-**Příklady:**
+**Priklady:**
 - Par LEDs
 - Wash moving heads
 - Cyclorama lights
 
 ### Spot Light
 
-Světlo s úzkým, fokusovaným světelným paprskem. Používáno pro zvýraznění konkrétních objektů.
+Svetlo s uzkym, fokusovanym svetelnym paprskem. Pouzivano pro zvyrazneni konkretnich objektu.
 
-**Příklady:**
+**Priklady:**
 - Profile spots
 - Beam moving heads
 - Follow spots
 
-## ⚡ Efekty a programování
+##  Efekty a programovani
 
-### Scene (Scéna)
+### Scene (Scena)
 
-Uložený snapshot všech DMX hodnot, motor pozic a servo úhlů. Umožňuje okamžité vyvolání kompletního lighting stavu.
+Ulozeny snapshot vsech DMX hodnot, motor pozic a servo uhlu. Umoznuje okamzite vyvolani kompletniho lighting stavu.
 
-**Použití:**
-- Opening scene (úvodní osvětlení)
-- Act 1, Act 2 (scény pro jednotlivé akty)
-- Blackout (všechna světla vypnuto)
+**Pouziti:**
+- Opening scene (uvodni osvetleni)
+- Act 1, Act 2 (sceny pro jednotlive akty)
+- Blackout (vsechna svetla vypnuto)
 
 ### Effect (Efekt)
 
-Automatizovaná sekvence změn osvětlení běžící v reálném čase.
+Automatizovana sekvence zmen osvetleni bezici v realnem case.
 
 **Typy:**
-- **Chase**: Postupné zapínání světel
-- **Strobe**: Synchronizované blikání
-- **Rainbow**: Plynulá změna barev
-- **Fade**: Stmívání/rozsvěcování
+- **Chase**: Postupne zapinani svetel
+- **Strobe**: Synchronizovane blikani
+- **Rainbow**: Plynula zmena barev
+- **Fade**: Stmivani/rozsvecovani
 
 ### Chase
 
-Efekt postupného zapínání/vypínání světel v pořadí.
+Efekt postupneho zapinani/vypinani svetel v poradi.
 
-**Příklad:** Světla 1→2→3→4→1→2→3→4...
+**Priklad:** Svetla 12341234...
 
 **Parametry:**
 - Speed (rychlost postupu)
-- Direction (směr - dopředu/zpět)
-- Fade time (čas přechodu)
+- Direction (smer - dopredu/zpet)
+- Fade time (cas prechodu)
 
 ### Fade
 
-Plynulý přechod mezi dvěma stavy (např. barva, intenzita).
+Plynuly prechod mezi dvema stavy (napr. barva, intenzita).
 
-**Fade In**: Postupné rozsvěcování  
-**Fade Out**: Postupné zhasínání  
-**Cross Fade**: Přechod z jednoho stavu do druhého
+**Fade In**: Postupne rozsvecovani  
+**Fade Out**: Postupne zhasinani  
+**Cross Fade**: Prechod z jednoho stavu do druheho
 
 ### Block Programming
 
-Vizuální programování efektů pomocí bloků. Každý blok reprezentuje jednu akci (set color, wait, loop).
+Vizualni programovani efektu pomoci bloku. Kazdy blok reprezentuje jednu akci (set color, wait, loop).
 
 **Bloky:**
 - **Color blocks**: set-color, fade, rainbow-shift
@@ -246,46 +246,46 @@ Vizuální programování efektů pomocí bloků. Každý blok reprezentuje jedn
 
 ### Cue
 
-Předdefinovaný lighting stav s fade time. Podobné scénám, ale s časováním.
+Preddefinovany lighting stav s fade time. Podobne scenam, ale s casovanim.
 
 **Cue List**: Sekvence cues pro celou show.
 
-**Příklad:**
+**Priklad:**
 - Cue 1: House lights (5s fade)
 - Cue 2: Stage wash (3s fade)
 - Cue 3: Spotlight on singer (1s fade)
 
-## 📱 Aplikační termíny
+##  Aplikacni terminy
 
 ### PWA (Progressive Web App)
 
-Webová aplikace která se chová jako nativní mobilní aplikace. Můžete ji instalovat na domovskou obrazovku a používat offline.
+Webova aplikace ktera se chova jako nativni mobilni aplikace. Muzete ji instalovat na domovskou obrazovku a pouzivat offline.
 
-**Výhody:**
-- Není potřeba App Store/Play Store
-- Automatické update
-- Menší velikost než nativní app
+**Vyhody:**
+- Neni potreba App Store/Play Store
+- Automaticke update
+- Mensi velikost nez nativni app
 - Cross-platform
 
 ### Service Worker
 
-JavaScript běžící na pozadí, který umožňuje offline funkcionalitu a caching.
+JavaScript bezici na pozadi, ktery umoznuje offline funkcionalitu a caching.
 
 ### IndexedDB
 
-Databáze v prohlížeči používaná pro lokální ukládání dat (fixtures, scény, efekty).
+Databaze v prohlizeci pouzivana pro lokalni ukladani dat (fixtures, sceny, efekty).
 
 ### KV Store
 
-Key-Value úložiště používané aplikací pro perzistentní data. Wrapper nad IndexedDB.
+Key-Value uloziste pouzivane aplikaci pro perzistentni data. Wrapper nad IndexedDB.
 
 ### Offline Mode
 
-Režim kdy aplikace funguje bez internetového připojení. Všechna data jsou lokální.
+Rezim kdy aplikace funguje bez internetoveho pripojeni. Vsechna data jsou lokalni.
 
 ### Custom Page Builder
 
-Funkce umožňující vytváření vlastních ovládacích panelů z UI bloků.
+Funkce umoznujici vytvareni vlastnich ovladacich panelu z UI bloku.
 
 **Bloky:**
 - Channel Slider
@@ -297,32 +297,32 @@ Funkce umožňující vytváření vlastních ovládacích panelů z UI bloků.
 
 ### Control Block
 
-Znovupoužitelná UI komponenta pro vytváření vlastních ovládacích panelů.
+Znovupouzitelna UI komponenta pro vytvareni vlastnich ovladacich panelu.
 
 **Vlastnosti:**
-- Standalone (funguje samostatně)
-- Configurable (nastavitelné parametry)
-- Responsive (přizpůsobivé)
-- Accessible (přístupné)
+- Standalone (funguje samostatne)
+- Configurable (nastavitelne parametry)
+- Responsive (prizpusobive)
+- Accessible (pristupne)
 
 ### Joystick Control
 
-Virtuální joystick pro ovládání Pan/Tilt u moving heads.
+Virtualni joystick pro ovladani Pan/Tilt u moving heads.
 
-**Použití:**
-- Táhněte pro pohyb
+**Pouziti:**
+- Tahnete pro pohyb
 - Center pro reset (127, 127)
 - Smooth control
 
 ### Connection Profile
 
-Uložená konfigurace síťového připojení (IP, port, universe). Umožňuje rychlé přepínání mezi různými venues.
+Ulozena konfigurace sitoveho pripojeni (IP, port, universe). Umoznuje rychle prepinani mezi ruznymi venues.
 
-**Příklad:**
+**Priklad:**
 - Profile "Main Stage": 192.168.1.100, Universe 1
 - Profile "Rehearsal": 192.168.2.50, Universe 0
 
-## 📊 Hodnoty a jednotky
+##  Hodnoty a jednotky
 
 ### DMX Value Range
 
@@ -335,9 +335,9 @@ Uložená konfigurace síťového připojení (IP, port, universe). Umožňuje r
 
 **0-65535**
 
-Používáno pro přesné polohování (Pan/Tilt, stepper motor).
+Pouzivano pro presne polohovani (Pan/Tilt, stepper motor).
 
-**Výpočet:**
+**Vypocet:**
 - High Byte = floor(position / 256)
 - Low Byte = position % 256
 
@@ -345,34 +345,34 @@ Používáno pro přesné polohování (Pan/Tilt, stepper motor).
 
 **0-100%**
 
-Používáno pro user-friendly hodnoty (speed, intensity).
+Pouzivano pro user-friendly hodnoty (speed, intensity).
 
 **Konverze:**
-- DMX = (Percentage / 100) × 255
-- Percentage = (DMX / 255) × 100
+- DMX = (Percentage / 100)  255
+- Percentage = (DMX / 255)  100
 
-### Angle (Úhel)
+### Angle (Uhel)
 
-**0-180°**
+**0-180**
 
-Používáno pro servomotory.
+Pouzivano pro servomotory.
 
 **Konverze:**
-- DMX = (Angle / 180) × 255
-- Angle = (DMX / 255) × 180
+- DMX = (Angle / 180)  255
+- Angle = (DMX / 255)  180
 
 ### Frequency (Hz)
 
-Frekvence obnovy DMX signálu nebo efektu.
+Frekvence obnovy DMX signalu nebo efektu.
 
 **DMX Standard**: 44 Hz (44 updates per second)  
-**Art-Net**: Konfigurovatelné (30-44 Hz obvykle)
+**Art-Net**: Konfigurovatelne (30-44 Hz obvykle)
 
-## 🔧 Technické termíny
+##  Technicke terminy
 
 ### Latency
 
-Zpoždění mezi příkazem v aplikaci a provedením na hardware.
+Zpozdeni mezi prikazem v aplikaci a provedenim na hardware.
 
 **Zdroje latence:**
 - WiFi latency (2-20ms)
@@ -383,35 +383,35 @@ Zpoždění mezi příkazem v aplikaci a provedením na hardware.
 
 ### Throughput
 
-Počet DMX packets odeslaných za sekundu.
+Pocet DMX packets odeslanych za sekundu.
 
 **Standard**: 40-44 packets/second
 
 ### Packet
 
-Jednotka dat odeslaná přes síť. Art-Net packet obsahuje až 512 DMX hodnot.
+Jednotka dat odeslana pres sit. Art-Net packet obsahuje az 512 DMX hodnot.
 
 ### Multicast
 
-Síťový režim kdy jeden packet je doručen více příjemcům najednou.
+Sitovy rezim kdy jeden packet je dorucen vice prijemcum najednou.
 
-**Použití v sACN**: Efektivnější než unicast pro více devices.
+**Pouziti v sACN**: Efektivnejsi nez unicast pro vice devices.
 
 ### Broadcast
 
-Síťový režim kdy packet je odeslán všem zařízením v síti.
+Sitovy rezim kdy packet je odeslan vsem zarizenim v siti.
 
-**Art-Net**: Používá broadcast nebo unicast podle nastavení.
+**Art-Net**: Pouziva broadcast nebo unicast podle nastaveni.
 
-## 📚 Další čtení
+##  Dalsi cteni
 
-- [User Guide](USER_GUIDE.md) - Praktické použití termínů
-- [Architecture](ARCHITECTURE.md) - Technická implementace
-- [API Reference](API.md) - Programátorská reference
-- [FAQ](FAQ.md) - Časté otázky
+- [User Guide](USER_GUIDE.md) - Prakticke pouziti terminu
+- [Architecture](ARCHITECTURE.md) - Technicka implementace
+- [API Reference](API.md) - Programatorska reference
+- [FAQ](FAQ.md) - Caste otazky
 
 ---
 
-**Glosář pro DMX 512 Kontrolér**  
-Poslední aktualizace: 2024-11-01  
-Chybí nějaký termín? [Dejte nám vědět!](https://github.com/atrep123/dmx-512-controller/issues)
+**Glosar pro DMX 512 Kontroler**  
+Posledni aktualizace: 2024-11-01  
+Chybi nejaky termin? [Dejte nam vedet!](https://github.com/atrep123/dmx-512-controller/issues)

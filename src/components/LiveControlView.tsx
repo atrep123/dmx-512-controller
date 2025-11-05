@@ -118,9 +118,9 @@ export default function LiveControlView({
                 <div className="rounded-full bg-muted p-6 mb-4">
                     <Faders size={48} className="text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Nic k ovládání</h3>
+                <h3 className="text-lg font-semibold mb-2">Nic k ovladani</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
-                    Přidejte světla v záložce Nastavení nebo vytvořte efekty v záložce Efekty
+                    Pridejte svetla v zalozce Nastaveni nebo vytvorte efekty v zalozce Efekty
                 </p>
             </div>
         )
@@ -131,7 +131,7 @@ export default function LiveControlView({
             <Card className="p-4">
                 <div className="flex items-center gap-2 mb-4">
                     <Lightning size={20} className="text-accent" weight="fill" />
-                    <h2 className="text-lg font-semibold">Rychlé efekty</h2>
+                    <h2 className="text-lg font-semibold">Rychle efekty</h2>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mb-4">
@@ -155,7 +155,7 @@ export default function LiveControlView({
                                         {effect ? effect.name : `Pozice ${index + 1}`}
                                     </span>
                                     {!effect && (
-                                        <span className="text-xs text-muted-foreground">Nepřiřazeno</span>
+                                        <span className="text-xs text-muted-foreground">Neprirazeno</span>
                                     )}
                                 </div>
                             </Button>
@@ -166,7 +166,7 @@ export default function LiveControlView({
                 <Separator className="my-4" />
 
                 <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground mb-2">Přiřadit efekty na tlačítka:</p>
+                    <p className="text-sm text-muted-foreground mb-2">Priradit efekty na tlacitka:</p>
                     <div className="grid gap-2">
                         {slots.map((effectId, index) => {
                             const Icon = slotIcons[index]
@@ -183,7 +183,7 @@ export default function LiveControlView({
                                         onChange={(e) => assignEffectToSlot(index, e.target.value || null)}
                                         className="flex-1 h-9 px-3 py-1 rounded-md border border-input bg-background text-sm"
                                     >
-                                        <option value="">Žádný efekt</option>
+                                        <option value="">Zadny efekt</option>
                                         {effects.map((eff) => (
                                             <option key={eff.id} value={eff.id}>
                                                 {eff.name} ({eff.type})
@@ -210,7 +210,7 @@ export default function LiveControlView({
                 <div>
                     <div className="flex items-center gap-2 mb-4">
                         <Lightning size={20} className="text-accent" />
-                        <h2 className="text-lg font-semibold">Aktivní efekty</h2>
+                        <h2 className="text-lg font-semibold">Aktivni efekty</h2>
                         <Badge variant="secondary" className="ml-auto">{activeEffects.length}</Badge>
                     </div>
 
@@ -223,7 +223,7 @@ export default function LiveControlView({
                                             <h3 className="font-semibold">{effect.name}</h3>
                                             <div className="flex gap-2 flex-wrap mt-1">
                                                 <Badge variant="secondary" className="text-xs">{effect.type}</Badge>
-                                                <Badge variant="outline" className="text-xs">{effect.fixtureIds.length} světel</Badge>
+                                                <Badge variant="outline" className="text-xs">{effect.fixtureIds.length} svetel</Badge>
                                             </div>
                                         </div>
                                     </div>
@@ -300,7 +300,7 @@ export default function LiveControlView({
                 <div>
                     <div className="flex items-center gap-2 mb-4">
                         <Lightbulb size={20} className="text-primary" />
-                        <h2 className="text-lg font-semibold">Ovládání světel</h2>
+                        <h2 className="text-lg font-semibold">Ovladani svetel</h2>
                         <Badge variant="secondary" className="ml-auto">{fixtures.length}</Badge>
                     </div>
 
@@ -363,7 +363,7 @@ export default function LiveControlView({
                                     {isAffectedByEffect && (
                                         <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
                                             <Lightning size={12} />
-                                            Ovládáno efektem
+                                            Ovladano efektem
                                         </p>
                                     )}
                                 </Card>

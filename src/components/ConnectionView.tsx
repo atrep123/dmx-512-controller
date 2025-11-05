@@ -62,10 +62,10 @@ const DEFAULT_SETTINGS: ConnectionSettings = {
 }
 
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
-  connected: 'Připojeno',
-  connecting: 'Připojování…',
+  connected: 'Pripojeno',
+  connecting: 'Pripojovani...',
   disconnected: 'Odpojeno',
-  error: 'Chyba připojení',
+  error: 'Chyba pripojeni',
 }
 
 const STATUS_COLORS: Record<ConnectionStatus, string> = {
@@ -110,17 +110,17 @@ function getStatusIcon(status: ConnectionStatus) {
 }
 
 function connectionSummary(settings?: ConnectionSettings) {
-  if (!settings) return 'Nepřipojeno k DMX síti'
-  if (settings.protocol === 'usb') return 'USB DMX rozhraní'
-  return `${settings.protocol.toUpperCase()} – ${settings.ipAddress}:${settings.port}`
+  if (!settings) return 'Nepripojeno k DMX siti'
+  if (settings.protocol === 'usb') return 'USB DMX rozhrani'
+  return `${settings.protocol.toUpperCase()} - ${settings.ipAddress}:${settings.port}`
 }
 
 function formatTimestamp(ts?: number) {
-  if (!ts) return '—'
+  if (!ts) return '-'
   try {
     return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   } catch {
-    return '—'
+    return '-'
   }
 }
 
@@ -128,7 +128,7 @@ function randomColorValue() {
   return Math.floor(Math.random() * 256)
 }
 
-const metricsValueOrDash = (value?: number) => (typeof value === 'number' && Number.isFinite(value) ? value : '—')
+const metricsValueOrDash = (value?: number) => (typeof value === 'number' && Number.isFinite(value) ? value : '-')
 
 export default function ConnectionView() {
   const [connectionSettings, setConnectionSettings] = useKV<ConnectionSettings>('dmx-connection-settings', DEFAULT_SETTINGS)
@@ -179,7 +179,7 @@ export default function ConnectionView() {
         setConnectionStatus('connected')
         setIsConnected(true)
         if (!connectToastShownRef.current) {
-          toast.success('Připojeno k DMX backendu')
+          toast.success('Pripojeno k DMX backendu')
           connectToastShownRef.current = true
         }
         if (pendingCommandTsRef.current !== null) {
@@ -189,8 +189,8 @@ export default function ConnectionView() {
       },
       on401: () => {
         setConnectionStatus('error')
-        setLastError('Server odmítl token (401)')
-        toast.error('Server odmítl token (401)')
+        setLastError('Server odmitl token (401)')
+        toast.error('Server odmitl token (401)')
       },
       onConnect: () => {
         setConnectionStatus((prev) => (prev === 'disconnected' ? 'connecting' : prev))
@@ -218,7 +218,7 @@ export default function ConnectionView() {
       const text = await response.text()
       setMetrics(parsePrometheus(text))
     } catch (error) {
-      toast.error('Nepodařilo se načíst metriky')
+      toast.error('Nepodarilo se nacist metriky')
       console.error('metrics_error', error)
     }
   }, [])
@@ -234,7 +234,7 @@ export default function ConnectionView() {
         setServerState({ type: 'state', r: payload.r, g: payload.g, b: payload.b, seq })
       }
     } catch (error) {
-      toast.error('Nepodařilo se načíst aktuální stav')
+      toast.error('Nepodarilo se nacist aktualni stav')
       console.error('refresh_state_error', error)
     } finally {
       setIsRefreshingState(false)
@@ -292,7 +292,7 @@ export default function ConnectionView() {
       clientRef.current = null
       setIsConnected(false)
       setConnectionStatus('disconnected')
-      toast.info('Odpojeno od DMX sítě')
+      toast.info('Odpojeno od DMX site')
       return
     }
     startClient()
@@ -333,11 +333,11 @@ export default function ConnectionView() {
     const universe = Number.parseInt(editUniverse, 10)
 
     if (Number.isNaN(port) || port < 1 || port > 65535) {
-      toast.error('Port musí být mezi 1 a 65535')
+      toast.error('Port musi byt mezi 1 a 65535')
       return
     }
     if (Number.isNaN(universe) || universe < 0 || universe > 32767) {
-      toast.error('Univerzum musí být mezi 0 a 32767')
+      toast.error('Univerzum musi byt mezi 0 a 32767')
       return
     }
     const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/
@@ -352,7 +352,7 @@ export default function ConnectionView() {
       port,
       universe,
     }))
-    toast.success('Nastavení připojení uloženo')
+    toast.success('Nastaveni pripojeni ulozeno')
   }
 
   const handleQuickConnect = (profile: ConnectionProfile) => {
@@ -360,12 +360,12 @@ export default function ConnectionView() {
     setEditIp(profile.settings.ipAddress)
     setEditPort(profile.settings.port.toString())
     setEditUniverse(profile.settings.universe.toString())
-    toast.success(`Profil „${profile.name}” načten`)
+    toast.success(`Profil "${profile.name}" nacten`)
   }
 
   const handleSaveProfile = () => {
     if (!profileName.trim()) {
-      toast.error('Zadejte název profilu')
+      toast.error('Zadejte nazev profilu')
       return
     }
     const newProfile: ConnectionProfile = {
@@ -375,12 +375,12 @@ export default function ConnectionView() {
     }
     setConnectionProfiles((current = []) => [...current, newProfile])
     setProfileName('')
-    toast.success(`Profil „${newProfile.name}” uložen`)
+    toast.success(`Profil "${newProfile.name}" ulozen`)
   }
 
   const handleDeleteProfile = (profileId: string) => {
     setConnectionProfiles((current = []) => current.filter((profile) => profile.id !== profileId))
-    toast.success('Profil odstraněn')
+    toast.success('Profil odstranen')
   }
 
   const handleSendTestCommand = async () => {
@@ -419,10 +419,10 @@ export default function ConnectionView() {
         }
       }
       setPacketsSent((prev) => prev + 1)
-      toast.success(`Testovací barva odeslána (${r}, ${g}, ${b})`)
+      toast.success(`Testovaci barva odeslana (${r}, ${g}, ${b})`)
     } catch (error) {
       pendingCommandTsRef.current = null
-      toast.error('Nepodařilo se odeslat testovací příkaz')
+      toast.error('Nepodarilo se odeslat testovaci prikaz')
       console.error('test_command_error', error)
     } finally {
       setIsSendingTest(false)
@@ -440,7 +440,7 @@ export default function ConnectionView() {
     <div className="space-y-6">
       {!online && (
         <div className="rounded-md border border-yellow-400 bg-yellow-100 px-3 py-2 text-sm text-yellow-900">
-          Offline – klient zkusí automaticky obnovit připojení, jakmile bude síť dostupná.
+          Offline - klient zkusi automaticky obnovit pripojeni, jakmile bude sit dostupna.
         </div>
       )}
 
@@ -458,7 +458,7 @@ export default function ConnectionView() {
             disabled={isRefreshingState}
           >
             <CloudArrowDown size={16} />
-            {isRefreshingState ? 'Načítám…' : 'Načíst stav'}
+            {isRefreshingState ? 'Nacitam...' : 'Nacist stav'}
           </Button>
         </div>
         <div className="text-xs text-muted-foreground flex flex-wrap gap-3">
@@ -480,7 +480,7 @@ export default function ConnectionView() {
               <p className="text-sm text-muted-foreground">{connectionSummary(connectionSettings)}</p>
               {serverState && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  Poslední stav · RGB {serverState.r}/{serverState.g}/{serverState.b} · Seq {serverState.seq}
+                  Posledni stav - RGB {serverState.r}/{serverState.g}/{serverState.b} - Seq {serverState.seq}
                 </p>
               )}
               {lastError && (
@@ -492,7 +492,7 @@ export default function ConnectionView() {
             </div>
           </div>
           <Badge variant={isConnected ? 'default' : 'outline'} className={isConnected ? STATUS_COLORS[connectionStatus] : ''}>
-            {isConnected ? 'Aktivní' : 'Neaktivní'}
+            {isConnected ? 'Aktivni' : 'Neaktivni'}
           </Badge>
         </div>
 
@@ -505,14 +505,14 @@ export default function ConnectionView() {
           >
             <Plugs weight="bold" />
             {connectionStatus === 'connecting'
-              ? 'Připojování…'
+              ? 'Pripojovani...'
               : isConnected
                 ? 'Odpojit'
-                : 'Připojit'}
+                : 'Pripojit'}
           </Button>
           <Button variant="secondary" onClick={() => handleSendTestCommand()} disabled={isSendingTest} className="flex-1 gap-2">
             <CloudArrowUp size={18} />
-            {isSendingTest ? 'Odesílám…' : 'Testovací příkaz'}
+            {isSendingTest ? 'Odesilam...' : 'Testovaci prikaz'}
           </Button>
         </div>
 
@@ -520,7 +520,7 @@ export default function ConnectionView() {
           <div className="rounded-lg bg-muted p-3">
             <div className="flex items-center gap-2 mb-1">
               <CloudArrowUp size={14} className="text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Odeslané příkazy</span>
+              <span className="text-xs text-muted-foreground">Odeslane prikazy</span>
             </div>
             <p className="text-xl font-bold" data-testid="packets-sent">
               {packetsSent.toLocaleString()}
@@ -529,7 +529,7 @@ export default function ConnectionView() {
           <div className="rounded-lg bg-muted p-3">
             <div className="flex items-center gap-2 mb-1">
               <CloudArrowDown size={14} className="text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Přijaté stavy</span>
+              <span className="text-xs text-muted-foreground">Prijate stavy</span>
             </div>
             <p className="text-xl font-bold" data-testid="packets-received">
               {packetsReceived.toLocaleString()}
@@ -538,10 +538,10 @@ export default function ConnectionView() {
           <div className="rounded-lg bg-muted p-3">
             <div className="flex items-center gap-2 mb-1">
               <Lightning size={14} className="text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Poslední latence</span>
+              <span className="text-xs text-muted-foreground">Posledni latence</span>
             </div>
             <p className="text-xl font-bold" data-testid="latency-ms">
-              {latencyMs === null ? '—' : `${latencyMs} ms`}
+              {latencyMs === null ? '-' : `${latencyMs} ms`}
             </p>
           </div>
         </div>
@@ -549,15 +549,15 @@ export default function ConnectionView() {
 
       <Tabs defaultValue="settings" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="settings">Nastavení</TabsTrigger>
+          <TabsTrigger value="settings">Nastaveni</TabsTrigger>
           <TabsTrigger value="profiles">Profily</TabsTrigger>
         </TabsList>
 
         <TabsContent value="settings" className="space-y-4 mt-4">
           <Card className="p-6 space-y-6">
             <div>
-              <h3 className="font-semibold mb-1">Nastavení sítě</h3>
-              <p className="text-sm text-muted-foreground">Konfigurace protokolu a síťových parametrů</p>
+              <h3 className="font-semibold mb-1">Nastaveni site</h3>
+              <p className="text-sm text-muted-foreground">Konfigurace protokolu a sitovych parametru</p>
             </div>
 
             <div className="space-y-4">
@@ -575,10 +575,10 @@ export default function ConnectionView() {
                 </Select>
                 <p className="text-xs text-muted-foreground">
                   {connectionSettings?.protocol === 'artnet'
-                    ? 'Art-Net protokol pro ethernetové DMX.'
+                    ? 'Art-Net protokol pro ethernetove DMX.'
                     : connectionSettings?.protocol === 'sacn'
                       ? 'sACN (E1.31) streaming DMX protokol.'
-                      : 'USB DMX rozhraní.'}
+                      : 'USB DMX rozhrani.'}
                 </p>
               </div>
 
@@ -616,7 +616,7 @@ export default function ConnectionView() {
 
               <div className="space-y-2">
                 <Label htmlFor="send-rate">
-                  Frekvence odesílání: {connectionSettings?.sendRate ?? DEFAULT_SETTINGS.sendRate} Hz
+                  Frekvence odesilani: {connectionSettings?.sendRate ?? DEFAULT_SETTINGS.sendRate} Hz
                 </Label>
                 <input
                   id="send-rate"
@@ -629,17 +629,17 @@ export default function ConnectionView() {
                   className="w-full cursor-pointer"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Vyšší frekvence = plynulejší řízení, ale větší síťový provoz.
+                  Vyssi frekvence = plynulejsi rizeni, ale vetsi sitovy provoz.
                 </p>
               </div>
 
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <Label htmlFor="auto-connect" className="cursor-pointer">
-                    Automatické připojení při startu
+                    Automaticke pripojeni pri startu
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Automaticky naváže spojení při otevření aplikace
+                    Automaticky navaze spojeni pri otevreni aplikace
                   </p>
                 </div>
                 <Switch
@@ -651,7 +651,7 @@ export default function ConnectionView() {
 
               <Button onClick={handleSaveSettings} variant="default" className="w-full gap-2">
                 <CloudArrowUp weight="bold" />
-                Uložit nastavení
+                Ulozit nastaveni
               </Button>
             </div>
           </Card>
@@ -660,41 +660,41 @@ export default function ConnectionView() {
         <TabsContent value="profiles" className="space-y-4 mt-4">
           <Card className="p-6 space-y-4">
             <div>
-              <h3 className="font-semibold mb-1">Profily připojení</h3>
-              <p className="text-sm text-muted-foreground">Ukládání a načítání přednastavených konfigurací</p>
+              <h3 className="font-semibold mb-1">Profily pripojeni</h3>
+              <p className="text-sm text-muted-foreground">Ukladani a nacitani prednastavenych konfiguraci</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profile-name">Uložit aktuální jako profil</Label>
+              <Label htmlFor="profile-name">Ulozit aktualni jako profil</Label>
               <div className="flex gap-2">
                 <Input
                   id="profile-name"
                   value={profileName}
                   onChange={(event) => setProfileName(event.target.value)}
-                  placeholder="např. Venue A, Studio"
+                  placeholder="napr. Venue A, Studio"
                 />
                 <Button onClick={handleSaveProfile} disabled={!profileName.trim()}>
-                  Uložit
+                  Ulozit
                 </Button>
               </div>
             </div>
 
             {(connectionProfiles ?? []).length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">Zatím žádné uložené profily</div>
+              <div className="text-center py-8 text-muted-foreground text-sm">Zatim zadne ulozene profily</div>
             ) : (
               <div className="space-y-2">
-                <Label>Uložené profily</Label>
+                <Label>Ulozene profily</Label>
                 {(connectionProfiles ?? []).map((profile) => (
                   <div key={profile.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <p className="font-medium">{profile.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {profile.settings.protocol.toUpperCase()} · {profile.settings.ipAddress}:{profile.settings.port}
+                        {profile.settings.protocol.toUpperCase()} - {profile.settings.ipAddress}:{profile.settings.port}
                       </p>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => handleQuickConnect(profile)}>
-                        Načíst
+                        Nacist
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleDeleteProfile(profile.id)}>
                         <Trash size={16} className="text-destructive" />

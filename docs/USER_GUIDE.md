@@ -1,249 +1,249 @@
-# Uživatelská příručka DMX 512 Kontrolér
+# Uzivatelska prirucka DMX 512 Kontroler
 
-Kompletní návod k použití DMX 512 Kontrolér aplikace pro řízení stage osvětlení, motorů a efektů.
+Kompletni navod k pouziti DMX 512 Kontroler aplikace pro rizeni stage osvetleni, motoru a efektu.
 
-## 📋 Obsah
+## Clipboard Obsah
 
-- [Úvod](#úvod)
-- [Začínáme](#začínáme)
-- [Nastavení](#nastavení)
-- [Ovládání světel](#ovládání-světel)
-- [Scény](#scény)
+- [Uvod](#uvod)
+- [Zaciname](#zaciname)
+- [Nastaveni](#nastaveni)
+- [Ovladani svetel](#ovladani-svetel)
+- [Sceny](#sceny)
 - [Efekty](#efekty)
 - [Motory a serva](#motory-a-serva)
-- [Živá kontrola](#živá-kontrola)
-- [Vlastní stránky](#vlastní-stránky)
-- [Síťové připojení](#síťové-připojení)
+- [Ziva kontrola](#ziva-kontrola)
+- [Vlastni stranky](#vlastni-stranky)
+- [Sitove pripojeni](#sitove-pripojeni)
 - [Tipy a triky](#tipy-a-triky)
 
-## 🎭 Úvod
+## Theater Uvod
 
-DMX 512 Kontrolér je profesionální aplikace pro ovládání stage osvětlení a motorů pomocí DMX 512 protokolu. Aplikace běží jako Progressive Web App (PWA) na mobilních zařízeních a poskytuje intuitivní dotykové rozhraní.
+DMX 512 Kontroler je profesionalni aplikace pro ovladani stage osvetleni a motoru pomoci DMX 512 protokolu. Aplikace bezi jako Progressive Web App (PWA) na mobilnich zarizenich a poskytuje intuitivni dotykove rozhrani.
 
-### Co můžete ovládat
+### Co muzete ovladat
 
-- 🎨 **Světelná zařízení** - DMX světla, RGB pary, moving heads
-- ⚙️ **Motory** - Stepper motory s přesným polohováním
-- 🎯 **Servomotory** - Úhlové polohování 0-180°
-- ⚡ **Efekty** - Automatizované lighting efekty
-- 🎬 **Scény** - Rychlé vyvolání uložených stavů
+-  **Svetelna zarizeni** - DMX svetla, RGB pary, moving heads
+-  **Motory** - Stepper motory s presnym polohovanim
+- Target **Servomotory** - Uhlove polohovani 0-180
+-  **Efekty** - Automatizovane lighting efekty
+-  **Sceny** - Rychle vyvolani ulozenych stavu
 
-### Hlavní funkce
+### Hlavni funkce
 
-- Ovládání jednotlivých DMX kanálů
-- RGB/RGBW barevný picker
-- Ukladání a vyvolávání scén
-- 14 vestavěných efektů
-- Vizuální blokové programování vlastních efektů
+- Ovladani jednotlivych DMX kanalu
+- RGB/RGBW barevny picker
+- Ukladani a vyvolavani scen
+- 14 vestavenych efektu
+- Vizualni blokove programovani vlastnich efektu
 - Joystick pro Pan/Tilt kontrolu
-- Offline režim
-- Vlastní ovládací panely
+- Offline rezim
+- Vlastni ovladaci panely
 
-## 🚀 Začínáme
+## Rocket Zaciname
 
-### První spuštění
+### Prvni spusteni
 
-1. **Otevřete aplikaci** v prohlížeči nebo jako nainstalovanou PWA
-2. **Instalační prompt** - Pokud používáte mobilní prohlížeč, objeví se prompt k instalaci
-3. **Základní orientace** - Aplikace má 9 hlavních sekcí dostupných přes horní záložky
+1. **Otevrete aplikaci** v prohlizeci nebo jako nainstalovanou PWA
+2. **Instalacni prompt** - Pokud pouzivate mobilni prohlizec, objevi se prompt k instalaci
+3. **Zakladni orientace** - Aplikace ma 9 hlavnich sekci dostupnych pres horni zalozky
 
-### Základní workflow
+### Zakladni workflow
 
 ```
-1. Nastavení → Přidejte universe
-2. Nastavení → Přidejte fixtures (světla)
-3. Světla → Nastavte hodnoty kanálů
-4. Scény → Uložte aktuální stav
-5. Připojení → Připojte se k DMX síti
-6. Živá kontrola → Ovládejte v reálném čase
+1. Nastaveni  Pridejte universe
+2. Nastaveni  Pridejte fixtures (svetla)
+3. Svetla  Nastavte hodnoty kanalu
+4. Sceny  Ulozte aktualni stav
+5. Pripojeni  Pripojte se k DMX siti
+6. Ziva kontrola  Ovladejte v realnem case
 ```
 
-## ⚙️ Nastavení
+##  Nastaveni
 
-### Vytvoření Universe
+### Vytvoreni Universe
 
-Universe reprezentuje 512 DMX kanálů.
+Universe reprezentuje 512 DMX kanalu.
 
-1. Přejděte na záložku **"Nastavení"**
-2. V sekci **"DMX Universa"** klikněte na **"Přidat Universe"**
-3. Zadejte název (např. "Main Stage")
-4. Klikněte **"Vytvořit"**
+1. Prejdete na zalozku **"Nastaveni"**
+2. V sekci **"DMX Universa"** kliknete na **"Pridat Universe"**
+3. Zadejte nazev (napr. "Main Stage")
+4. Kliknete **"Vytvorit"**
 
-### Přidání Fixture (světla)
+### Pridani Fixture (svetla)
 
-1. V záložce **"Nastavení"**
-2. V sekci **"Fixtures"** klikněte **"Přidat Fixture"**
-3. Vyplňte formulář:
-   - **Název**: Pojmenujte vaše světlo (např. "Par LED 1")
+1. V zalozce **"Nastaveni"**
+2. V sekci **"Fixtures"** kliknete **"Pridat Fixture"**
+3. Vyplnte formular:
+   - **Nazev**: Pojmenujte vase svetlo (napr. "Par LED 1")
    - **Universe**: Vyberte universe
    - **DMX adresa**: Start adresa (1-512)
    - **Typ fixture**: Vyberte typ
-   - **Počet kanálů**: Kolik kanálů má fixture
+   - **Pocet kanalu**: Kolik kanalu ma fixture
 
 **Typy fixtures:**
-- **Generic** - Obecné světlo s custom kanály
-- **RGB** - RGB světlo (3 kanály: Red, Green, Blue)
-- **RGBW** - RGBW světlo (4 kanály: Red, Green, Blue, White)
+- **Generic** - Obecne svetlo s custom kanaly
+- **RGB** - RGB svetlo (3 kanaly: Red, Green, Blue)
+- **RGBW** - RGBW svetlo (4 kanaly: Red, Green, Blue, White)
 - **Moving Head** - Moving head s Pan/Tilt
 
-4. Klikněte **"Přidat Fixture"**
+4. Kliknete **"Pridat Fixture"**
 
-### Úprava kanálů
+### Uprava kanalu
 
-Po vytvoření fixture můžete upravit názvy kanálů:
+Po vytvoreni fixture muzete upravit nazvy kanalu:
 
-1. Najděte fixture v seznamu
-2. Klikněte na **"Upravit"**
-3. Změňte názvy kanálů (např. "Ch 1" → "Dimmer")
-4. Uložte změny
+1. Najdete fixture v seznamu
+2. Kliknete na **"Upravit"**
+3. Zmente nazvy kanalu (napr. "Ch 1"  "Dimmer")
+4. Ulozte zmeny
 
-## 💡 Ovládání světel
+##  Ovladani svetel
 
-### Záložka "Světla"
+### Zalozka "Svetla"
 
-Zde najdete všechna vaše fixtures s ovládáním jednotlivých kanálů.
+Zde najdete vsechna vase fixtures s ovladanim jednotlivych kanalu.
 
-#### Ovládání pomocí sliderů
+#### Ovladani pomoci slideru
 
-1. Najděte fixture v seznamu
-2. Posuňte slider kanálu doleva (nižší hodnota) nebo doprava (vyšší hodnota)
-3. Hodnota se okamžitě aplikuje
+1. Najdete fixture v seznamu
+2. Posunte slider kanalu doleva (nizsi hodnota) nebo doprava (vyssi hodnota)
+3. Hodnota se okamzite aplikuje
 
 **DMX hodnoty:**
-- 0 = Vypnuto / Minimální
-- 255 = Maximální intenzita
+- 0 = Vypnuto / Minimalni
+- 255 = Maximalni intenzita
 
 #### RGB Color Picker
 
 Pro RGB/RGBW fixtures:
 
-1. Klikněte na **barevný čtverec** nebo **"Vybrat barvu"**
-2. Použijte color picker k výběru barvy
-3. Nebo zadejte RGB hodnoty manuálně
-4. Barva se okamžitě aplikuje na všechny RGB kanály
+1. Kliknete na **barevny ctverec** nebo **"Vybrat barvu"**
+2. Pouzijte color picker k vyberu barvy
+3. Nebo zadejte RGB hodnoty manualne
+4. Barva se okamzite aplikuje na vsechny RGB kanaly
 
-#### Číselné vstupy
+#### Ciselne vstupy
 
-Pro přesné hodnoty:
+Pro presne hodnoty:
 
-1. Klikněte na **číselnou hodnotu** vedle slideru
-2. Zadejte přesnou hodnotu (0-255)
-3. Stiskněte Enter
+1. Kliknete na **ciselnou hodnotu** vedle slideru
+2. Zadejte presnou hodnotu (0-255)
+3. Stisknete Enter
 
-### Rychlé akce
+### Rychle akce
 
 - **Reset na 0**: Double-klik na slider
 - **Set na Max (255)**: Klik na maximum slideru
-- **Copy hodnotu**: Long-press na hodnotu (mobilní)
+- **Copy hodnotu**: Long-press na hodnotu (mobilni)
 
-## 🎬 Scény
+##  Sceny
 
-Scény umožňují uložit a rychle vyvolat kompletní stavy všech světel a motorů.
+Sceny umoznuji ulozit a rychle vyvolat kompletni stavy vsech svetel a motoru.
 
-### Vytvoření scény
+### Vytvoreni sceny
 
-1. Přejděte na záložku **"Scény"**
-2. Nastavte všechna světla do požadovaného stavu
-3. Klikněte **"Uložit novou scénu"**
-4. Zadejte název scény (např. "Opening", "Red Wash", "Blackout")
-5. Klikněte **"Uložit"**
+1. Prejdete na zalozku **"Sceny"**
+2. Nastavte vsechna svetla do pozadovaneho stavu
+3. Kliknete **"Ulozit novou scenu"**
+4. Zadejte nazev sceny (napr. "Opening", "Red Wash", "Blackout")
+5. Kliknete **"Ulozit"**
 
-Scéna uloží:
-- Všechny hodnoty DMX kanálů
-- Pozice stepper motorů
-- Úhly servomotorů
+Scena ulozi:
+- Vsechny hodnoty DMX kanalu
+- Pozice stepper motoru
+- Uhly servomotoru
 
-### Vyvolání scény
+### Vyvolani sceny
 
-1. V záložce **"Scény"** najděte požadovanou scénu
-2. Klikněte na **"Aktivovat"**
-3. Všechny hodnoty se okamžitě aplikují
+1. V zalozce **"Sceny"** najdete pozadovanou scenu
+2. Kliknete na **"Aktivovat"**
+3. Vsechny hodnoty se okamzite aplikuji
 
-**Aktivní scéna** je zvýrazněná barevným rámečkem.
+**Aktivni scena** je zvyraznena barevnym rameckem.
 
-### Správa scén
+### Sprava scen
 
-- **Přejmenovat**: Klik na ikonu tužky
-- **Smazat**: Klik na ikonu koše
-- **Aktualizovat**: Aktivujte scénu → upravte hodnoty → "Uložit změny"
+- **Prejmenovat**: Klik na ikonu tuzky
+- **Smazat**: Klik na ikonu kose
+- **Aktualizovat**: Aktivujte scenu  upravte hodnoty  "Ulozit zmeny"
 
 ### Best practices
 
-- Vytvořte scénu "Blackout" (všechny kanály na 0)
-- Pojmenujte scény popisně (např. "Act 1 Opening", ne "Scene 1")
-- Testujte scény před showem
-- Vytvořte záložní scény
+- Vytvorte scenu "Blackout" (vsechny kanaly na 0)
+- Pojmenujte sceny popisne (napr. "Act 1 Opening", ne "Scene 1")
+- Testujte sceny pred showem
+- Vytvorte zalozni sceny
 
-## ⚡ Efekty
+##  Efekty
 
-Efekty jsou automatizované lighting sekvence.
+Efekty jsou automatizovane lighting sekvence.
 
-### Předdefinované efekty
+### Preddefinovane efekty
 
-Aplikace obsahuje 14 vestavěných efektů:
+Aplikace obsahuje 14 vestavenych efektu:
 
-1. **Chase** - Postupné zapínání světel
-2. **Strobe** - Rychlé blikání
-3. **Rainbow** - Plynulá změna barev duhy
-4. **Fade** - Plynulé stmívání/rozsvěcování
-5. **Sweep** - Pohyb světla napříč fixtures
-6. **Sparkle** - Náhodné blikání
-7. **Wipe** - Wipe přechod
-8. **Bounce** - Bounce tam a zpět
+1. **Chase** - Postupne zapinani svetel
+2. **Strobe** - Rychle blikani
+3. **Rainbow** - Plynula zmena barev duhy
+4. **Fade** - Plynule stmivani/rozsvecovani
+5. **Sweep** - Pohyb svetla napric fixtures
+6. **Sparkle** - Nahodne blikani
+7. **Wipe** - Wipe prechod
+8. **Bounce** - Bounce tam a zpet
 9. **Theater Chase** - Theater chase pattern
-10. **Fire** - Simulace ohně
+10. **Fire** - Simulace ohne
 11. **Wave** - Wave pattern
-12. **Pulse** - Pulsní efekt
+12. **Pulse** - Pulsni efekt
 13. **Color Fade** - Fade mezi barvami
-14. **Block Program** - Vlastní block program
+14. **Block Program** - Vlastni block program
 
-### Vytvoření efektu
+### Vytvoreni efektu
 
-1. Přejděte na záložku **"Efekty"**
-2. Klikněte **"Vytvořit efekt"**
-3. Vyplňte formulář:
-   - **Název**: Pojmenujte efekt
+1. Prejdete na zalozku **"Efekty"**
+2. Kliknete **"Vytvorit efekt"**
+3. Vyplnte formular:
+   - **Nazev**: Pojmenujte efekt
    - **Typ**: Vyberte typ efektu
-   - **Rychlost**: 0-100 (vyšší = rychlejší)
-   - **Intenzita**: 0-100 (ovlivňuje intenzitu efektu)
-4. **Vyberte fixtures**: Zaškrtněte která světla efekt ovlivní
-5. Klikněte **"Vytvořit"**
+   - **Rychlost**: 0-100 (vyssi = rychlejsi)
+   - **Intenzita**: 0-100 (ovlivnuje intenzitu efektu)
+4. **Vyberte fixtures**: Zaskrtnete ktera svetla efekt ovlivni
+5. Kliknete **"Vytvorit"**
 
-### Spuštění efektu
+### Spusteni efektu
 
-1. Najděte efekt v seznamu
-2. Klikněte na **přepínač** (toggle)
-3. Efekt se začne okamžitě provádět
+1. Najdete efekt v seznamu
+2. Kliknete na **prepinac** (toggle)
+3. Efekt se zacne okamzite provadet
 
-**Zelená** = efekt běží  
-**Šedá** = efekt je zastaven
+**Zelena** = efekt bezi  
+**Seda** = efekt je zastaven
 
-### Úprava běžícího efektu
+### Uprava beziciho efektu
 
-I když efekt běží, můžete upravit:
+I kdyz efekt bezi, muzete upravit:
 - **Rychlost**: Slider rychlosti
 - **Intenzita**: Slider intenzity
-- Změny se aplikují okamžitě
+- Zmeny se aplikuji okamzite
 
-### Vizuální blokové programování
+### Vizualni blokove programovani
 
-Pro pokročilé uživatele - vytvořte vlastní efekty pomocí bloků:
+Pro pokrocile uzivatele - vytvorte vlastni efekty pomoci bloku:
 
-1. Vytvořte nový efekt typu **"Block Program"**
-2. Klikněte **"Upravit bloky"**
-3. V levém panelu vyberte typ bloku:
+1. Vytvorte novy efekt typu **"Block Program"**
+2. Kliknete **"Upravit bloky"**
+3. V levem panelu vyberte typ bloku:
    - **Barvy**: set-color, fade, rainbow-shift
    - **Pohyb**: pan-tilt, chase-step
    - **Timing**: wait
    - **Control**: loop-start, loop-end
    - **Efekty**: strobe-pulse, random-color
-4. Přetáhněte bloky do middle panelu
-5. Klikněte na blok pro úpravu parametrů
-6. Uspořádejte bloky do sekvence
-7. Přidejte smyčky pomocí loop-start/loop-end
-8. Uložte a spusťte
+4. Pretahnete bloky do middle panelu
+5. Kliknete na blok pro upravu parametru
+6. Usporadejte bloky do sekvence
+7. Pridejte smycky pomoci loop-start/loop-end
+8. Ulozte a spustte
 
-**Příklad simple chase:**
+**Priklad simple chase:**
 ```
 1. loop-start (count: 10)
 2. set-color (fixture 0, red)
@@ -253,223 +253,223 @@ Pro pokročilé uživatele - vytvořte vlastní efekty pomocí bloků:
 6. loop-end
 ```
 
-## 🔧 Motory a serva
+##  Motory a serva
 
 ### Stepper Motory
 
-Stepper motory používají 16-bit polohování (0-65535 kroků).
+Stepper motory pouzivaji 16-bit polohovani (0-65535 kroku).
 
-#### Přidání motoru
+#### Pridani motoru
 
-1. Záložka **"Nastavení"** → sekce **"Stepper Motory"**
-2. Klikněte **"Přidat Motor"**
-3. Vyplňte:
-   - Název
-   - DMX adresa (obvykle 4 kanály)
-   - Max kroků (např. 200 pro 1 otáčku)
-4. Klikněte **"Přidat"**
+1. Zalozka **"Nastaveni"**  sekce **"Stepper Motory"**
+2. Kliknete **"Pridat Motor"**
+3. Vyplnte:
+   - Nazev
+   - DMX adresa (obvykle 4 kanaly)
+   - Max kroku (napr. 200 pro 1 otacku)
+4. Kliknete **"Pridat"**
 
-#### Ovládání
+#### Ovladani
 
-1. Záložka **"Motory"**
-2. Najděte motor
+1. Zalozka **"Motory"**
+2. Najdete motor
 3. Nastavte:
    - **Pozice**: Target pozice (0-max steps)
    - **Rychlost**: Jak rychle se pohybuje (0-255)
-   - **Zrychlení**: Acceleration rate (0-255)
+   - **Zrychleni**: Acceleration rate (0-255)
 
 Motor se automaticky pohne na target pozici.
 
 ### Servomotory
 
-Serva používají úhlové polohování (0-180°).
+Serva pouzivaji uhlove polohovani (0-180).
 
-#### Přidání serva
+#### Pridani serva
 
-1. Záložka **"Nastavení"** → sekce **"Servomotory"**
-2. Klikněte **"Přidat Servo"**
-3. Vyplňte:
-   - Název
-   - DMX adresa (1 kanál)
-   - Min/Max úhel (default 0-180)
-4. Klikněte **"Přidat"**
+1. Zalozka **"Nastaveni"**  sekce **"Servomotory"**
+2. Kliknete **"Pridat Servo"**
+3. Vyplnte:
+   - Nazev
+   - DMX adresa (1 kanal)
+   - Min/Max uhel (default 0-180)
+4. Kliknete **"Pridat"**
 
-#### Ovládání
+#### Ovladani
 
-1. Záložka **"Motory"**
-2. Najděte servo
-3. Nastavte **úhel** (0-180°)
+1. Zalozka **"Motory"**
+2. Najdete servo
+3. Nastavte **uhel** (0-180)
 
-Servo se pohne na nastavený úhel.
+Servo se pohne na nastaveny uhel.
 
-## 🎮 Živá kontrola
+##  Ziva kontrola
 
-Záložka "Kontrola" poskytuje real-time ovládání pomocí joysticku.
+Zalozka "Kontrola" poskytuje real-time ovladani pomoci joysticku.
 
 ### Joystick Pan/Tilt
 
 Pro moving heads a motory s Pan/Tilt:
 
-1. Přejděte na **"Kontrola"**
+1. Prejdete na **"Kontrola"**
 2. Vyberte fixture v dropdown menu
-3. Použijte **joystick** k ovládání:
-   - Táhněte joystick doleva/doprava = Pan
-   - Táhněte joystick nahoru/dolů = Tilt
-4. Joystick má **středovou pozici** (127, 127)
+3. Pouzijte **joystick** k ovladani:
+   - Tahnete joystick doleva/doprava = Pan
+   - Tahnete joystick nahoru/dolu = Tilt
+4. Joystick ma **stredovou pozici** (127, 127)
 
-### Rychlé ovládání efektů
+### Rychle ovladani efektu
 
-V sekci "Aktivní efekty":
-- Start/Stop efekty jedním kliknutím
+V sekci "Aktivni efekty":
+- Start/Stop efekty jednim kliknutim
 - Upravte rychlost on-the-fly
-- Přepínání mezi více efekty současně
+- Prepinani mezi vice efekty soucasne
 
-## 🎨 Vlastní stránky
+##  Vlastni stranky
 
-Vytvořte si vlastní ovládací panel z UI bloků.
+Vytvorte si vlastni ovladaci panel z UI bloku.
 
-### Záložka "Moje stránka"
+### Zalozka "Moje stranka"
 
-1. Přejděte na **"Moje stránka"**
-2. Klikněte **"Přidat blok"**
+1. Prejdete na **"Moje stranka"**
+2. Kliknete **"Pridat blok"**
 3. Vyberte typ bloku:
-   - **Channel Slider** - Ovládání jednoho kanálu
+   - **Channel Slider** - Ovladani jednoho kanalu
    - **Color Picker** - RGB picker
-   - **Toggle Button** - On/Off přepínač
-   - **Button Pad** - Grid tlačítek
+   - **Toggle Button** - On/Off prepinac
+   - **Button Pad** - Grid tlacitek
    - **Position Control** - Pan/Tilt kontrola
-   - **Intensity Fader** - Vertikální fader
+   - **Intensity Fader** - Vertikalni fader
 4. Nakonfigurujte blok
-5. Uspořádejte bloky drag & drop
+5. Usporadejte bloky drag & drop
 
 ### Use cases
 
-- **DJ panel**: Rychlé ovládání barev a efektů
-- **Theater panel**: Scény a dimming
-- **Mobile panel**: Zjednodušené ovládání pro pohyb
+- **DJ panel**: Rychle ovladani barev a efektu
+- **Theater panel**: Sceny a dimming
+- **Mobile panel**: Zjednodusene ovladani pro pohyb
 - **Backup panel**: Emergency kontroly
 
-## 🌐 Síťové připojení
+##  Sitove pripojeni
 
-### Podporované protokoly
+### Podporovane protokoly
 
-- **Art-Net** - Nejpoužívanější DMX-over-Ethernet protokol
-- **sACN (E1.31)** - Profesionální streaming ACN (připraveno)
-- **USB DMX** - DMX interface přes USB (připraveno)
+- **Art-Net** - Nejpouzivanejsi DMX-over-Ethernet protokol
+- **sACN (E1.31)** - Profesionalni streaming ACN (pripraveno)
+- **USB DMX** - DMX interface pres USB (pripraveno)
 
 ### Konfigurace Art-Net
 
-1. Přejděte na **"Připojení"**
+1. Prejdete na **"Pripojeni"**
 2. V sekci **"Protokol"** vyberte **"Art-Net"**
-3. Vyplňte:
-   - **IP adresa**: IP vaší Art-Net node (např. 192.168.1.100)
+3. Vyplnte:
+   - **IP adresa**: IP vasi Art-Net node (napr. 192.168.1.100)
    - **Port**: Obvykle 6454
-   - **Universe**: Číslo universa (0-15)
+   - **Universe**: Cislo universa (0-15)
    - **Send Rate**: Packets per second (40-44)
-4. Klikněte **"Připojit"**
+4. Kliknete **"Pripojit"**
 
-### Profily připojení
+### Profily pripojeni
 
-Uložte si různé konfigurace pro různá místa:
+Ulozte si ruzne konfigurace pro ruzna mista:
 
-1. Vyplňte konfiguraci
-2. Zadejte **Název profilu** (např. "Main Venue", "Rehearsal Room")
-3. Klikněte **"Uložit profil"**
+1. Vyplnte konfiguraci
+2. Zadejte **Nazev profilu** (napr. "Main Venue", "Rehearsal Room")
+3. Kliknete **"Ulozit profil"**
 
-**Načtení profilu:**
+**Nacteni profilu:**
 - Vyberte profil z dropdown
-- Klikněte **"Načíst"**
-- Konfigurace se vyplní automaticky
+- Kliknete **"Nacist"**
+- Konfigurace se vyplni automaticky
 
-### Monitoring připojení
+### Monitoring pripojeni
 
-V horní části sekce připojení vidíte:
+V horni casti sekce pripojeni vidite:
 - **Status**: Connected / Disconnected / Connecting / Error
-- **Packet counter**: Kolik packets bylo odesláno
-- **Last packet**: Časová značka posledního packetu
+- **Packet counter**: Kolik packets bylo odeslano
+- **Last packet**: Casova znacka posledniho packetu
 
-### Troubleshooting připojení
+### Troubleshooting pripojeni
 
-**Nepřipojí se:**
+**Nepripoji se:**
 - Zkontrolujte IP adresu
-- Ověřte že Art-Net node je zapnutá
-- Zkontrolujte síťové připojení
-- Firewall může blokovat komunikaci
+- Overte ze Art-Net node je zapnuta
+- Zkontrolujte sitove pripojeni
+- Firewall muze blokovat komunikaci
 
-**Vysoká latence:**
-- Snižte Send Rate
-- Zkontrolujte WiFi sílu
-- Použijte kabelové připojení pokud možné
+**Vysoka latence:**
+- Snizte Send Rate
+- Zkontrolujte WiFi silu
+- Pouzijte kabelove pripojeni pokud mozne
 
-## 💡 Tipy a triky
+##  Tipy a triky
 
 ### Performance
 
-- **Disable nepoužívané efekty** - Běžící efekty používají CPU
-- **Omezení fixture count** - Pro mobilní zařízení max 30-40 fixtures
-- **Offline mode** - Vypněte WiFi pro lepší battery life
-- **Brightness** - Snižte jas displeje během show
+- **Disable nepouzivane efekty** - Bezici efekty pouzivaji CPU
+- **Omezeni fixture count** - Pro mobilni zarizeni max 30-40 fixtures
+- **Offline mode** - Vypnete WiFi pro lepsi battery life
+- **Brightness** - Snizte jas displeje behem show
 
 ### Workflow tipy
 
 - **Organize fixtures logicky** - Pojmenujte je podle pozice
-- **Color coding** - Použijte emoji v názvech (🔴 Red Par, 🔵 Blue Par)
-- **Backup data** - Exportujte data pravidelně (TODO: implement)
-- **Test před showem** - Vyzkoušejte všechny scény a efekty
+- **Color coding** - Pouzijte emoji v nazvech ( Red Par,  Blue Par)
+- **Backup data** - Exportujte data pravidelne (TODO: implement)
+- **Test pred showem** - Vyzkousejte vsechny sceny a efekty
 
 ### Keyboard shortcuts
 
-Na desktopu můžete použít:
-- **Space** - Play/Pause aktivní efekt
+Na desktopu muzete pouzit:
+- **Space** - Play/Pause aktivni efekt
 - **Esc** - Close dialog
 - **Tab** - Navigate mezi controls
 
 ### Mobile tips
 
-- **Portrait mode** - Lepší pro ovládání sliderů
-- **Landscape mode** - Lepší pro joystick kontrolu
-- **Pull to refresh** - Zakázáno aby se nepletlo s UI
+- **Portrait mode** - Lepsi pro ovladani slideru
+- **Landscape mode** - Lepsi pro joystick kontrolu
+- **Pull to refresh** - Zakazano aby se nepletlo s UI
 - **Screen lock** - Nastavte "Keep screen on" v system settings
 
 ### Pro users
 
-- **MIDI mapping** - Připojte MIDI kontrolér (TODO: implement)
-- **OSC protocol** - Remote control přes OSC (TODO: implement)
+- **MIDI mapping** - Pripojte MIDI kontroler (TODO: implement)
+- **OSC protocol** - Remote control pres OSC (TODO: implement)
 - **Timecode sync** - Sync s timecode (TODO: implement)
-- **Multi-user** - Více zařízení současně (vyžaduje server)
+- **Multi-user** - Vice zarizeni soucasne (vyzaduje server)
 
-## 🆘 Často kladené otázky
+##  Casto kladene otazky
 
-### Q: Mohu ovládat více univerzí současně?
-A: Ano, přidejte více univerzí v Nastavení. Každé universe má 512 kanálů.
+### Q: Mohu ovladat vice univerzi soucasne?
+A: Ano, pridejte vice univerzi v Nastaveni. Kazde universe ma 512 kanalu.
 
 ### Q: Funguje aplikace offline?
-A: Ano! Všechna data jsou lokální. Potřebujete jen připojení k DMX síti.
+A: Ano! Vsechna data jsou lokalni. Potrebujete jen pripojeni k DMX siti.
 
-### Q: Kolik fixtures mohu přidat?
-A: Technicky neomezeno, ale doporučujeme max 50 fixtures pro mobile performance.
+### Q: Kolik fixtures mohu pridat?
+A: Technicky neomezeno, ale doporucujeme max 50 fixtures pro mobile performance.
 
 ### Q: Mohu exportovat/importovat data?
-A: Zatím ne, tato funkce je v plánu.
+A: Zatim ne, tato funkce je v planu.
 
-### Q: Podporuje aplikace MIDI kontroléry?
-A: Zatím ne, ale je to v roadmapě.
+### Q: Podporuje aplikace MIDI kontrolery?
+A: Zatim ne, ale je to v roadmape.
 
 ### Q: Jak aktualizuji aplikaci?
-A: PWA se aktualizuje automaticky. Obnovte stránku pro načtení nové verze.
+A: PWA se aktualizuje automaticky. Obnovte stranku pro nacteni nove verze.
 
 ### Q: Je aplikace zdarma?
-A: Ano! Open source pod MIT licencí.
+A: Ano! Open source pod MIT licenci.
 
-## 📞 Potřebujete pomoc?
+##  Potrebujete pomoc?
 
-- 📖 [Architecture Guide](./ARCHITECTURE.md)
-- 💻 [API Documentation](./API.md)
-- 🐛 [Report Issue](https://github.com/atrep123/dmx-512-controller/issues)
-- 💬 [Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
+- Book [Architecture Guide](./ARCHITECTURE.md)
+- Computer [API Documentation](./API.md)
+- Bug [Report Issue](https://github.com/atrep123/dmx-512-controller/issues)
+- Chat [Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
 
 ---
 
-**Uživatelská příručka pro DMX 512 Kontrolér**  
+**Uzivatelska prirucka pro DMX 512 Kontroler**  
 Verze: 1.0  
-Poslední aktualizace: 2024
+Posledni aktualizace: 2024

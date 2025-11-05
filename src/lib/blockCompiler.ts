@@ -24,8 +24,8 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
   let estimatedDuration = 0
   let loopCount = 0
 
-  codeLines.push('// Zkompilovaný efektový program')
-  codeLines.push('// Automaticky vygenerováno z blokového programování\n')
+  codeLines.push('// Zkompilovany efektovy program')
+  codeLines.push('// Automaticky vygenerovano z blokoveho programovani\n')
 
   const loopStarts: number[] = []
 
@@ -110,7 +110,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
           params: { hueShift: block.parameters.hueShift || 0 },
           duration: rainbowDuration,
         })
-        codeLines.push(`rainbowShift(hue: +${block.parameters.hueShift}°, ${rainbowDuration}ms)`)
+        codeLines.push(`rainbowShift(hue: +${block.parameters.hueShift}deg, ${rainbowDuration}ms)`)
         estimatedDuration += rainbowDuration
         break
 
@@ -160,7 +160,7 @@ export function compileBlocks(blocks: EffectBlock[]): CompiledEffect {
   })
 
   codeLines.push('')
-  codeLines.push(`// Statistiky: ${blocks.length} bloků, ${loopCount} smyček, ~${estimatedDuration}ms`)
+  codeLines.push(`// Statistiky: ${blocks.length} bloku, ${loopCount} smycek, ~${estimatedDuration}ms`)
 
   return {
     instructions,
@@ -175,5 +175,5 @@ export function getEffectSummary(compiled: CompiledEffect): string {
   const { blockCount, loopCount, estimatedDuration } = compiled
   const durationSeconds = (estimatedDuration / 1000).toFixed(1)
   
-  return `${blockCount} bloků · ${loopCount} smyček · ~${durationSeconds}s cyklus`
+  return `${blockCount} bloku - ${loopCount} smycek - ~${durationSeconds}s cyklus`
 }

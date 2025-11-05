@@ -1,5 +1,5 @@
 {
-  "title": "DMX Controller — OLA & Fades",
+  "title": "DMX Controller - OLA & Fades",
   "uid": "dmx-ola-fades",
   "timezone": "browser",
   "refresh": "5s",
@@ -31,7 +31,7 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "Aktivní fade kanály",
+      "title": "Aktivni fade kanaly",
       "datasource": "$DS_PROMETHEUS",
       "targets": [{ "expr": "sum(dmx_core_fade_active{universe=~\"$universe\"})" }],
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto" },
@@ -40,7 +40,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Aktivní fade joby",
+      "title": "Aktivni fade joby",
       "datasource": "$DS_PROMETHEUS",
       "targets": [{ "expr": "sum(dmx_core_fade_jobs_active{universe=~\"$universe\"})" }],
       "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto" },
@@ -91,7 +91,7 @@
     {
       "id": 6,
       "type": "bargauge",
-      "title": "Fades zrušené vs. dokončené (/s)",
+      "title": "Fades zrusene vs. dokoncene (/s)",
       "datasource": "$DS_PROMETHEUS",
       "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
       "targets": [
@@ -115,7 +115,7 @@
     {
       "id": 8,
       "type": "timeseries",
-      "title": "DMX příkazy / s podle protokolu",
+      "title": "DMX prikazy / s podle protokolu",
       "datasource": "$DS_PROMETHEUS",
       "targets": [
         { "expr": "sum by (proto) (rate(dmx_core_cmds_total{type=\"dmx.patch\"}[5m]))" }

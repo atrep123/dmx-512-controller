@@ -1,45 +1,45 @@
 # Troubleshooting Guide
 
-Řešení nejčastějších problémů a chyb v DMX 512 Kontrolér aplikaci.
+Reseni nejcastejsich problemu a chyb v DMX 512 Kontroler aplikaci.
 
-## 📋 Obsah
+## Clipboard Obsah
 
 - [Instalace a PWA](#instalace-a-pwa)
-- [Připojení k síti](#připojení-k-síti)
-- [Ovládání světel](#ovládání-světel)
-- [Výkon a rychlost](#výkon-a-rychlost)
-- [Data a ukládání](#data-a-ukládání)
-- [Efekty a scény](#efekty-a-scény)
-- [Browser problémy](#browser-problémy)
+- [Pripojeni k siti](#pripojeni-k-siti)
+- [Ovladani svetel](#ovladani-svetel)
+- [Vykon a rychlost](#vykon-a-rychlost)
+- [Data a ukladani](#data-a-ukladani)
+- [Efekty a sceny](#efekty-a-sceny)
+- [Browser problemy](#browser-problemy)
 
-## 📱 Instalace a PWA
+##  Instalace a PWA
 
-### Problém: Instalační prompt se nezobrazuje
+### Problem: Instalacni prompt se nezobrazuje
 
-**Možné příčiny:**
-1. Aplikace není na HTTPS
-2. PWA už je nainstalovaná
-3. Prohlížeč nepodporuje PWA
+**Mozne priciny:**
+1. Aplikace neni na HTTPS
+2. PWA uz je nainstalovana
+3. Prohlizec nepodporuje PWA
 4. Service Worker selhalo
 
-**Řešení:**
+**Reseni:**
 
 **Krok 1: Zkontroluj HTTPS**
 ```
-URL musí začínat https:// (ne http://)
+URL musi zacinat https:// (ne http://)
 ```
 
-**Krok 2: Manuální instalace**
-- Chrome: Menu (⋮) → "Přidat na plochu" nebo "Instalovat aplikaci"
-- Safari (iOS): Share → "Add to Home Screen"
-- Edge: Menu (⋮) → "Apps" → "Install this site as an app"
+**Krok 2: Manualni instalace**
+- Chrome: Menu ()  "Pridat na plochu" nebo "Instalovat aplikaci"
+- Safari (iOS): Share  "Add to Home Screen"
+- Edge: Menu ()  "Apps"  "Install this site as an app"
 
 **Krok 3: Zkontroluj Service Worker**
-1. Otevři DevTools (F12)
-2. Application tab → Service Workers
-3. Mělo by být "activated and is running"
+1. Otevri DevTools (F12)
+2. Application tab  Service Workers
+3. Melo by byt "activated and is running"
 
-**Krok 4: Vymaž cache a zkus znovu**
+**Krok 4: Vymaz cache a zkus znovu**
 ```javascript
 // V console (F12)
 navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -48,421 +48,421 @@ navigator.serviceWorker.getRegistrations().then(registrations => {
 // Pak refresh (Ctrl+R)
 ```
 
-### Problém: Aplikace se po instalaci neotevírá
+### Problem: Aplikace se po instalaci neotevira
 
-**Příčiny:**
-- Chybný manifest
+**Priciny:**
+- Chybny manifest
 - Service Worker crashed
 - Browser cache issue
 
-**Řešení:**
+**Reseni:**
 
 1. **Odinstaluj a znovu nainstaluj:**
-   - Dlouhé držení ikony → Odinstalovat
-   - Otevři v browseru znovu
+   - Dlouhe drzeni ikony  Odinstalovat
+   - Otevri v browseru znovu
    - Instaluj znovu
 
-2. **Vymaž browser data:**
-   - Chrome: Settings → Privacy → Clear browsing data
-   - Zaškrtni: Cached images, Site data
-   - Nemazat: Cookies (ztratíte data!)
+2. **Vymaz browser data:**
+   - Chrome: Settings  Privacy  Clear browsing data
+   - Zaskrtni: Cached images, Site data
+   - Nemazat: Cookies (ztratite data!)
 
-3. **Zkus jiný prohlížeč:**
-   - Chrome (doporučeno)
+3. **Zkus jiny prohlizec:**
+   - Chrome (doporuceno)
    - Edge
    - Samsung Internet
 
-### Problém: Ikona aplikace vypadá špatně
+### Problem: Ikona aplikace vypada spatne
 
-**Příčiny:**
-- Chybějící ikony pro váš device
-- Cache problém
+**Priciny:**
+- Chybejici ikony pro vas device
+- Cache problem
 - Android adaptive icons
 
-**Řešení:**
+**Reseni:**
 
-1. **Vymaž cache ikony:**
-   - Android: Settings → Apps → [Browser] → Storage → Clear cache
-   - iOS: Smaž ikonu a reinstaluj
+1. **Vymaz cache ikony:**
+   - Android: Settings  Apps  [Browser]  Storage  Clear cache
+   - iOS: Smaz ikonu a reinstaluj
 
-2. **Počkej na refresh:**
-   - Android někdy trvá až 24h než se ikona aktualizuje
+2. **Pockej na refresh:**
+   - Android nekdy trva az 24h nez se ikona aktualizuje
 
 3. **Zkontroluj manifest:**
    ```
-   DevTools → Application → Manifest
-   Zkontroluj že "icons" obsahuje různé velikosti
+   DevTools  Application  Manifest
+   Zkontroluj ze "icons" obsahuje ruzne velikosti
    ```
 
-## 🌐 Připojení k síti
+##  Pripojeni k siti
 
-### Problém: Nepřipojí se k Art-Net node
+### Problem: Nepripoji se k Art-Net node
 
 **Diagnostika:**
 
-**Krok 1: Základní kontrola**
+**Krok 1: Zakladni kontrola**
 ```
-✓ Je Art-Net node zapnutá? (kontrolka svítí)
-✓ Je mobil ve stejné síti? (stejné WiFi)
-✓ Je IP adresa správná?
+ Je Art-Net node zapnuta? (kontrolka sviti)
+ Je mobil ve stejne siti? (stejne WiFi)
+ Je IP adresa spravna?
 ```
 
-**Krok 2: Otestuj síťové připojení**
+**Krok 2: Otestuj sitove pripojeni**
 
-Použij ping app nebo terminal:
+Pouzij ping app nebo terminal:
 ```bash
 # Android (Termux app)
 ping 192.168.1.100
 
-# Nebo použij "Network Analyzer" app
+# Nebo pouzij "Network Analyzer" app
 ```
 
-Měl by odpovídat. Pokud ne:
-- Node není dostupná
+Mel by odpovidat. Pokud ne:
+- Node neni dostupna
 - Firewall blokuje
-- Špatná IP adresa
+- Spatna IP adresa
 
 **Krok 3: Zkontroluj port**
 ```
-Art-Net používá port 6454 (UDP)
-Firewall musí tento port povolit
+Art-Net pouziva port 6454 (UDP)
+Firewall musi tento port povolit
 ```
 
-**Krok 4: Zkontroluj universe číslo**
+**Krok 4: Zkontroluj universe cislo**
 ```
 Art-Net universe 0 = DMX universe 1
-Některé node používají 0-based indexing
+Nektere node pouzivaji 0-based indexing
 ```
 
-**Řešení:**
+**Reseni:**
 
 1. **Restart Art-Net node**
-   - Vypni a zapni napájení
-   - Počkej 30 sekund
-   - Zkus připojit znovu
+   - Vypni a zapni napajeni
+   - Pockej 30 sekund
+   - Zkus pripojit znovu
 
-2. **Zkontroluj IP v node manuálu**
-   - Výchozí IP bývá:
+2. **Zkontroluj IP v node manualu**
+   - Vychozi IP byva:
      - 2.x.x.x (Art-Net default)
      - 192.168.1.x (home router)
-     - 10.x.x.x (pro sítě)
+     - 10.x.x.x (pro site)
 
-3. **Použij broadcast mode**
-   - Některé nodes podporují broadcast
+3. **Pouzij broadcast mode**
+   - Nektere nodes podporuji broadcast
    - IP adresa: 2.255.255.255 nebo 255.255.255.255
 
 4. **Zkus lower send rate**
-   - Sniž na 30-35 packets/sec
-   - Může pomoct s nestabilním WiFi
+   - Sniz na 30-35 packets/sec
+   - Muze pomoct s nestabilnim WiFi
 
-### Problém: Připojení je nestabilní (odpojuje se)
+### Problem: Pripojeni je nestabilni (odpojuje se)
 
-**Příčiny:**
-- Slabý WiFi signál
+**Priciny:**
+- Slaby WiFi signal
 - Interference
-- Přetížená síť
-- Node má problémy
+- Pretizena sit
+- Node ma problemy
 
-**Řešení:**
+**Reseni:**
 
-1. **Zlepši WiFi signál:**
-   - Přesuň se blíž k routeru/access pointu
-   - Použij 5GHz WiFi místo 2.4GHz
-   - Eliminuj překážky mezi zařízeními
+1. **Zlepsi WiFi signal:**
+   - Presun se bliz k routeru/access pointu
+   - Pouzij 5GHz WiFi misto 2.4GHz
+   - Eliminuj prekazky mezi zarizenimi
 
-2. **Dedicated WiFi síť:**
-   - Ideálně samostatná WiFi jen pro DMX
-   - Žádné jiné zařízení na síti
+2. **Dedicated WiFi sit:**
+   - Idealne samostatna WiFi jen pro DMX
+   - Zadne jine zarizeni na siti
    - Vypni internet sharing
 
-3. **Použij kabelové připojení:**
+3. **Pouzij kabelove pripojeni:**
    - USB-C to Ethernet adapter
-   - Přímý kabel do Art-Net node
-   - Nejstabilnější řešení
+   - Primy kabel do Art-Net node
+   - Nejstabilnejsi reseni
 
 4. **Zkontroluj node:**
-   - Může být přehřátá
+   - Muze byt prehrata
    - Firmware update
-   - Testuj s jiným zařízením
+   - Testuj s jinym zarizenim
 
-### Problém: Vysoká latence (zpoždění)
+### Problem: Vysoka latence (zpozdeni)
 
 **Diagnostika:**
 
-Měř latenci:
+Mer latenci:
 - Pohni sliderem
-- Počkej na změnu světla
-- Mělo by být < 50ms
+- Pockej na zmenu svetla
+- Melo by byt < 50ms
 
-**Příčiny latence:**
+**Priciny latence:**
 - WiFi latency (20-100ms)
-- Přetížená síť
+- Pretizena sit
 - Node processing delay
-- Příliš mnoho fixtures
+- Prilis mnoho fixtures
 
-**Řešení:**
+**Reseni:**
 
-1. **Optimalizuj síť:**
+1. **Optimalizuj sit:**
    ```
-   WiFi: 5GHz místo 2.4GHz
-   Kabel: Vždy lepší než WiFi
-   Router: Blízko node i mobilu
+   WiFi: 5GHz misto 2.4GHz
+   Kabel: Vzdy lepsi nez WiFi
+   Router: Blizko node i mobilu
    ```
 
-2. **Sniž send rate:**
+2. **Sniz send rate:**
    ```
-   44 Hz → 30 Hz může snížit latenci
-   Méně packets = méně congestion
+   44 Hz  30 Hz muze snizit latenci
+   Mene packets = mene congestion
    ```
 
 3. **Omez fixtures:**
    ```
    < 50 fixtures per universe
-   Rozděl do více univerzí
+   Rozdel do vice univerzi
    ```
 
 4. **Quality of Service (QoS):**
    ```
-   Router nastavení:
+   Router nastaveni:
    Prioritizuj DMX traffic (port 6454)
    ```
 
-## 💡 Ovládání světel
+##  Ovladani svetel
 
-### Problém: Světla nereagují na změny
+### Problem: Svetla nereaguji na zmeny
 
 **Checklist:**
 
 ```
-✓ Je připojení aktivní? (zelená tečka v Connection)
-✓ Je správná DMX adresa? (ověř v fixture setup)
-✓ Je správné universe? (ověř v Setup)
-✓ Je fixture zapnuto? (napájení)
-✓ Jsou DMX kabely zapojené správně?
+ Je pripojeni aktivni? (zelena tecka v Connection)
+ Je spravna DMX adresa? (over v fixture setup)
+ Je spravne universe? (over v Setup)
+ Je fixture zapnuto? (napajeni)
+ Jsou DMX kabely zapojene spravne?
 ```
 
 **Diagnostika:**
 
-1. **Testuj jednoduché světlo:**
+1. **Testuj jednoduche svetlo:**
    - Nastav simple dimmer fixture
-   - DMX adresa 1, 1 kanál
+   - DMX adresa 1, 1 kanal
    - Pohni sliderem 0-255
-   - Mělo by reagovat
+   - Melo by reagovat
 
 2. **Zkontroluj packet counter:**
    ```
-   Connection view → "Packets sent: XXX"
-   Mělo by se zvyšovat když pohybuješ sliderem
+   Connection view  "Packets sent: XXX"
+   Melo by se zvysovat kdyz pohybujes sliderem
    ```
 
 3. **Zkontroluj DMX addressing:**
    ```
-   Fixture na DMX 10 s 4 kanály zabírá:
-   Kanály 10, 11, 12, 13
-   Nesmí se překrývat s jiným fixture!
+   Fixture na DMX 10 s 4 kanaly zabira:
+   Kanaly 10, 11, 12, 13
+   Nesmi se prekryvat s jinym fixture!
    ```
 
-**Řešení:**
+**Reseni:**
 
 1. **Reset fixture DMX adresy:**
-   - Zkontroluj fixture manuál
+   - Zkontroluj fixture manual
    - Nastav na jednoduchou adresu (1, 10, 100)
    - Otestuj
 
-2. **Zkontroluj DMX řetěz:**
+2. **Zkontroluj DMX retez:**
    ```
-   Controller → Node → Fixture 1 → Fixture 2 → ...
-   Každé fixture musí být v řetězu
-   Poslední fixture: DMX terminator (120Ω)
+   Controller  Node  Fixture 1  Fixture 2  ...
+   Kazde fixture musi byt v retezu
+   Posledni fixture: DMX terminator (120)
    ```
 
 3. **Testuj mimo aplikaci:**
-   - Použij jinou DMX kontrolu
-   - Ověř že fixture funguje
-   - Vyluč hardware problém
+   - Pouzij jinou DMX kontrolu
+   - Over ze fixture funguje
+   - Vyluc hardware problem
 
-### Problém: Některé kanály nefungují
+### Problem: Nektere kanaly nefunguji
 
-**Příčiny:**
-- Špatné channel mapping
-- Fixture má jiný channel layout
+**Priciny:**
+- Spatne channel mapping
+- Fixture ma jiny channel layout
 - Firmware verze fixture
 
-**Řešení:**
+**Reseni:**
 
-1. **Zkontroluj fixture manuál:**
+1. **Zkontroluj fixture manual:**
    ```
-   Najdi správný DMX channel layout
-   Některé fixtures mají multiple modes:
+   Najdi spravny DMX channel layout
+   Nektere fixtures maji multiple modes:
    - 3-channel mode (RGB)
    - 4-channel mode (RGBW)
    - 7-channel mode (RGB + dimmer + special)
    ```
 
-2. **Přenastavit fixture mode:**
+2. **Prenastavit fixture mode:**
    - Obvykle v fixture menu
-   - Vyber mode který odpovídá channel count v aplikaci
+   - Vyber mode ktery odpovida channel count v aplikaci
 
 3. **Manually test channels:**
    ```
-   Fixtures view → Vyberte fixture
-   Postupně zkoušej jednotlivé kanály
-   Sleduj co se děje na fixture
+   Fixtures view  Vyberte fixture
+   Postupne zkousej jednotlive kanaly
+   Sleduj co se deje na fixture
    ```
 
-### Problém: Barvy nevypadají správně
+### Problem: Barvy nevypadaji spravne
 
-**Příčiny:**
-- Špatné RGB channel pořadí
+**Priciny:**
+- Spatne RGB channel poradi
 - RGBW vs RGB mode
 - Color calibration
 
-**Řešení:**
+**Reseni:**
 
 1. **Zkontroluj channel order:**
    ```
-   Některé fixtures používají:
+   Nektere fixtures pouzivaji:
    - RGB (standard)
    - RBG
-   - GRB (méně časté)
+   - GRB (mene caste)
    
-   Zkus swapnout kanály v Setup
+   Zkus swapnout kanaly v Setup
    ```
 
 2. **Calibrate color:**
    ```
-   Red   = 255, 0, 0   (mělo být čistě červená)
-   Green = 0, 255, 0   (mělo být čistě zelená)
-   Blue  = 0, 0, 255   (mělo být čistě modrá)
+   Red   = 255, 0, 0   (melo byt ciste cervena)
+   Green = 0, 255, 0   (melo byt ciste zelena)
+   Blue  = 0, 0, 255   (melo byt ciste modra)
    
-   Pokud ne, channels jsou špatně namapované
+   Pokud ne, channels jsou spatne namapovane
    ```
 
 3. **Zkontroluj fixture mode:**
    ```
    RGB vs RGBW mode v fixture
-   Musí odpovídat typu v aplikaci
+   Musi odpovidat typu v aplikaci
    ```
 
-## ⚡ Výkon a rychlost
+##  Vykon a rychlost
 
-### Problém: Aplikace je pomalá
+### Problem: Aplikace je pomala
 
 **Symptomy:**
-- Dlouhé načítání
+- Dlouhe nacitani
 - Laggy slidery
-- Zpoždění UI
+- Zpozdeni UI
 
 **Diagnostika:**
 
-Otevři DevTools (F12):
+Otevri DevTools (F12):
 ```
-Performance tab → Nahraj session
-Hledej dlouhé tasks (> 50ms)
+Performance tab  Nahraj session
+Hledej dlouhe tasks (> 50ms)
 ```
 
-**Řešení:**
+**Reseni:**
 
-1. **Omez počet fixtures:**
+1. **Omez pocet fixtures:**
    ```
-   Doporučeno:
+   Doporuceno:
    - Mobil: < 40 fixtures
    - Tablet: < 60 fixtures
    - Desktop: unlimited
    ```
 
-2. **Vypni nepoužívané efekty:**
+2. **Vypni nepouzivane efekty:**
    ```
-   Běžící efekty používají CPU
-   Effects view → Vypni všechny
+   Bezici efekty pouzivaji CPU
+   Effects view  Vypni vsechny
    ```
 
 3. **Restart aplikaci:**
    ```
-   Zavři a otevři znovu
-   Vymaže memory leaks
+   Zavri a otevri znovu
+   Vymaze memory leaks
    ```
 
-4. **Vymaž stará data:**
+4. **Vymaz stara data:**
    ```
-   Setup → Smaž nepoužívané:
+   Setup  Smaz nepouzivane:
    - Fixtures
    - Scenes
    - Effects
    ```
 
-5. **Update prohlížeč:**
+5. **Update prohlizec:**
    ```
-   Chrome/Edge na nejnovější verzi
-   Starší verze mohou být pomalejší
+   Chrome/Edge na nejnovejsi verzi
+   Starsi verze mohou byt pomalejsi
    ```
 
-### Problém: Efekty nejsou plynulé
+### Problem: Efekty nejsou plynule
 
-**Příčiny:**
-- Nízký send rate
-- Slabý WiFi
+**Priciny:**
+- Nizky send rate
+- Slaby WiFi
 - CPU overload
-- Příliš mnoho fixtures v efektu
+- Prilis mnoho fixtures v efektu
 
-**Řešení:**
+**Reseni:**
 
-1. **Zvyš send rate:**
+1. **Zvys send rate:**
    ```
-   Connection → Send Rate: 44 Hz
-   Vyšší = plynulejší (ale více bandwidth)
+   Connection  Send Rate: 44 Hz
+   Vyssi = plynulejsi (ale vice bandwidth)
    ```
 
-2. **Sniž effect speed:**
+2. **Sniz effect speed:**
    ```
-   Pomalejší efekty = méně updates
-   Vypadá plynuleji
+   Pomalejsi efekty = mene updates
+   Vypada plynuleji
    ```
 
 3. **Omez fixtures v efektu:**
    ```
    Chase efekt na 50 fixtures = laggy
-   Rozdel do 2 efektů po 25 fixtures
+   Rozdel do 2 efektu po 25 fixtures
    ```
 
-4. **Použij jednodušší efekty:**
+4. **Pouzij jednodussi efekty:**
    ```
    Rainbow effect je CPU intensive
-   Chase effect je lehký
+   Chase effect je lehky
    ```
 
-## 💾 Data a ukládání
+##  Data a ukladani
 
-### Problém: Data se ztratila
+### Problem: Data se ztratila
 
-**Kde se data ukládají:**
+**Kde se data ukladaji:**
 ```
-Browser → IndexedDB → "spark-kv" database
-Samostatné pro každý prohlížeč
+Browser  IndexedDB  "spark-kv" database
+Samostatne pro kazdy prohlizec
 ```
 
-**Možné příčiny:**
-- Vymazaná cache browseru
+**Mozne priciny:**
+- Vymazana cache browseru
 - Browser reinstalace
-- Přechod na jiný browser
+- Prechod na jiny browser
 - Storage quota exceeded
 
 **Prevention:**
 
-⚠️ **DŮLEŽITÉ:**
+ **DULEZITE:**
 ```
-"Clear browsing data" → NEMAZAT "Site data"!
+"Clear browsing data"  NEMAZAT "Site data"!
 Pouze "Cached images and files" je safe
 ```
 
 **Budoucnost:** Export/import bude v V1.2
 
-### Problém: "Quota exceeded" error
+### Problem: "Quota exceeded" error
 
-**Příčina:**
-Browser má limit storage (obvykle 50-100MB).
+**Pricina:**
+Browser ma limit storage (obvykle 50-100MB).
 
-**Řešení:**
+**Reseni:**
 
 1. **Zkontroluj usage:**
    ```javascript
@@ -470,74 +470,74 @@ Browser má limit storage (obvykle 50-100MB).
    navigator.storage.estimate().then(console.log)
    ```
 
-2. **Vymaž stará data:**
-   - Smaž nepoužívané fixtures
-   - Smaž staré scenes
-   - Smaž staré effects
+2. **Vymaz stara data:**
+   - Smaz nepouzivane fixtures
+   - Smaz stare scenes
+   - Smaz stare effects
 
-3. **Request více storage:**
+3. **Request vice storage:**
    ```javascript
    // V console (F12)
    navigator.storage.persist().then(console.log)
    ```
 
-## 🎬 Efekty a scény
+##  Efekty a sceny
 
-### Problém: Scéna se neaplikuje správně
+### Problem: Scena se neaplikuje spravne
 
 **Diagnostika:**
 
 ```
-✓ Je scéna uložená? (zkontroluj v Scenes)
-✓ Obsahuje fixtures které existují?
-✓ Jsou fixtures připojené?
+ Je scena ulozena? (zkontroluj v Scenes)
+ Obsahuje fixtures ktere existuji?
+ Jsou fixtures pripojene?
 ```
 
-**Řešení:**
+**Reseni:**
 
-1. **Znovu ulož scénu:**
+1. **Znovu uloz scenu:**
    ```
-   Nastav světla
-   Save Scene → Overwrite existující
+   Nastav svetla
+   Save Scene  Overwrite existujici
    ```
 
 2. **Zkontroluj deleted fixtures:**
    ```
-   Scéna obsahuje fixtures které už neexistují?
-   Smaž a vytvoř znovu
+   Scena obsahuje fixtures ktere uz neexistuji?
+   Smaz a vytvor znovu
    ```
 
-### Problém: Effect se nespustí
+### Problem: Effect se nespusti
 
 **Checklist:**
 
 ```
-✓ Je vybraný nějaký fixture?
-✓ Fixtures existují?
-✓ Effect speed > 0?
-✓ Je připojení aktivní?
+ Je vybrany nejaky fixture?
+ Fixtures existuji?
+ Effect speed > 0?
+ Je pripojeni aktivni?
 ```
 
-**Řešení:**
+**Reseni:**
 
 1. **Zkontroluj fixture selection:**
    ```
-   Effect edit → Fixtures list
-   Musí být minimálně 1 zaškrtnutý
+   Effect edit  Fixtures list
+   Musi byt minimalne 1 zaskrtnuty
    ```
 
 2. **Restart effect:**
    ```
-   Stop → Wait 2 sec → Start
+   Stop  Wait 2 sec  Start
    ```
 
-3. **Smaž a vytvoř znovu:**
+3. **Smaz a vytvor znovu:**
    ```
-   Někdy se corrupted state
-   Delete effect → Create new
+   Nekdy se corrupted state
+   Delete effect  Create new
    ```
 
-## 🌐 Browser problémy
+##  Browser problemy
 
 ### Chrome
 
@@ -547,31 +547,31 @@ Browser má limit storage (obvykle 50-100MB).
 - Disable extensions
 
 **Slow performance**
-- Vymaž cache (ne site data!)
+- Vymaz cache (ne site data!)
 - Disable heavy extensions
 - Update Chrome
 
 ### Safari (iOS)
 
 **PWA features limited**
-- Safari má horší PWA support
-- Některé funkce nemusí fungovat
-- Preferuj Chrome na iOS pokud možné
+- Safari ma horsi PWA support
+- Nektere funkce nemusi fungovat
+- Preferuj Chrome na iOS pokud mozne
 
 **Refresh issues**
 - Pull-to-refresh disabled
-- Ruční refresh: Close a znovu otevři
+- Rucni refresh: Close a znovu otevri
 
 ### Firefox
 
 **Partial PWA support**
 - Firefox nepodporuje instalaci
-- Můžeš použít jako web app
-- Některé PWA features chybí
+- Muzes pouzit jako web app
+- Nektere PWA features chybi
 
-## 🆘 Stále nefunguje?
+##  Stale nefunguje?
 
-### Získej help
+### Ziskej help
 
 1. **GitHub Issues:**
    ```
@@ -583,34 +583,34 @@ Browser má limit storage (obvykle 50-100MB).
    - Browser (Chrome 119, Safari 17, etc.)
    - Steps to reproduce
    - Screenshots
-   - Console errors (F12 → Console)
+   - Console errors (F12  Console)
    ```
 
 2. **GitHub Discussions:**
    ```
-   Pro obecné otázky a pomoc komunity
+   Pro obecne otazky a pomoc komunity
    https://github.com/atrep123/dmx-512-controller/discussions
    ```
 
 3. **Console errors:**
    ```
-   F12 → Console tab
-   Screenshot errors (červeně)
+   F12  Console tab
+   Screenshot errors (cervene)
    Include v issue reportu
    ```
 
 ### Debug mode
 
-Pro detailní diagnostiku:
+Pro detailni diagnostiku:
 ```javascript
 // V console (F12)
 localStorage.setItem('debug', 'true')
 // Refresh page
-// Vidíš debug logs v console
+// Vidis debug logs v console
 ```
 
 ---
 
-**Troubleshooting Guide pro DMX 512 Kontrolér**  
-Poslední aktualizace: 2024-11-01  
-Nenašli jste řešení? [Vytvořte issue!](https://github.com/atrep123/dmx-512-controller/issues/new?template=bug_report.yml)
+**Troubleshooting Guide pro DMX 512 Kontroler**  
+Posledni aktualizace: 2024-11-01  
+Nenasli jste reseni? [Vytvorte issue!](https://github.com/atrep123/dmx-512-controller/issues/new?template=bug_report.yml)

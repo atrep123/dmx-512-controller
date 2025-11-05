@@ -36,5 +36,5 @@ def test_state_etag_and_sparse(live_server_url: str) -> None:
     us = j.get("universesSparse", {})
     u0 = us.get("0", {})
     assert u0.get("3") == 9 and u0.get("5") == 7
-    assert "1" not in u0  # nulové kanály v sparse nesmí být
+    assert "1" not in u0  # nulov kanly v sparse nesm bt
 

@@ -1,110 +1,110 @@
 # Changelog
 
-Všechny významné změny v projektu DMX 512 Kontrolér jsou zdokumentovány v tomto souboru.
+Vsechny vyznamne zmeny v projektu DMX 512 Kontroler jsou zdokumentovany v tomto souboru.
 
-Formát je založen na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Format je zalozen na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+a tento projekt dodrzuje [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Added
-- OLA integrační pipeline (feature‑flag `OUTPUT_MODE=ola`): per‑universe frame store, 44 fps guard, debounce identických framů, diagnostický endpoint `GET /universes/:u/frame` a metriky `dmx_core_ola_*`.
-- FE testy (Vitest): dmxQueue chunking (≤64), optimistic‑revert pro Scény.
-- /state nyní posílá ETag a podporuje volitelný `sparse=1` (přidá `universesSparse`, `sparse:true`).
+- OLA integracni pipeline (featureflag `OUTPUT_MODE=ola`): peruniverse frame store, 44fps guard, debounce identickych framu, diagnosticky endpoint `GET /universes/:u/frame` a metriky `dmx_core_ola_*`.
+- FE testy (Vitest): dmxQueue chunking (64), optimisticrevert pro Sceny.
+- /state nyni posila ETag a podporuje volitelny `sparse=1` (prida `universesSparse`, `sparse:true`).
 
 ## [1.1.1] - 2025-11-04
 
 ### Added
-- Odolnější WebSocket klient s jitter backoffem, heartbeatem a frontou zpráv pro příkazy v UI.
-- ConnectionView nově zobrazuje offline banner, prométheovské metriky (`cmds_total`, `queue_depth`, `ws_clients`, `apply_latency`) a nabízí ruční refresh bez zobrazování API klíče.
-- Nové testy pokrývají reconnect chování a REST fallback při vypnutém WebSocketu.
-- CI pipeline cache-uje npm/pip artefakty a testy používají MQTT service name (`MQTT_HOST=mqtt`).
+- Odolnejsi WebSocket klient s jitter backoffem, heartbeatem a frontou zprav pro prikazy v UI.
+- ConnectionView nove zobrazuje offline banner, prometheovske metriky (`cmds_total`, `queue_depth`, `ws_clients`, `apply_latency`) a nabizi rucni refresh bez zobrazovani API klice.
+- Nove testy pokryvaji reconnect chovani a REST fallback pri vypnutem WebSocketu.
+- CI pipeline cache-uje npm/pip artefakty a testy pouzivaji MQTT service name (`MQTT_HOST=mqtt`).
 
 ### Changed
-- Service worker ignoruje dynamické endpointy a nechává `/` i `index.html` vždy načíst ze sítě.
-- Vite proxy sjednocena do jednoho pravidla a vendor knihovny se bundlují do samostatného chunku.
-- Docker Compose + Caddy používají relativní `VITE_WS_URL=/ws` a správně forwardují WebSocket hlavičky.
-- Těžké React view komponenty se načítají lazy (React.lazy + Suspense), čímž se zmenšil úvodní bundle.
+- Service worker ignoruje dynamicke endpointy a nechava `/` i `index.html` vzdy nacist ze site.
+- Vite proxy sjednocena do jednoho pravidla a vendor knihovny se bundluji do samostatneho chunku.
+- Docker Compose + Caddy pouzivaji relativni `VITE_WS_URL=/ws` a spravne forwarduji WebSocket hlavicky.
+- Tezke React view komponenty se nacitaji lazy (React.lazy + Suspense), cimz se zmensil uvodni bundle.
 
 ### Fixed
-- ConnectionView korektně uklízí socket při unmountu a nikdy nevypisuje API klíč v UI.
-- README a Deployment Guide doplněny o dev proxy, env proměnné, compose/Caddy a smoke test postupy.
+- ConnectionView korektne uklizi socket pri unmountu a nikdy nevypisuje API klic v UI.
+- README a Deployment Guide doplneny o dev proxy, env promenne, compose/Caddy a smoke test postupy.
 
-### Plánované funkce
-- Export/Import konfigurace a scén
-- MIDI kontrolér podpora
+### Planovane funkce
+- Export/Import konfigurace a scen
+- MIDI kontroler podpora
 - OSC protocol podpora
 - Multi-user collaboration
 - Timecode synchronizace
-- Více jazykových mutací (EN, DE)
+- Vice jazykovych mutaci (EN, DE)
 - Advanced effect editor
-- Fixture library (předpřipravené fixture profily)
+- Fixture library (predpripravene fixture profily)
 
 ## [1.0.0] - 2024-11-01
 
-### Added - Nové funkce
-- 🎨 **DMX kontrola** - Ovládání jednotlivých DMX kanálů (0-255)
-- 🌈 **RGB/RGBW Color Picker** - Intuitivní výběr barev
-- 🎬 **Scene Management** - Ukládání a vyvolávání kompletních stavů
-- ⚡ **14 Preset Effects** - Chase, Strobe, Rainbow, Fade, Sweep, atd.
-- 🧩 **Block Programming** - Vizuální programování vlastních efektů
-- 🔧 **Stepper Motor Control** - 16-bit polohování motorů
-- 🎯 **Servo Control** - Úhlové polohování servomotorů (0-180°)
-- 🎮 **Joystick Control** - Pan/Tilt ovládání pomocí virtuálního joysticku
-- 🌐 **Art-Net Support** - DMX over Ethernet protokol
-- 📱 **PWA Support** - Instalace jako nativní aplikace
-- 🎨 **Custom Page Builder** - Vytváření vlastních ovládacích panelů
-- 📊 **Universe Management** - Správa DMX univerzí (512 kanálů/universe)
-- 💾 **Offline Storage** - Všechna data uložená lokálně v IndexedDB
-- 🎛️ **6 Control Blocks** - Reusable UI komponenty pro vlastní panely
+### Added - Nove funkce
+-  **DMX kontrola** - Ovladani jednotlivych DMX kanalu (0-255)
+-  **RGB/RGBW Color Picker** - Intuitivni vyber barev
+-  **Scene Management** - Ukladani a vyvolavani kompletnich stavu
+-  **14 Preset Effects** - Chase, Strobe, Rainbow, Fade, Sweep, atd.
+-  **Block Programming** - Vizualni programovani vlastnich efektu
+-  **Stepper Motor Control** - 16-bit polohovani motoru
+- Target **Servo Control** - Uhlove polohovani servomotoru (0-180)
+-  **Joystick Control** - Pan/Tilt ovladani pomoci virtualniho joysticku
+-  **Art-Net Support** - DMX over Ethernet protokol
+-  **PWA Support** - Instalace jako nativni aplikace
+-  **Custom Page Builder** - Vytvareni vlastnich ovladacich panelu
+-  **Universe Management** - Sprava DMX univerzi (512 kanalu/universe)
+-  **Offline Storage** - Vsechna data ulozena lokalne v IndexedDB
+-  **6 Control Blocks** - Reusable UI komponenty pro vlastni panely
 
 ### Components
-- `FixturesView` - Správa a ovládání světelných zařízení
-- `ScenesView` - Správa scén
-- `EffectsView` - Vytváření a spouštění efektů
-- `MotorsView` - Ovládání motorů a servomotorů
-- `ConnectionView` - Konfigurace síťového připojení
-- `SetupView` - Nastavení univerzí a fixtures
-- `LiveControlView` - Živá kontrola s joystickem
-- `CustomPageBuilder` - Builder vlastních stránek
-- `BlockProgramming` - Vizuální editor bloků
-- `ControlBlocksDemo` - Demo UI bloků
+- `FixturesView` - Sprava a ovladani svetelnych zarizeni
+- `ScenesView` - Sprava scen
+- `EffectsView` - Vytvareni a spousteni efektu
+- `MotorsView` - Ovladani motoru a servomotoru
+- `ConnectionView` - Konfigurace sitoveho pripojeni
+- `SetupView` - Nastaveni univerzi a fixtures
+- `LiveControlView` - Ziva kontrola s joystickem
+- `CustomPageBuilder` - Builder vlastnich stranek
+- `BlockProgramming` - Vizualni editor bloku
+- `ControlBlocksDemo` - Demo UI bloku
 
 ### Control Blocks
-- `ChannelSliderBlock` - Slider pro DMX kanály
+- `ChannelSliderBlock` - Slider pro DMX kanaly
 - `ColorPickerBlock` - RGB/RGBW color picker
-- `ToggleButtonBlock` - On/Off přepínač
-- `ButtonPadBlock` - Grid tlačítek
+- `ToggleButtonBlock` - On/Off prepinac
+- `ButtonPadBlock` - Grid tlacitek
 - `PositionControlBlock` - Pan/Tilt kontrola
-- `IntensityFaderBlock` - Vertikální fader
+- `IntensityFaderBlock` - Vertikalni fader
 
 ### Effects
-- Chase - Postupné zapínání fixtures
-- Strobe - Rychlé blikání
-- Rainbow - Plynulá změna barev
-- Fade - Stmívání/rozsvěcování
-- Sweep - Pohyb napříč fixtures
-- Sparkle - Náhodné blikání
-- Wipe - Wipe přechod
+- Chase - Postupne zapinani fixtures
+- Strobe - Rychle blikani
+- Rainbow - Plynula zmena barev
+- Fade - Stmivani/rozsvecovani
+- Sweep - Pohyb napric fixtures
+- Sparkle - Nahodne blikani
+- Wipe - Wipe prechod
 - Bounce - Bounce efekt
 - Theater Chase - Theater chase pattern
-- Fire - Simulace ohně
+- Fire - Simulace ohne
 - Wave - Wave pattern
-- Pulse - Pulsní efekt
+- Pulse - Pulsni efekt
 - Color Fade - Fade mezi barvami
-- Block Program - Vlastní programování
+- Block Program - Vlastni programovani
 
 ### Documentation
-- 📖 Kompletní README s přehledem projektu
-- 🤝 Contributing Guide pro vývojáře
-- 🏗️ Architecture Documentation
-- 📚 API Reference pro všechny typy a funkce
-- 👤 User Guide s návody k použití
-- 📱 Android Setup Guide
-- 🚀 Deployment Guide
-- 🎨 Icons Guide
-- 🔒 Security Guide
-- 📋 PRD (Product Requirements Document)
+- Book Kompletni README s prehledem projektu
+- Handshake Contributing Guide pro vyvojare
+- Build Architecture Documentation
+-  API Reference pro vsechny typy a funkce
+-  User Guide s navody k pouziti
+-  Android Setup Guide
+- Rocket Deployment Guide
+-  Icons Guide
+-  Security Guide
+- Clipboard PRD (Product Requirements Document)
 
 ### Technology Stack
 - React 19.0
@@ -141,26 +141,26 @@ a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - shadcn/ui integration
 - Basic DMX types
 
-## Verze formát
+## Verze format
 
-Format verzí: `MAJOR.MINOR.PATCH`
+Format verzi: `MAJOR.MINOR.PATCH`
 
-- **MAJOR** - Breaking changes, nekompatibilní API změny
-- **MINOR** - Nové funkce, zpětně kompatibilní
-- **PATCH** - Bug fixes, malé vylepšení
+- **MAJOR** - Breaking changes, nekompatibilni API zmeny
+- **MINOR** - Nove funkce, zpetne kompatibilni
+- **PATCH** - Bug fixes, male vylepseni
 
-## Typy změn
+## Typy zmen
 
-- `Added` - Nové funkce
-- `Changed` - Změny v existujících funkcích
-- `Deprecated` - Funkce která bude odstraněna
-- `Removed` - Odstraněné funkce
+- `Added` - Nove funkce
+- `Changed` - Zmeny v existujicich funkcich
+- `Deprecated` - Funkce ktera bude odstranena
+- `Removed` - Odstranene funkce
 - `Fixed` - Bug fixes
 - `Security` - Security fixes
 
 ## Contributing
 
-Chcete přispět? Přečtěte si [Contributing Guide](CONTRIBUTING.md).
+Chcete prispet? Prectete si [Contributing Guide](CONTRIBUTING.md).
 
 ---
 
