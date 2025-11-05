@@ -11,7 +11,7 @@ operational guardrails.
 
    ```bash
    cd infra
-   docker-compose up --build
+   docker compose up --build
    ```
 
    * MQTT broker: `mqtt://localhost:1883`
@@ -78,17 +78,17 @@ Mount `server_state` volume if you need durability between runs.
 ## API
 
 * **REST**
-  * `GET /rgb` → canonical state (`demo.rgb.state.v1`)
-  * `POST /rgb` → accepts command payloads (schema is defaulted)
+  * `GET /rgb`  canonical state (`demo.rgb.state.v1`)
+  * `POST /rgb`  accepts command payloads (schema is defaulted)
 * **WebSocket** `ws://<host>/ws`
-  * Client → `{ "type": "set", "cmdId": "ULID", "src": "ui", "r": 0, "g": 0, "b": 0 }`
-  * Server → `{ "type": "state", "r": 0, "g": 0, "b": 0, "seq": 1, "ts": 123456 }`
+  * Client  `{ "type": "set", "cmdId": "ULID", "src": "ui", "r": 0, "g": 0, "b": 0 }`
+  * Server  `{ "type": "state", "r": 0, "g": 0, "b": 0, "seq": 1, "ts": 123456 }`
 * **MQTT topics**
-  * `v1/demo/rgb/cmd` – incoming commands, QoS 1, non-retained
-  * `v1/demo/rgb/state` – retained canonical state, QoS 1
-  * `v1/devices/<id>/state` – device LWT online/offline (server publishes its own LWT)
+  * `v1/demo/rgb/cmd`  incoming commands, QoS 1, non-retained
+  * `v1/demo/rgb/state`  retained canonical state, QoS 1
+  * `v1/devices/<id>/state`  device LWT online/offline (server publishes its own LWT)
 
-PWA klient přidává `?token=<VITE_API_KEY>` do WebSocket URL a k REST požadavkům přikládá hlavičku `x-api-key`. Backend v1.1.0 token nevaliduje, ale hodnotu logujeme pro audit a budoucí rozšíření autentizace.
+PWA klient pridava `?token=<VITE_API_KEY>` do WebSocket URL a k REST pozadavkum priklada hlavicku `x-api-key`. Backend v1.1.0 token nevaliduje, ale hodnotu logujeme pro audit a budouci rozsireni autentizace.
 
 All command payloads must contain a ULID `cmdId`.  Duplicates within 15 minutes are ignored.
 JSON Schemas for the command and state payloads live in `server/schemas/`.
@@ -118,7 +118,7 @@ JSON Schemas for the command and state payloads live in `server/schemas/`.
 ### Optional OLA driver
 
 * Disabled by default.
-* When enabled, RGB values map to channels 1–3 of the configured universe.
+* When enabled, RGB values map to channels 13 of the configured universe.
 * Rate limited to 44 fps with duplicate frame suppression.  Fail-open (logs only).
 
 ## Observability & Operations
@@ -127,13 +127,13 @@ JSON Schemas for the command and state payloads live in `server/schemas/`.
   * 99.9% of `apply()` executions < 100 ms
   * 99% of WebSocket broadcasts < 50 ms
 * **Health**
-  * `/healthz` – liveness (process + event loop)
-  * `/readyz` – readiness (MQTT connected and queue drained)
-* **Metrics** – Prometheus text at `/metrics`
+  * `/healthz`  liveness (process + event loop)
+  * `/readyz`  readiness (MQTT connected and queue drained)
+* **Metrics**  Prometheus text at `/metrics`
   * `dmx_engine_processed_total`, `dmx_engine_deduped_total`
   * `dmx_engine_queue_depth`, `dmx_engine_last_latency_ms`
   * `dmx_ws_clients`, `dmx_mqtt_connected`
-* **Logging** – JSON to stdout with `seq`, `cmdId`, `src`, and latency hints.
+* **Logging**  JSON to stdout with `seq`, `cmdId`, `src`, and latency hints.
 
 ## Testing
 
@@ -144,9 +144,9 @@ pip install -r server/requirements.txt
 pytest server/tests -k "not mqtt"  # skip MQTT integration if broker unavailable
 ```
 
-* `test_engine.py` – unit + property tests for the single-writer engine.
-* `test_api.py` – REST + WebSocket behaviour using ASGI test clients.
-* `test_mqtt.py` – requires a Mosquitto broker on `localhost:1883`; publishes a command and asserts
+* `test_engine.py`  unit + property tests for the single-writer engine.
+* `test_api.py`  REST + WebSocket behaviour using ASGI test clients.
+* `test_mqtt.py`  requires a Mosquitto broker on `localhost:1883`; publishes a command and asserts
   retained state is updated.
 
 ## Runbook
@@ -155,7 +155,7 @@ pytest server/tests -k "not mqtt"  # skip MQTT integration if broker unavailable
 | --- | --- | --- |
 | WS client never receives updates | Inspect `/readyz` (queue depth + MQTT status).  Review logs for `mqtt_reconnect` warnings. | Restart broker or server.  If queue is large, ensure UI clients are not flooding commands. |
 | ESP ignores commands after restart | Verify retained state on `v1/demo/rgb/state` (use `mosquitto_sub -R`).  Confirm server bootstrap logged `publish_state`. | If retained message missing, ensure broker persistence volume mounted and server started after broker. |
-| Rapid colour flicker | Confirm dedupe TTL (default 15 min) and ensure unique ULIDs per command.  Check if queue dropping UI drag events—slow down UI emission. |
+| Rapid colour flicker | Confirm dedupe TTL (default 15 min) and ensure unique ULIDs per command.  Check if queue dropping UI drag eventsslow down UI emission. |
 | OLA output silent | Ensure `DMX_OLA_ENABLED=true` and endpoint reachable.  Logs with `ws_error`/`ola` indicate connectivity issues.  Service fails open, so state updates continue even when OLA is offline. |
 | Demo feedback loop | Verify clients send only commands (never state).  The server never accepts state from clients and rebroadcasts canonical state only. |
 

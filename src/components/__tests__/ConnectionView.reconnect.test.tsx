@@ -1,21 +1,16 @@
-import '../../test/setup'
-import { useState, act } from 'react'
+import { act } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import type { ServerClientOptions, ServerClient } from '@/lib/serverClient'
 import ConnectionView from '../ConnectionView'
 
 const clientOptions: ServerClientOptions[] = []
 const originalFetch = globalThis.fetch
 
-vi.mock('@github/spark/hooks', () => ({
-  useKV: <T,>(key: string, initial: T) => useState(initial),
-}))
-
 const createServerClientMock = vi.fn((opts: ServerClientOptions): ServerClient => {
   clientOptions.push(opts)
   return {
     setRgb: vi.fn(),
+    sendCommand: vi.fn(),
     close: vi.fn(),
   }
 })
@@ -28,12 +23,12 @@ describe('ConnectionView reconnect behaviour', () => {
   beforeEach(() => {
     clientOptions.length = 0
     createServerClientMock.mockClear()
-    globalThis.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        text: async () => '',
-      })
-    ) as unknown as typeof globalThis.fetch
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      text: async () => '',
+      json: async () => ({ r: 0, g: 0, b: 0, seq: 1 }),
+      headers: new Headers(),
+    })) as unknown as typeof globalThis.fetch
   })
 
   afterEach(() => {
@@ -41,11 +36,12 @@ describe('ConnectionView reconnect behaviour', () => {
   })
 
   it('transitions to connecting after disconnect and accepts new state', async () => {
-    const user = userEvent.setup()
     render(<ConnectionView />)
 
-    const connectButton = screen.getByRole('button', { name: /připojit/i })
-    await user.click(connectButton)
+    const connectButton = screen.getByRole('button', { name: /pripojit/i })
+    await act(async () => {
+      connectButton.click()
+    })
 
     const opts = clientOptions[0]
     expect(opts).toBeDefined()
@@ -53,16 +49,16 @@ describe('ConnectionView reconnect behaviour', () => {
     act(() => {
       opts.onState?.({ type: 'state', r: 1, g: 2, b: 3, seq: 1 })
     })
-    await waitFor(() => expect(screen.getByText(/RGB 1\/2\/3/)).toBeInTheDocument())
+    expect(screen.getByText(/RGB 1\/2\/3/)).toBeInTheDocument()
 
     act(() => {
       opts.onDisconnect?.()
     })
-    await waitFor(() => expect(connectButton).toHaveTextContent('Připojování'))
+    expect(connectButton).toHaveTextContent('Pripojovani')
 
     act(() => {
       opts.onState?.({ type: 'state', r: 4, g: 5, b: 6, seq: 2 })
     })
-    await waitFor(() => expect(screen.getByText(/RGB 4\/5\/6/)).toBeInTheDocument())
+    expect(screen.getByText(/RGB 4\/5\/6/)).toBeInTheDocument()
   })
 })

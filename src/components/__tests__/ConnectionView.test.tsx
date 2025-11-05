@@ -1,26 +1,23 @@
-import '../../test/setup'
-import { useState, act } from 'react'
+import { act } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import type { ServerClientOptions, ServerClient } from '@/lib/serverClient'
 import ConnectionView from '../ConnectionView'
 
 const clientOptions: ServerClientOptions[] = []
 const setRgbMocks: Array<ReturnType<typeof vi.fn>> = []
 const closeMocks: Array<ReturnType<typeof vi.fn>> = []
+const sendCommandMocks: Array<ReturnType<typeof vi.fn>> = []
 const originalFetch = globalThis.fetch
-
-vi.mock('@github/spark/hooks', () => ({
-  useKV: <T,>(key: string, initial: T) => useState(initial),
-}))
 
 const createServerClientMock = vi.fn((opts: ServerClientOptions): ServerClient => {
   clientOptions.push(opts)
   const setRgb = vi.fn()
   const close = vi.fn()
+  const sendCommand = vi.fn()
   setRgbMocks.push(setRgb)
   closeMocks.push(close)
-  return { setRgb, close }
+  sendCommandMocks.push(sendCommand)
+  return { setRgb, sendCommand, close }
 })
 
 vi.mock('@/lib/serverClient', () => ({
@@ -32,13 +29,14 @@ describe('ConnectionView', () => {
     clientOptions.length = 0
     setRgbMocks.length = 0
     closeMocks.length = 0
+    sendCommandMocks.length = 0
     createServerClientMock.mockClear()
-    globalThis.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        text: async () => '',
-      })
-    ) as unknown as typeof globalThis.fetch
+    globalThis.fetch = vi.fn(async () => ({
+      ok: true,
+      text: async () => '',
+      json: async () => ({ r: 0, g: 0, b: 0, seq: 1 }),
+      headers: new Headers(),
+    })) as unknown as typeof globalThis.fetch
   })
 
   afterEach(() => {
@@ -46,11 +44,12 @@ describe('ConnectionView', () => {
   })
 
   it('handles WebSocket state updates and metrics', async () => {
-    const user = userEvent.setup()
     render(<ConnectionView />)
 
-    const connectButton = screen.getByRole('button', { name: /připojit/i })
-    await user.click(connectButton)
+    const connectButton = screen.getByRole('button', { name: /pripojit/i })
+    await act(async () => {
+      connectButton.click()
+    })
 
     expect(createServerClientMock).toHaveBeenCalledTimes(1)
     const opts = clientOptions[0]
@@ -59,17 +58,20 @@ describe('ConnectionView', () => {
     act(() => {
       opts.onState?.({ type: 'state', r: 5, g: 15, b: 25, seq: 2 })
     })
-    await waitFor(() => expect(screen.getByText(/RGB 5\/15\/25/)).toBeInTheDocument())
+    expect(screen.getByText(/RGB 5\/15\/25/)).toBeInTheDocument()
 
-    const testButton = screen.getByRole('button', { name: /testovací příkaz/i })
-    await user.click(testButton)
+    const testButton = screen.getByRole('button', { name: /testovaci prikaz/i })
+    await act(async () => {
+      testButton.click()
+    })
 
     expect(setRgbMocks[0]).toHaveBeenCalled()
 
     act(() => {
       opts.onState?.({ type: 'state', r: 10, g: 20, b: 30, seq: 3 })
     })
-    await waitFor(() => expect(screen.getByTestId('packets-sent')).toHaveTextContent('1'))
-    await waitFor(() => expect(screen.getByTestId('packets-received')).toHaveTextContent('2'))
+    // Metrics counters should reflect sent and received packets
+    expect(screen.getByTestId('packets-sent')).toHaveTextContent('1')
+    expect(screen.getByTestId('packets-received')).toHaveTextContent('2')
   })
 })

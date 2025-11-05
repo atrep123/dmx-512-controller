@@ -5,12 +5,13 @@ import { cn } from '@/lib/utils'
 interface EffectPreviewProps {
     effect: Effect
     fixtureCount?: number
-    size?: 'sm' | 'lg'
+    size?: 'sm' | 'md' | 'lg'
     className?: string
 }
 
-const SIZE_MAP: Record<'sm' | 'lg', { width: number; height: number }> = {
+const SIZE_MAP: Record<'sm' | 'md' | 'lg', { width: number; height: number }> = {
     sm: { width: 220, height: 80 },
+    md: { width: 280, height: 100 },
     lg: { width: 340, height: 120 },
 }
 
@@ -23,7 +24,7 @@ export default function EffectPreview({
     className,
 }: EffectPreviewProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    const animationRef = useRef<number>()
+    const animationRef = useRef<number | null>(null)
     const effectRef = useRef(effect)
 
     useEffect(() => {
@@ -32,7 +33,7 @@ export default function EffectPreview({
 
     const dimensions = useMemo(() => SIZE_MAP[size] ?? SIZE_MAP.sm, [size])
     const fixtures = Math.max(
-        fixtureCount ?? effect.fixtureIds.length ?? DEFAULT_FIXTURE_COUNT,
+        fixtureCount ?? effect.fixtureIds?.length ?? DEFAULT_FIXTURE_COUNT,
         1
     )
 
@@ -77,8 +78,9 @@ export default function EffectPreview({
 
         return () => {
             isMounted = false
-            if (animationRef.current) {
+            if (animationRef.current !== null) {
                 cancelAnimationFrame(animationRef.current)
+                animationRef.current = null
             }
         }
     }, [dimensions, fixtures, effect])
