@@ -92,8 +92,11 @@ export default function ScenesView({
                 for (const ch of fixture.channels) {
                     const targetVal = scene.channelValues[ch.id]
                     if (typeof targetVal === 'number') {
-                        // ch.number is already absolute DMX address (1..512)
-                        const absCh = Math.max(1, Math.min(512, ch.number))
+                        // Channels are stored relative to the fixture's base DMX address; convert to absolute
+                        const baseAddress =
+                            typeof fixture.dmxAddress === 'number' ? fixture.dmxAddress : 1
+                        const offset = typeof ch.number === 'number' ? ch.number - 1 : 0
+                        const absCh = Math.max(1, Math.min(512, baseAddress + offset))
                         const arr = byUniverse.get(uniNum) || []
                         arr.push({ ch: absCh, val: targetVal })
                         byUniverse.set(uniNum, arr)

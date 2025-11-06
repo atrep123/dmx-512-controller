@@ -5,6 +5,9 @@ import ScenesView from "@/components/ScenesView";
 import type { Fixture, Scene, Universe } from "@/lib/types";
 import { registerServerClient } from "@/lib/transport";
 
+const rangeInclusive = (start: number, end: number) =>
+  Array.from({ length: end - start + 1 }, (_, i) => start + i);
+
 function makeFixture(
   universeId: string,
   start: number,
@@ -40,18 +43,22 @@ test("large scene splits into ≤64-sized dmx.patch chunks per universe", () => 
       { id: "u0", name: "U0", number: 0 },
       { id: "u1", name: "U1", number: 1 },
     ];
-    // u0: 100 kanálů (jeden fixture se startem 1)
-    const f0 = makeFixture("u0", 1, 100);
-    // u1: 70 kanálů (jeden fixture se startem 1)
-    const f1 = makeFixture("u1", 1, 70);
-    const [fixtures, setFixtures] = useState<Fixture[]>([f0, f1]);
+    // u0: 40 kanálů od 1 + 35 kanálů od 80 (pro ověření offset adres)
+    const f0a = makeFixture("u0", 1, 40);
+    const f0b = makeFixture("u0", 80, 35);
+    // u1: 70 kanálů od 200 (offset adresa v jiném univerzu)
+    const f1 = makeFixture("u1", 200, 70);
+    const [fixtures, setFixtures] = useState<Fixture[]>([f0a, f0b, f1]);
     const [scenes, setScenes] = useState<Scene[]>([
       {
         id: "s1",
         name: "S1",
         timestamp: Date.now(),
         channelValues: Object.fromEntries(
-          [...f0.channels, ...f1.channels].map((c, i) => [c.id, (i + 1) % 256])
+          [...f0a.channels, ...f0b.channels, ...f1.channels].map((c, i) => [
+            c.id,
+            (i + 1) % 256,
+          ])
         ),
       },
     ]);
@@ -79,10 +86,39 @@ test("large scene splits into ≤64-sized dmx.patch chunks per universe", () => 
     // rAF flush
     vi.advanceTimersByTime(20);
   });
-
-  // očekáváme 4 chunkované patche: u0 64+36, u1 64+6
-  expect(sent.length).toBe(4);
-  sent.forEach((p) => expect(p.patch.length).toBeLessThanOrEqual(64));
-
   vi.useRealTimers();
+
+  const patchesByUniverse = sent.reduce<Record<number, typeof sent>>((acc, cmd) => {
+    acc[cmd.universe] = acc[cmd.universe] || [];
+    acc[cmd.universe].push(cmd);
+    return acc;
+  }, {});
+
+  // očekáváme 4 chunkované patche: u0 64+11, u1 64+6
+  expect(sent).toHaveLength(4);
+  sent.forEach((p) => {
+    expect(p.type).toBe("dmx.patch");
+    expect(p.patch.length).toBeLessThanOrEqual(64);
+  });
+
+  const u0Commands = patchesByUniverse[0] || [];
+  const u1Commands = patchesByUniverse[1] || [];
+  expect(u0Commands).toHaveLength(2);
+  expect(u1Commands).toHaveLength(2);
+
+  const u0Channels = u0Commands.flatMap((patch) =>
+    patch.patch.map((entry: any) => entry.ch)
+  );
+  const u1Channels = u1Commands.flatMap((patch) =>
+    patch.patch.map((entry: any) => entry.ch)
+  );
+
+  expect([...u0Channels].sort((a, b) => a - b)).toEqual([
+    ...rangeInclusive(1, 40),
+    ...rangeInclusive(80, 114),
+  ]);
+  expect([...u1Channels].sort((a, b) => a - b)).toEqual(
+    rangeInclusive(200, 269)
+  );
+  registerServerClient(null);
 });
