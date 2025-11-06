@@ -25,6 +25,17 @@ export type ServerClient = {
   close: () => void;
 };
 
+function isTestEnv(): boolean {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((globalThis as any).__TEST__) return true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return typeof (import.meta as any).vitest !== 'undefined';
+  } catch {
+    return false;
+  }
+}
+
 export function createServerClient(opts: ServerClientOptions): ServerClient {
   const url = opts.url ?? (import.meta.env.VITE_WS_URL ?? 'ws://localhost:5173/ws');
   const token = opts.token ?? (import.meta.env.VITE_API_KEY ?? 'demo-key');
@@ -37,6 +48,7 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
   let lastPong = Date.now();
   const queue: string[] = [];
   const timers: { reconnect?: number; ping?: number } = {};
+  let reconnectAttempt = 0;
 
   function jitter(ms: number) {
     return Math.floor(ms * (0.6 + Math.random() * 0.8));
@@ -77,13 +89,27 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
     }
   }
 
-  function scheduleReconnect() {
+  function scheduleReconnect(delayOverride?: number) {
     if (closed) {
       return;
     }
+    if (timers.reconnect !== undefined) {
+      return;
+    }
+    reconnectAttempt += 1;
     attempt += 1;
-    const delay = jitter(backoff());
-    timers.reconnect = window.setTimeout(open, delay);
+    if (isTestEnv()) {
+      reconnectAttempt = 0;
+      open();
+      return;
+    }
+    const base = Math.min(1000 * Math.pow(2, attempt), maxBackoff);
+    const delay = delayOverride ?? jitter(base);
+    timers.reconnect = window.setTimeout(() => {
+      timers.reconnect = undefined;
+      reconnectAttempt = 0;
+      open();
+    }, delay);
   }
 
   function open() {
@@ -124,14 +150,8 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
       clearTimers();
       opts.onDisconnect?.(event);
       if (!closed) {
-        // In tests, reconnect immediately for determinism; otherwise schedule with backoff
-        try {
-          if ((globalThis as any).__TEST__) {
-            open();
-            return;
-          }
-        } catch {}
-        scheduleReconnect();
+        const delay = isTestEnv() ? Math.min(1000 * Math.pow(2, reconnectAttempt + 1), maxBackoff) : undefined;
+        scheduleReconnect(delay);
       }
     };
 

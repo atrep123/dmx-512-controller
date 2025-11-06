@@ -104,7 +104,11 @@ export default function ScenesView({
             for (const [uni, list] of byUniverse) {
                 for (const it of list) setChannel(uni, it.ch, it.val)
             }
-            try { if ((globalThis as any).__TEST__) { __flushForTests() } } catch {}
+            try {
+                if ((globalThis as any).__TEST__) {
+                    Promise.resolve().then(() => __flushForTests())
+                }
+            } catch {}
         } catch {
             // silent – UI už je optimisticky přepnuté
         }
