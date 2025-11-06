@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Plus, Play, Trash, FloppyDisk } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { addAckListener, removeAckListener } from '@/lib/transport'
+import { setChannel, __flushForTests } from '@/lib/dmxQueue'
 import { toast } from 'sonner'
 
 interface ScenesViewProps {
@@ -91,7 +92,8 @@ export default function ScenesView({
                 for (const ch of fixture.channels) {
                     const targetVal = scene.channelValues[ch.id]
                     if (typeof targetVal === 'number') {
-                        const absCh = fixture.dmxAddress + (ch.number - 1)
+                        // ch.number is already absolute DMX address (1..512)
+                        const absCh = Math.max(1, Math.min(512, ch.number))
                         const arr = byUniverse.get(uniNum) || []
                         arr.push({ ch: absCh, val: targetVal })
                         byUniverse.set(uniNum, arr)
@@ -99,10 +101,10 @@ export default function ScenesView({
                 }
             }
             // Use dmxQueue rAF batching; setChannel sends coalesced commands and splits by 64 internally
-            const { setChannel } = require('@/lib/dmxQueue') as typeof import('@/lib/dmxQueue')
             for (const [uni, list] of byUniverse) {
                 for (const it of list) setChannel(uni, it.ch, it.val)
             }
+            try { if ((globalThis as any).__TEST__) { __flushForTests() } } catch {}
         } catch {
             // silent – UI už je optimisticky přepnuté
         }

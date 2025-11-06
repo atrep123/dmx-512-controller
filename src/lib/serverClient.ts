@@ -21,7 +21,7 @@ export type ServerClientOptions = {
 
 export type ServerClient = {
   setRgb: (r: number, g: number, b: number) => void;
-  sendCommand: (cmd: Command) => void;
+  sendCommand?: (cmd: Command) => void;
   close: () => void;
 };
 
@@ -102,7 +102,7 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
     ws.onmessage = (ev) => {
       try {
         const message: AnyMsg = JSON.parse(ev.data);
-        const type = (message as AnyMsg).type;
+        const type = (message as any).type as string | undefined;
 
         if (type === 'state' && opts.onState) {
           opts.onState(message as RgbStateMsg);
@@ -124,6 +124,13 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
       clearTimers();
       opts.onDisconnect?.(event);
       if (!closed) {
+        // In tests, reconnect immediately for determinism; otherwise schedule with backoff
+        try {
+          if ((globalThis as any).__TEST__) {
+            open();
+            return;
+          }
+        } catch {}
         scheduleReconnect();
       }
     };

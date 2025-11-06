@@ -29,7 +29,7 @@ from server.ws_hub import WSHub
 
 
 @pytest.fixture
-async def test_app(tmp_path) -> AsyncIterator[tuple[FastAPI, AppContext, list[dict[str, Any]]]]:
+def test_app(tmp_path):
     settings = Settings(
         persistence_path=tmp_path / "state.json",
         dedupe_path=tmp_path / "dedupe.json",
@@ -90,7 +90,7 @@ async def test_app(tmp_path) -> AsyncIterator[tuple[FastAPI, AppContext, list[di
             with contextlib.suppress(asyncio.CancelledError):
                 await task
 
-    yield app, context, published
+    return app, context, published
 
 
 def _free_port() -> int:

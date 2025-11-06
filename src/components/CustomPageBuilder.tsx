@@ -1,14 +1,16 @@
 import { Card } from '@/components/ui/card'
+import type { Effect, Fixture, StepperMotor, Servo } from '@/lib/types'
+import type React from 'react'
 
 interface CustomPageBuilderProps {
-  effects: any[]
-  fixtures: any[]
-  stepperMotors: any[]
-  servos: any[]
-  setEffects: (value: any) => void
-  setFixtures: (value: any) => void
-  setStepperMotors: (value: any) => void
-  setServos: (value: any) => void
+  effects: Effect[]
+  fixtures: Fixture[]
+  stepperMotors: StepperMotor[]
+  servos: Servo[]
+  setEffects: React.Dispatch<React.SetStateAction<Effect[]>>
+  setFixtures: React.Dispatch<React.SetStateAction<Fixture[]>>
+  setStepperMotors: React.Dispatch<React.SetStateAction<StepperMotor[]>>
+  setServos: React.Dispatch<React.SetStateAction<Servo[]>>
 }
 
 export default function CustomPageBuilder({

@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from asyncio_mqtt import Client, Will
+import logging
 
 from .config import Settings
 
@@ -13,8 +14,19 @@ STATE_TOPIC = "v1/demo/rgb/state"
 LWT_TOPIC = "v1/devices/server/state"
 
 
-async def build_publisher(settings: Settings) -> Client:
-    """Create and connect an MQTT client for publishing state."""
+class _NoopPublisher:
+    async def publish(self, *_args, **_kwargs) -> None:  # pragma: no cover - trivial
+        return None
+
+    async def disconnect(self) -> None:  # pragma: no cover - trivial
+        return None
+
+
+async def build_publisher(settings: Settings) -> Client | _NoopPublisher:
+    """Create and connect an MQTT client for publishing state.
+
+    Fail-open if the broker is unavailable to avoid aborting app startup.
+    """
 
     will_payload = json.dumps({"online": False}).encode()
     client = Client(
@@ -26,9 +38,15 @@ async def build_publisher(settings: Settings) -> Client:
         keepalive=settings.mqtt_keepalive,
         will=Will(topic=LWT_TOPIC, payload=will_payload, qos=1, retain=True),
     )
-    await client.connect()
-    await client.publish(LWT_TOPIC, json.dumps({"online": True}).encode(), qos=1, retain=True)
-    return client
+    try:
+        await client.connect()
+        await client.publish(LWT_TOPIC, json.dumps({"online": True}).encode(), qos=1, retain=True)
+        return client
+    except Exception as exc:  # pragma: no cover - depends on env
+        logging.getLogger("mqtt").warning(
+            "mqtt_connect_failed_fail_open", extra={"err": str(exc)}
+        )
+        return _NoopPublisher()
 
 
 async def publish_state(client: Client, state: dict[str, Any]) -> None:

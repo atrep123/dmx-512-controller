@@ -403,19 +403,20 @@ export default function ConnectionView() {
             { ch: 3, val: b },
           ],
         })
+        // Prefer legacy REST endpoint for compatibility; fallback to unified /command
         let ok = false
         try {
-          const res = await fetch('/command', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
-          ok = res.ok
-        } catch {
-          ok = false
-        }
-        if (!ok) {
-          await fetch('/rgb', {
+          const resRgb = await fetch('/rgb', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ cmdId: crypto.randomUUID(), src: 'ui', r, g, b }),
           })
+          ok = resRgb.ok
+        } catch {
+          ok = false
+        }
+        if (!ok) {
+          await fetch('/command', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
         }
       }
       setPacketsSent((prev) => prev + 1)

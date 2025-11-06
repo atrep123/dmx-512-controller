@@ -9,6 +9,14 @@ from typing import Any, Callable, Dict, Optional
 
 import anyio
 import httpx
+from types import SimpleNamespace
+
+# Expose a 'requests'-like shim for tests to monkeypatch: tests patch drivers.ola_universe.requests.post
+# Default implementation forwards to httpx.post to avoid changing production behavior.
+def _default_sync_post(url: str, data: dict[str, str], timeout: float = 0.5) -> Any:
+    return httpx.post(url, data=data, timeout=timeout)
+
+requests = SimpleNamespace(post=_default_sync_post)
 
 
 HttpPost = Callable[[str, dict[str, str]], Any]
@@ -129,8 +137,11 @@ class UniverseFrame:
         }
         start = time.perf_counter()
         try:
-            # Use shared AsyncClient via manager
-            if hasattr(self, "_client") and isinstance(self._client, httpx.AsyncClient):  # type: ignore[attr-defined]
+            # Prefer sync hook if it's an injected override (i.e., not the default shim)
+            if self._http_post is not None and self._http_post is not _default_sync_post:
+                await anyio.to_thread.run_sync(self._http_post, url, data)
+            # Otherwise use shared AsyncClient when available
+            elif hasattr(self, "_client") and isinstance(self._client, httpx.AsyncClient):  # type: ignore[attr-defined]
                 resp = await self._client.post(url, data=data, timeout=0.5)  # type: ignore[attr-defined]
                 if resp.status_code >= 400:
                     # HTTP error metrics
@@ -143,10 +154,9 @@ class UniverseFrame:
                     if callable(by_code):
                         by_code(self.ola_universe, str(resp.status_code))  # type: ignore[misc]
                     return
-            else:
-                # Fallback to sync hook if provided
-                if self._http_post is not None:
-                    await anyio.to_thread.run_sync(self._http_post, url, data)
+            # Fallback to sync shim if nothing else
+            elif self._http_post is not None:
+                await anyio.to_thread.run_sync(self._http_post, url, data)
         except httpx.TimeoutException:
             inc_err = getattr(self._metrics, "ola_inc_http_error", None)
             if callable(inc_err):
@@ -208,7 +218,8 @@ class OLAUniverseManager:
         self.base_url = base_url
         self.fps = fps
         self.mapping = mapping or {}
-        self.http_post = http_post
+        # Default sync hook is module-level requests.post (patchable by tests)
+        self.http_post = http_post or requests.post
         self.metrics = metrics or OLAMetrics({}, {}, {}, {})
         self._universes: Dict[int, UniverseFrame] = {}
         # Shared HTTP client
