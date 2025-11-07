@@ -1,25 +1,26 @@
 import type { Command, DmxPatchEntry } from '@/shared/types'
 import { getServerClient } from '@/lib/transport'
+import { isTestEnv } from '@/lib/isTestEnv'
 
 type UniverseKey = number
+type PatchObserver = (universe: number, patch: DmxPatchEntry[]) => void
 
 const pending: Map<UniverseKey, Map<number, number>> = new Map()
 let rafId: number | null = null
 let timeoutId: number | null = null
+const observers = new Set<PatchObserver>()
 
 function scheduleFlush() {
   // Deterministic in tests: coalesce via a single timeout in the same tick
-  try {
-    if ((globalThis as any).__TEST__) {
-      if (timeoutId === null) {
-        timeoutId = window.setTimeout(() => {
-          timeoutId = null
-          flush()
-        }, 0)
-      }
-      return
+  if (isTestEnv()) {
+    if (timeoutId === null) {
+      timeoutId = window.setTimeout(() => {
+        timeoutId = null
+        flush()
+      }, 0)
     }
-  } catch {}
+    return
+  }
   // Debounce; if already scheduled, do nothing
   if (rafId !== null || timeoutId !== null) return
   // Prefer rAF for responsiveness, but provide a timeout fallback to make tests deterministic
@@ -82,6 +83,16 @@ function flush() {
         patch,
       }
       void send(cmd)
+      if (observers.size > 0) {
+        const cloned = patch.map((entry) => ({ ...entry }))
+        for (const observer of observers) {
+          try {
+            observer(universe, cloned)
+          } catch (error) {
+            console.error('dmx_queue_observer_error', error)
+          }
+        }
+      }
     }
   }
   pending.clear()
@@ -101,11 +112,20 @@ export function setChannel(universe: number, ch: number, val: number) {
 export function __flushForTests() {
   flush()
 }
+
+export function registerPatchObserver(observer: PatchObserver) {
+  observers.add(observer)
+  return () => observers.delete(observer)
+}
 function uuid(): string {
   try {
     if (typeof crypto !== 'undefined' && typeof (crypto as any).randomUUID === 'function') {
       return (crypto as any).randomUUID()
     }
-  } catch {}
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('dmx_queue_uuid_fallback', error)
+    }
+  }
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }

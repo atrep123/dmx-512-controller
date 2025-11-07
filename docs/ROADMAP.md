@@ -40,25 +40,25 @@ Přehled plánovaných funkcí a vylepšení pro DMX 512 Kontrolér aplikaci.
 ### Nové funkce
 
 #### 1. Testing Framework ⚡ Vysoká priorita
-- [ ] Vitest setup
-- [ ] React Testing Library
-- [ ] Component tests
-- [ ] Integration tests
+- [x] Vitest setup
+- [x] React Testing Library
+- [x] Component tests
+- [x] Integration tests
 - [ ] E2E tests (Playwright)
 
 **Proč**: Zajistit kvalitu kódu a prevenci regresí
 
 #### 2. USB DMX Support 🔌 Vysoká priorita
-- [ ] Web Serial API integration
-- [ ] Support pro běžné USB DMX interfaces
+- [x] Web Serial API integration
+- [x] Support pro běžné USB DMX interfaces
 - [ ] Enttec DMX USB PRO support
 - [ ] Auto-detection devices
 
 **Use case**: Přímé připojení k DMX bez Art-Net node
 
 #### 3. Fixture Templates 📚 Střední priorita
-- [ ] Library běžných fixtures
-- [ ] Template picker při přidávání fixture
+- [x] Library běžných fixtures
+- [x] Template picker při přidávání fixture
 - [ ] Community fixture contributions
 - [ ] Import custom fixture profiles
 
@@ -68,9 +68,9 @@ Přehled plánovaných funkcí a vylepšení pro DMX 512 Kontrolér aplikaci.
 - Popular brands (Chauvet, ADJ, Martin)
 
 #### 4. UI/UX Improvements 🎨 Střední priorita
-- [ ] Dark/Light theme toggle
+- [x] Dark/Light theme toggle
 - [ ] Customizable color scheme
-- [ ] Larger touch targets na mobilech
+- [x] Larger touch targets na mobilech
 - [ ] Better gesture support
 - [ ] Haptic feedback (vibrace)
 
@@ -89,11 +89,11 @@ Přehled plánovaných funkcí a vylepšení pro DMX 512 Kontrolér aplikaci.
 ### Nové funkce
 
 #### 1. Export/Import 💼 Vysoká priorita
-- [ ] Export celé konfigurace (JSON)
-- [ ] Export jednotlivých scén
-- [ ] Export effects
-- [ ] Import konfigurace
-- [ ] Merge import (sloučení s existujícími daty)
+- [x] Export celé konfigurace (JSON)
+- [x] Export jednotlivých scén
+- [x] Export effects
+- [x] Import konfigurace
+- [x] Merge import (sloučení s existujícími daty)
 
 **Formát**: JSON s verzováním
 

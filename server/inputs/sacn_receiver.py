@@ -8,55 +8,97 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, Tuple, List, Any
 
+ACN_PACKET_IDENTIFIER = b"ASC-E1.17\x00\x00\x00"
 
 def parse_sacn_packet(data: bytes) -> tuple[int, int, int, bytes, str, bytes, int]:
-    # Validate Root Layer
+    """Parse an E1.31 packet and return (universe, priority, seq, cid, source, dmx, start_code)."""
     if len(data) < 126:
         raise ValueError("packet too short")
-    # Preamble Size (16), Post-amble (0)
-    preamble_size = struct.unpack_from("!H", data, 0)[0]
+
+    view = memoryview(data)
+    offset = 0
+
+    preamble_size = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
     if preamble_size != 0x0010:
         raise ValueError("bad preamble")
-    # ACN Packet Identifier "ASC-E1.17"
-    if data[4:16] != b"ASC-E1.17\x00\x00\x00\x00\x00\x00":
+    postamble_size = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
+    if postamble_size != 0:
+        raise ValueError("bad postamble")
+
+    pid_len = len(ACN_PACKET_IDENTIFIER)
+    if len(view) < offset + pid_len or view[offset:offset + pid_len].tobytes() != ACN_PACKET_IDENTIFIER:
         raise ValueError("bad ACN PID")
-    # Root layer length + vector
-    # flags & length (2 bytes), then vector (4 bytes)
-    _, = struct.unpack_from("!H", data, 16)
-    root_vector = struct.unpack_from("!I", data, 18)[0]
+    offset += pid_len
+
+    _root_flags_and_length = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
+    root_vector = struct.unpack_from("!I", view, offset)[0]
+    offset += 4
     if root_vector != 0x00000004:
         raise ValueError("not data packet")
-    # CID (16 bytes)
-    cid = data[22:38]
-    # Framing Layer starts at 38
-    framing_vector = struct.unpack_from("!I", data, 38)[0]
+
+    cid_end = offset + 16
+    if len(view) < cid_end:
+        raise ValueError("truncated cid")
+    cid = bytes(view[offset:cid_end])
+    offset = cid_end
+
+    # Framing layer
+    _framing_flags_and_length = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
+    framing_vector = struct.unpack_from("!I", view, offset)[0]
+    offset += 4
     if framing_vector != 0x00000002:
         raise ValueError("bad framing vector")
-    source_name = data[42:106].split(b"\x00", 1)[0].decode(errors="ignore")
-    priority = data[106]
-    # Sync address (2), seq (1), options (1), universe (2)
-    seq = data[109]
-    universe = struct.unpack_from("!H", data, 111)[0]
-    # DMP Layer starts at 113
-    dmp_vector = data[115]
+
+    source_name_end = offset + 64
+    if len(view) < source_name_end:
+        raise ValueError("truncated source name")
+    source_name = view[offset:source_name_end].tobytes().split(b"\x00", 1)[0].decode(errors="ignore")
+    offset = source_name_end
+
+    if len(view) < offset + 6:
+        raise ValueError("truncated framing fields")
+    priority = view[offset]
+    offset += 1
+    # sync address present but unused
+    offset += 2
+    seq = view[offset]
+    offset += 1
+    offset += 1  # options
+    universe = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
+
+    # DMP layer
+    _dmp_flags_and_length = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
+    dmp_vector = view[offset]
+    offset += 1
     if dmp_vector != 0x02:
         raise ValueError("bad dmp vector")
-    # Address & Data Type (1), First Property Address (2), Address Increment (2), property value count (2)
-    prop_count = struct.unpack_from("!H", data, 123)[0]
+    # Address & Data Type
+    if len(view) < offset + 7:
+        raise ValueError("truncated dmp header")
+    offset += 1  # address & data type
+    offset += 2  # first property address
+    offset += 2  # address increment
+    prop_count = struct.unpack_from("!H", view, offset)[0]
+    offset += 2
     if prop_count < 1 or prop_count > 513:
         raise ValueError("bad property count")
-    # Property values begin at 125
-    start_code = data[125]
+    if len(view) < offset + prop_count:
+        raise ValueError("truncated dmx")
+    start_code = view[offset]
+    offset += 1
     if start_code != 0x00:
-        # only process start_code 0x00 DMX data
         raise ValueError("unsupported start code")
     values_len = prop_count - 1
-    dmx = data[126:126 + values_len]
-    if len(dmx) < values_len:
-        raise ValueError("truncated dmx")
-    # pad to 512
+    dmx = bytes(view[offset:offset + values_len])
     if values_len < 512:
         dmx = dmx + bytes(512 - values_len)
+
     return int(universe), int(priority), int(seq), cid, source_name, dmx[:512], int(start_code)
 
 

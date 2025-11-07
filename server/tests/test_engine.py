@@ -92,7 +92,7 @@ async def test_engine_last_write_wins() -> None:
 async def test_engine_bounds() -> None:
     engine, _, task = await build_engine()
     cmd = RGBCommand.model_construct(
-        schema=CMD_SCHEMA,
+        schema_=CMD_SCHEMA,
         cmdId=new_ulid(),
         src="ui",
         r=999,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import json
 import socket
 import threading
 import time
@@ -21,7 +20,15 @@ def _free_port() -> int:
 def test_sacn_diag_and_metrics(monkeypatch):
     port = _free_port()
     monkeypatch.setenv("SACN_ENABLED", "false")
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    import importlib
+    import server.app as appmod
+    importlib.reload(appmod)
+    config = uvicorn.Config(
+        "server.app:app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -37,7 +44,6 @@ def test_sacn_diag_and_metrics(monkeypatch):
         time.sleep(0.05)
 
     try:
-        import server.app as appmod
         ctx = appmod.app.state.context
         rec = SACNReceiver(ctx)
         appmod.app.state.context._sacn_receiver = rec
@@ -57,4 +63,3 @@ def test_sacn_diag_and_metrics(monkeypatch):
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

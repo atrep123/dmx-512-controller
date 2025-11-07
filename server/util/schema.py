@@ -40,6 +40,12 @@ class SchemaBundle:
         if "state.update" not in self._validators:
             self._validators["state.update"] = self._load("shared/schema/state.update.schema.json")
         return self._validators["state.update"]
+
+    def fixture(self) -> Draft202012Validator:
+        if "fixture.set" not in self._validators:
+            self._validators["fixture.set"] = self._load("shared/schema/fixture.set.schema.json")
+        return self._validators["fixture.set"]
+
     def fade(self) -> Draft202012Validator:
         if "fade" not in self._validators:
             self._validators["fade"] = self._load("shared/schema/fade.schema.json")

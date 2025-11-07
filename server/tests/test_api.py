@@ -45,7 +45,13 @@ def test_websocket_receives_updates(test_app: tuple) -> None:
     app, context, _ = test_app
     with TestClient(app) as client:
         with client.websocket_connect("/ws") as ws:
-            initial = ws.receive_json()
+            initial = None
+            for _ in range(5):
+                candidate = ws.receive_json()
+                if candidate.get("type") == "state":
+                    initial = candidate
+                    break
+            assert initial is not None, "Initial state message not received"
             assert initial["seq"] == context.engine.state["seq"]
             payload = {
                 "cmdId": "01HZX3YJ9YJ3M5QAZ3GZ8K3QAA",
@@ -56,6 +62,12 @@ def test_websocket_receives_updates(test_app: tuple) -> None:
                 "b": 92,
             }
             ws.send_json(payload)
-            message = ws.receive_json()
+            message = None
+            for _ in range(5):
+                candidate = ws.receive_json()
+                if candidate.get("type") == "state":
+                    message = candidate
+                    break
+            assert message is not None, "State update after command not received"
             assert message["type"] == "state"
             assert (message["r"], message["g"], message["b"]) == (90, 91, 92)

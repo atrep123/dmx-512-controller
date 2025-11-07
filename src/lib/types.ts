@@ -88,6 +88,9 @@ export interface Scene {
   motorPositions?: Record<string, number>
   servoAngles?: Record<string, number>
   timestamp: number
+  description?: string
+  tags?: string[]
+  favorite?: boolean
 }
 
 export interface AppState {

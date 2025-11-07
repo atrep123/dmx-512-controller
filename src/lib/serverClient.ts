@@ -1,5 +1,6 @@
 import type { Command, Ack } from '@/shared/types';
 import { notifyAck } from '@/lib/transport';
+import { isTestEnv } from '@/lib/isTestEnv';
 
 export type RgbStateMsg = { type: 'state'; r: number; g: number; b: number; seq: number };
 type PongMsg = { type: 'pong'; ts?: number };
@@ -24,17 +25,6 @@ export type ServerClient = {
   sendCommand?: (cmd: Command) => void;
   close: () => void;
 };
-
-function isTestEnv(): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((globalThis as any).__TEST__) return true;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return typeof (import.meta as any).vitest !== 'undefined';
-  } catch {
-    return false;
-  }
-}
 
 export function createServerClient(opts: ServerClientOptions): ServerClient {
   const url = opts.url ?? (import.meta.env.VITE_WS_URL ?? 'ws://localhost:5173/ws');
@@ -139,7 +129,13 @@ export function createServerClient(opts: ServerClientOptions): ServerClient {
         } else if ((message as Ack).ack !== undefined && typeof (message as Ack).accepted === 'boolean') {
           const ack = message as Ack;
           opts.onAck?.(ack);
-          try { notifyAck(ack) } catch {}
+          try {
+            notifyAck(ack);
+          } catch (error) {
+            if (import.meta.env.DEV) {
+              console.warn('notify_ack_error', error);
+            }
+          }
         }
       } catch {
         // ignore malformed payloads

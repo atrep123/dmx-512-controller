@@ -32,7 +32,13 @@ def test_engine_triggers_ola_with_rate_and_debounce(monkeypatch) -> None:
 
     monkeypatch.setattr(mod.requests, "post", fake_post, raising=True)
 
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -94,4 +100,3 @@ def test_engine_triggers_ola_with_rate_and_debounce(monkeypatch) -> None:
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

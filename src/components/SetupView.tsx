@@ -7,8 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash, Lightbulb } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { fixtureTemplates, findFixtureTemplate } from '@/lib/fixtureTemplates'
 
 interface SetupViewProps {
     universes: Universe[]
@@ -27,6 +28,8 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
     const [fixtureChannelCount, setFixtureChannelCount] = useState('1')
     const [selectedUniverseId, setSelectedUniverseId] = useState('')
     const [fixtureType, setFixtureType] = useState<Fixture['fixtureType']>('generic')
+    const [fixtureTemplateId, setFixtureTemplateId] = useState('')
+    const selectedTemplate = useMemo(() => findFixtureTemplate(fixtureTemplateId), [fixtureTemplateId])
 
     const addUniverse = () => {
         if (!universeName.trim()) {
@@ -74,14 +77,15 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         }
 
         const dmxAddress = parseInt(fixtureDmxAddress)
-        const channelCount = parseInt(fixtureChannelCount)
+        const requestedChannelCount = parseInt(fixtureChannelCount)
+        const channelCount = selectedTemplate?.channelCount ?? requestedChannelCount
 
-        if (dmxAddress < 1 || dmxAddress > 512) {
+        if (Number.isNaN(dmxAddress) || dmxAddress < 1 || dmxAddress > 512) {
             toast.error('DMX adresa musí být mezi 1 a 512')
             return
         }
 
-        if (channelCount < 1 || channelCount > 32) {
+        if (Number.isNaN(channelCount) || channelCount < 1 || channelCount > 32) {
             toast.error('Počet kanálů musí být mezi 1 a 32')
             return
         }
@@ -103,9 +107,8 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
             return
         }
 
+        const channelNames = (selectedTemplate?.channelNames ?? getChannelNames(fixtureType, channelCount)).slice(0, channelCount)
         const channels: DMXChannel[] = []
-        const channelNames = getChannelNames(fixtureType, channelCount)
-
         for (let i = 0; i < channelCount; i++) {
             channels.push({
                 id: `${Date.now()}-${i}`,
@@ -130,11 +133,27 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
         setFixtureDmxAddress('1')
         setFixtureChannelCount('1')
         setFixtureType('generic')
+        setFixtureTemplateId('')
         setIsFixtureDialogOpen(false)
         toast.success(`Světlo "${newFixture.name}" přidáno`)
     }
 
-    const deleteFixture = (fixtureId: string) => {
+    const handleFixtureTemplateSelect = (templateId: string) => {
+        setFixtureTemplateId(templateId)
+        if (!templateId) return
+        const template = findFixtureTemplate(templateId)
+        if (template) {
+            setFixtureType(template.fixtureType)
+            setFixtureChannelCount(String(template.channelCount))
+        }
+    }
+
+    const handleFixtureTypeChange = (value: Fixture['fixtureType']) => {
+        setFixtureTemplateId('')
+        setFixtureType(value)
+    }
+
+const deleteFixture = (fixtureId: string) => {
         const fixture = fixtures.find((f) => f.id === fixtureId)
         setFixtures((currentFixtures) => currentFixtures.filter((f) => f.id !== fixtureId))
         if (fixture) {
@@ -278,11 +297,41 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
+                                    <Label htmlFor="fixture-template">Šablona</Label>
+                                    <Select value={fixtureTemplateId} onValueChange={handleFixtureTemplateSelect}>
+                                        <SelectTrigger id="fixture-template">
+                                            <SelectValue placeholder="Vyberte šablonu (volitelné)" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="">Vlastní</SelectItem>
+                                            {fixtureTemplates.map((template) => (
+                                                <SelectItem key={template.id} value={template.id}>
+                                                    {template.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {selectedTemplate && (
+                                    <div className="rounded-md bg-muted p-3 text-xs text-muted-foreground">
+                                        <p className="font-semibold text-foreground">{selectedTemplate.name}</p>
+                                        <p>{selectedTemplate.description}</p>
+                                        <div className="mt-2 grid grid-cols-2 gap-1">
+                                            {selectedTemplate.channelNames.map((name, index) => (
+                                                <span key={`${selectedTemplate.id}-${index}`}>
+                                                    Ch {index + 1}: {name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
                                     <Label htmlFor="fixture-type">Typ světla</Label>
                                     <Select
                                         value={fixtureType}
                                         onValueChange={(value) =>
-                                            setFixtureType(value as Fixture['fixtureType'])
+                                            handleFixtureTypeChange(value as Fixture['fixtureType'])
                                         }
                                     >
                                         <SelectTrigger id="fixture-type">
@@ -316,7 +365,10 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
                                             id="channel-count"
                                             type="number"
                                             value={fixtureChannelCount}
-                                            onChange={(e) => setFixtureChannelCount(e.target.value)}
+                                            onChange={(e) => {
+                                            setFixtureChannelCount(e.target.value)
+                                            setFixtureTemplateId('')
+                                        }}
                                             min="1"
                                             max="32"
                                         />

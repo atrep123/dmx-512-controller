@@ -25,6 +25,8 @@ from server.context import AppContext
 from server.engine import Engine
 from server.persistence.dedupe import CommandDeduplicator
 from server.persistence.store import RGBState, StateStore
+from server.persistence.scenes import ScenesStore
+from server.persistence.show import ShowStore
 from server.ws_hub import WSHub
 
 
@@ -73,22 +75,27 @@ def test_app(tmp_path):
         metrics=engine.metrics,
     )
     context.mqtt_connected = True
+    context.scenes_store = ScenesStore(tmp_path / "scenes.json")
+    context.show_store = ShowStore(tmp_path / "show.json")
+    context.scenes = []
+    context.show_snapshot = {}
 
     app = FastAPI()
     app.include_router(router)
     app.state.context = context
 
-    @app.on_event("startup")
-    async def _startup() -> None:
-        app.state.engine_task = asyncio.create_task(engine.run())
-
-    @app.on_event("shutdown")
-    async def _shutdown() -> None:
-        task = getattr(app.state, "engine_task", None)
-        if task is not None:
+    @contextlib.asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        task = asyncio.create_task(engine.run())
+        _app.state.engine_task = task
+        try:
+            yield
+        finally:
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await task
+
+    app.router.lifespan_context = lifespan
 
     return app, context, published
 
@@ -106,7 +113,13 @@ def live_server_url() -> str:
     Assumes MQTT either reachable or server handles backoff.
     """
     port = _free_port()
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()

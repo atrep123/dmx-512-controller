@@ -33,7 +33,8 @@ export default function FixturesView({ fixtures, setFixtures, universes }: Fixtu
         if (!u) return
         const ch = fx.channels.find((c) => c.id === channelId)
         if (!ch) return
-        const absCh = fx.dmxAddress + (ch.number - 1)
+        const isRelativeNumber = ch.number <= fx.channelCount
+        const absCh = isRelativeNumber ? fx.dmxAddress + (ch.number - 1) : ch.number
         enqueueDmxPatch(u.number, absCh, value)
     }
 
@@ -81,6 +82,7 @@ export default function FixturesView({ fixtures, setFixtures, universes }: Fixtu
                                         </span>
                                     </div>
                                     <Slider
+                                        data-testid={`fixture-slider-${fixture.id}-${channel.id}`}
                                         value={[channel.value]}
                                         onValueChange={(values) =>
                                             updateChannelValue(fixture.id, channel.id, values[0])

@@ -11,6 +11,8 @@ import pytest
 import requests
 import uvicorn
 
+from server.tests.utils import channel_value
+
 
 def _free_port() -> int:
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -21,7 +23,13 @@ def _free_port() -> int:
 def test_fade_ltp_via_command_cancel() -> None:
     os.environ["FADES_ENABLED"] = "true"
     port = _free_port()
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -68,10 +76,9 @@ def test_fade_ltp_via_command_cancel() -> None:
         )
         time.sleep(0.5)
         st = requests.get(f"{base}/state", timeout=2).json()
-        assert st["universes"][0][1] == 10
+        assert channel_value(st, 0, 1) == 10
         metrics = requests.get(f"{base}/metrics", timeout=2).text
         assert "dmx_core_fades_cancelled_total" in metrics and "reason=\"ltp\"" in metrics
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

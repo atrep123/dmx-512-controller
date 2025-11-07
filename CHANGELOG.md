@@ -14,6 +14,11 @@ a tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ## [1.1.1] - 2025-11-04
 
+- USB DMX bridge pes Web Serial (ConnectionView dokude patche pmo do USB rozhrand a zobrazuje diagnostiku).
+- Knihovna fixture ablon a picker v SetupView (rychlejd patching DMX adres).
+- Panel Export/Import s JSON zalodou + sloucendm redimem a novfd Theme toggle s vdtdfdfimi touch targety.
+- dmxQueue patch pozorovateld a Vitest pokrytd FixturesView/observer logiky.
+
 ### Added
 - Odolnější WebSocket klient s jitter backoffem, heartbeatem a frontou zpráv pro příkazy v UI.
 - ConnectionView nově zobrazuje offline banner, prométheovské metriky (`cmds_total`, `queue_depth`, `ws_clients`, `apply_latency`) a nabízí ruční refresh bez zobrazování API klíče.

@@ -6,14 +6,14 @@ import asyncio
 import time
 import json
 import logging
-from typing import Any
+from typing import Any, AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse, PlainTextResponse, Response
+from fastapi.responses import JSONResponse, PlainTextResponse, Response, StreamingResponse
 
 from .context import AppContext
 from .engine import Engine
-from .models import CMD_SCHEMA, RESTCommand, RGBCommand, RGBState, WSSetMessage
+from .models import CMD_SCHEMA, RESTCommand, RGBCommand, RGBState, WSSetMessage, SceneModel
 from .util.schema import load_schemas
 from .fixtures.mapper import resolve_attrs
 from .util.ulid import ulid_from_string
@@ -200,7 +200,7 @@ async def post_command(request: Request, context: AppContext = Depends(get_conte
         return ack
     # Handle commands by type
     if typ == "fixture.set" and context.settings.fixtures_enabled:
-        schema = _schemas._load("shared/schema/fixture.set.schema.json")
+        schema = _schemas.fixture()
         fs_errors = sorted(schema.iter_errors(payload), key=lambda e: e.path)
         if fs_errors:
             return {"ack": payload.get("id"), "accepted": False, "reason": "VALIDATION_FAILED", "errors": [{"path": "/" + "/".join(map(str, e.path)), "msg": e.message} for e in fs_errors]}
@@ -334,6 +334,79 @@ async def get_state(request: Request, sparse: int = 0, context: AppContext = Dep
     return JSONResponse(content=body, headers={"ETag": etag})
 
 
+@router.get("/scenes", response_model=list[SceneModel])
+async def get_scenes(context: AppContext = Depends(get_context)) -> list[SceneModel]:
+    """Return all stored scenes."""
+
+    return [SceneModel.model_validate(scene) for scene in context.scenes or []]
+
+
+@router.put("/scenes", response_model=list[SceneModel])
+async def put_scenes(payload: list[SceneModel], context: AppContext = Depends(get_context)) -> list[SceneModel]:
+    """Replace scenes with provided list and persist to disk."""
+
+    serialized = [scene.model_dump() for scene in payload]
+    context.scenes = serialized
+    store = context.scenes_store
+    if store is not None:
+        await store.save(serialized)
+    # keep snapshot in sync
+    if context.show_snapshot is not None:
+        context.show_snapshot["scenes"] = serialized
+        if context.show_store is not None:
+            await context.show_store.save(context.show_snapshot)
+    return payload
+
+
+def _current_show_payload(context: AppContext) -> dict[str, Any]:
+    snapshot = dict(context.show_snapshot or {})
+    scenes = context.scenes or snapshot.get("scenes") or []
+    payload = {
+        "version": snapshot.get("version", "1.1"),
+        "exportedAt": int(time.time() * 1000),
+        "universes": snapshot.get("universes") or [],
+        "fixtures": snapshot.get("fixtures") or [],
+        "scenes": scenes,
+        "effects": snapshot.get("effects") or [],
+        "stepperMotors": snapshot.get("stepperMotors") or [],
+        "servos": snapshot.get("servos") or [],
+    }
+    return payload
+
+
+@router.get("/export")
+async def export_show(context: AppContext = Depends(get_context)) -> StreamingResponse:
+    """Export the full show configuration as JSON."""
+
+    payload = _current_show_payload(context)
+
+    async def iterator() -> AsyncIterator[bytes]:
+        data = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+        yield data.encode("utf-8")
+
+    return StreamingResponse(iterator(), media_type="application/json")
+
+
+@router.post("/import")
+async def import_show(payload: dict[str, Any], context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    """Import a show payload and persist scenes."""
+
+    scenes_data = payload.get("scenes") or []
+    if not isinstance(scenes_data, list):
+        scenes_data = []
+    validated_scenes: list[dict[str, Any]] = [
+        SceneModel.model_validate(scene).model_dump() for scene in scenes_data
+    ]
+    payload["scenes"] = validated_scenes
+    context.scenes = validated_scenes
+    if context.scenes_store is not None:
+        await context.scenes_store.save(validated_scenes)
+    context.show_snapshot = payload
+    if context.show_store is not None:
+        await context.show_store.save(payload)
+    return payload
+
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     context = get_context_ws(websocket)
@@ -384,7 +457,14 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 # legacy clients didn't expect ack; skip
                 continue
             # Unified Command over WS
-            errors = sorted(_schemas.command().iter_errors(data), key=lambda e: e.path)
+            typ = str(data.get("type"))
+            if typ == "fixture.set" and context.settings.fixtures_enabled:
+                validator = _schemas.fixture()
+            elif typ == "dmx.fade":
+                validator = _schemas.fade()
+            else:
+                validator = _schemas.command()
+            errors = sorted(validator.iter_errors(data), key=lambda e: e.path)
             if errors:
                 ack = {
                     "ack": data.get("id"),
@@ -399,18 +479,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 context.core.observe_ack(int((time.perf_counter() - start) * 1000))
                 context.core.inc_cmd("ws", str(data.get("type")), False)
                 continue
-            typ = str(data.get("type"))
             # Fixture set (if enabled)
             if typ == "fixture.set" and context.settings.fixtures_enabled:
-                schema = _schemas._load("shared/schema/fixture.set.schema.json")
-                fs_errors = sorted(schema.iter_errors(data), key=lambda e: e.path)
-                if fs_errors:
-                    await websocket.send_text(json.dumps({
-                        "ack": data.get("id"), "accepted": False, "reason": "VALIDATION_FAILED",
-                        "errors": [{"path": "/" + "/".join(map(str, e.path)), "msg": e.message} for e in fs_errors],
-                        "ts": int(time.time() * 1000),
-                    }))
-                    continue
                 fx_id = str(data.get("fixtureId"))
                 inst = (context.fixture_instances or {}).get(fx_id)
                 if inst is None:
@@ -437,21 +507,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await websocket.send_text(json.dumps({"ack": data.get("id"), "accepted": True, "ts": int(time.time() * 1000)}))
                 continue
             if typ == "dmx.fade" and context.settings.fades_enabled:
-                # Validate fade schema
-                fade_errors = sorted(_schemas.fade().iter_errors(data), key=lambda e: e.path)
-                if fade_errors:
-                    ack = {
-                        "ack": data.get("id"),
-                        "accepted": False,
-                        "reason": "VALIDATION_FAILED",
-                        "errors": [
-                            {"path": "/" + "/".join(map(str, e.path)), "msg": e.message} for e in fade_errors
-                        ],
-                        "ts": int(time.time() * 1000),
-                    }
-                    await websocket.send_text(json.dumps(ack))
-                    context.core.inc_cmd("ws", typ, False)
-                    continue
                 # Enqueue fade
                 universe = int(data.get("universe", 0))
                 duration_ms = int(data.get("durationMs", 0))
@@ -549,6 +604,11 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     except Exception:
                         pass
             delta, rev, ts2 = context.dmx.apply_patch(universe, data.get("patch", []))
+            accepted = True
+            context.core.inc_cmd("ws", typ, True)
+            ack = {"ack": data.get("id"), "accepted": True, "ts": int(time.time() * 1000)}
+            await websocket.send_text(json.dumps(ack))
+            context.core.observe_ack(int((time.perf_counter() - start) * 1000))
             if delta:
                 # Mirror RGB legacy engine for universe 0 ch1..3 so legacy state stays meaningful
                 if universe == 0:
@@ -583,11 +643,6 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                         await context.ola_manager.maybe_send(universe)
                     except Exception:
                         pass
-            accepted = True
-            context.core.inc_cmd("ws", typ, True)
-            ack = {"ack": data.get("id"), "accepted": True, "ts": int(time.time() * 1000)}
-            await websocket.send_text(json.dumps(ack))
-            context.core.observe_ack(int((time.perf_counter() - start) * 1000))
             try:
                 patch_size = len(data.get("patch", [])) if typ == "dmx.patch" else 0
                 logger.info(

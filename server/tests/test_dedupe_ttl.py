@@ -11,6 +11,8 @@ import pytest
 import requests
 import uvicorn
 
+from server.tests.utils import channel_value
+
 
 def _free_port() -> int:
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -23,7 +25,13 @@ def test_dedupe_ttl_expires(ttl: int) -> None:
     # Start a dedicated server with short dedupe TTL
     os.environ["DEDUPE_TTL_SEC"] = str(ttl)
     port = _free_port()
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -88,10 +96,8 @@ def test_dedupe_ttl_expires(ttl: int) -> None:
         assert a3.get("accepted") is True
 
         state = requests.get(f"{base}/state", timeout=2.0).json()
-        uni0 = state["universes"][0]
         # Final value should be 30 (post-TTL apply)
-        assert uni0[1] == 30
+        assert channel_value(state, 0, 1) == 30
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

@@ -15,9 +15,13 @@ STATE_SCHEMA = "demo.rgb.state.v1"
 class RGBCommand(BaseModel):
     """Incoming mutation command."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    schema: Literal[CMD_SCHEMA] = Field(CMD_SCHEMA)
+    schema_: Literal[CMD_SCHEMA] = Field(
+        CMD_SCHEMA,
+        alias="schema",
+        serialization_alias="schema",
+    )
     cmdId: str = Field(..., description="Unique command identifier (ULID).")
     src: str = Field(..., description="Source identifier of the command.")
     r: int = Field(..., ge=0, le=255)
@@ -35,9 +39,13 @@ class RGBCommand(BaseModel):
 class RGBState(BaseModel):
     """Canonical RGB state."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    schema: Literal[STATE_SCHEMA] = Field(STATE_SCHEMA)
+    schema_: Literal[STATE_SCHEMA] = Field(
+        STATE_SCHEMA,
+        alias="schema",
+        serialization_alias="schema",
+    )
     r: int = Field(..., ge=0, le=255)
     g: int = Field(..., ge=0, le=255)
     b: int = Field(..., ge=0, le=255)
@@ -96,12 +104,32 @@ class RESTCommand(BaseModel):
         return value
 
 
+class SceneModel(BaseModel):
+    """Scene payload mirrored from frontend."""
+
+    id: str
+    name: str
+    channelValues: dict[str, int]
+    timestamp: PositiveInt
+    description: str | None = None
+    tags: list[str] | None = None
+    favorite: bool | None = None
+
+    @field_validator("name")
+    def _validate_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("name must not be empty")
+        return value
+
+
 __all__ = [
     "RGBCommand",
     "RGBState",
     "WSSetMessage",
     "WSStateMessage",
     "RESTCommand",
+    "SceneModel",
     "CMD_SCHEMA",
     "STATE_SCHEMA",
 ]

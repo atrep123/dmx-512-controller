@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any, cast
@@ -19,12 +20,17 @@ from .inputs.sacn_receiver import SACNReceiver
 from .fixtures.profiles import load_profiles
 from .fixtures.patch import load_patch
 from .engine import Engine
+from .models import SceneModel
 from .mqtt_in import run_mqtt_in
 from .mqtt_out import build_publisher, publish_state
 from .persistence.dedupe import CommandDeduplicator
 from .persistence.store import RGBState, StateStore
+from .persistence.scenes import ScenesStore
+from .persistence.show import ShowStore
 from .util.log import configure_logging
 from .ws_hub import WSHub
+
+app: FastAPI | None = None
 
 
 def _build_ola(settings: Settings) -> OLAClient | None:
@@ -44,12 +50,68 @@ def create_context(settings: Settings) -> AppContext:
     return AppContext(settings=settings, hub=hub, store=store, dedupe=dedupe)
 
 
+def _sanitize_scene_list(payload: object) -> list[dict[str, Any]]:
+    """Coerce arbitrary payload into a validated list of scenes."""
+
+    if not isinstance(payload, list):
+        return []
+    sanitized: list[dict[str, Any]] = []
+    for item in payload:
+        try:
+            model = SceneModel.model_validate(item)
+        except Exception:
+            continue
+        sanitized.append(model.model_dump())
+    return sanitized
+
+
+async def _load_scenes_from_store(store: ScenesStore | None) -> list[dict[str, Any]]:
+    if store is None:
+        return []
+    try:
+        raw = await store.load()
+    except Exception:
+        return []
+    return _sanitize_scene_list(raw)
+
+
+async def _load_show_snapshot(store: ShowStore | None) -> dict[str, Any]:
+    if store is None:
+        return {}
+    try:
+        raw = await store.load()
+    except Exception:
+        return {}
+    if not isinstance(raw, dict):
+        return {}
+    snapshot: dict[str, Any] = {
+        "version": raw.get("version", "1.1"),
+        "exportedAt": raw.get("exportedAt"),
+        "universes": raw.get("universes") if isinstance(raw.get("universes"), list) else [],
+        "fixtures": raw.get("fixtures") if isinstance(raw.get("fixtures"), list) else [],
+        "effects": raw.get("effects") if isinstance(raw.get("effects"), list) else [],
+        "stepperMotors": raw.get("stepperMotors") if isinstance(raw.get("stepperMotors"), list) else [],
+        "servos": raw.get("servos") if isinstance(raw.get("servos"), list) else [],
+        "scenes": _sanitize_scene_list(raw.get("scenes")),
+    }
+    return snapshot
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     configure_logging()
     settings = get_settings()
     context = create_context(settings)
     app.state.context = context
+    data_root = Path(settings.persistence_path).parent
+    context.scenes_store = ScenesStore(data_root / "scenes.json")
+    context.show_store = ShowStore(data_root / "show.json")
+    context.scenes = await _load_scenes_from_store(context.scenes_store)
+    context.show_snapshot = await _load_show_snapshot(context.show_store)
+    if not context.scenes:
+        fallback = list(context.show_snapshot.get("scenes") or [])
+        if fallback:
+            context.scenes = fallback
     ola_driver = _build_ola(settings)
     # Feature-flagged OLA universe manager
     if settings.output_mode == "ola":
@@ -226,9 +288,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
-    settings = get_settings()
-    app = FastAPI(title="DMX Demo Server", lifespan=lifespan)
-    app.add_middleware(
+    settings = get_settings(force_reload=True)
+    application = FastAPI(title="DMX Demo Server", lifespan=lifespan)
+    application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allow_origins,
         allow_credentials=True,
@@ -237,8 +299,10 @@ def create_app() -> FastAPI:
     )
     from .api import router  # Imported lazily to avoid circular import
 
-    app.include_router(router)
-    return app
+    application.include_router(router)
+    global app
+    app = application
+    return application
 
 
 app = create_app()

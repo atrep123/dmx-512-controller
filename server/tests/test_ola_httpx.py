@@ -41,7 +41,13 @@ def test_ola_httpx_errors_and_queue_depth(monkeypatch, codes):
 
     monkeypatch.setattr(httpx.AsyncClient, "post", fake_post, raising=True)
 
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -81,4 +87,3 @@ def test_ola_httpx_errors_and_queue_depth(monkeypatch, codes):
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

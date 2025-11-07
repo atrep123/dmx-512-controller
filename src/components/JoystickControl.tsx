@@ -125,7 +125,6 @@ export default function JoystickControl({
         }
     }, [position, isDragging])
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- setFixtures/setStepperMotors/setServos jsou stabilní updatery
     useEffect(() => {
         const x = mapping.invertX ? -position.x : position.x
         const y = mapping.invertY ? -position.y : position.y
@@ -184,7 +183,7 @@ export default function JoystickControl({
                 })
             )
         })
-    }, [position, mapping])
+    }, [position, mapping, fixtures, setFixtures, setStepperMotors, setServos])
 
     const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
         setIsDragging(true)

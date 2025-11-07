@@ -11,6 +11,8 @@ import pytest
 import requests
 import uvicorn
 
+from server.tests.utils import channel_value
+
 
 def _free_port() -> int:
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -21,7 +23,13 @@ def _free_port() -> int:
 def test_fade_partial_overlap_ltp() -> None:
     os.environ["FADES_ENABLED"] = "true"
     port = _free_port()
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -69,11 +77,10 @@ def test_fade_partial_overlap_ltp() -> None:
         time.sleep(0.7)
         st = requests.get(f"{base}/state", timeout=2).json()
         # ch1 should be > 0 (fade progressed), ch2 must be exactly 7
-        assert st["universes"][0][1] > 0
-        assert st["universes"][0][2] == 7
+        assert channel_value(st, 0, 1) > 0
+        assert channel_value(st, 0, 2) == 7
         metrics = requests.get(f"{base}/metrics", timeout=2).text
         assert "dmx_core_fades_cancelled_total" in metrics and "reason=\"ltp\"" in metrics
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

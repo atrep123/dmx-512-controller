@@ -8,8 +8,7 @@ import pytest
 import requests
 import websockets
 
-pytestmark = pytest.mark.asyncio
-
+from server.tests.utils import channel_value
 
 def _post_cmd(base: str, cid: str, ch: int, val: int) -> dict:
     resp = requests.post(
@@ -32,6 +31,7 @@ def _get_state(base: str) -> dict:
     return requests.get(f"{base}/state", timeout=2.0).json()
 
 
+@pytest.mark.asyncio
 async def test_cross_path_dedupe(live_server_url: str):
     # Snapshot before
     _before = _get_state(live_server_url)
@@ -60,7 +60,7 @@ async def test_cross_path_dedupe(live_server_url: str):
 
     after = _get_state(live_server_url)
     # State must reflect exactly one application for ch=2 (not two increments).
-    assert after["universes"][0][2] == 11
+    assert channel_value(after, 0, 2) == 11
 
 
 def _burst(base: str, n: int, ch: int) -> int:
@@ -90,4 +90,3 @@ def test_rate_limit_probe(live_server_url: str):
     elapsed = time.perf_counter() - start
     # Don't assert exact count; ensure we see some RATE_LIMITED if sent swiftly
     assert hits >= 1 or elapsed < 1.2
-

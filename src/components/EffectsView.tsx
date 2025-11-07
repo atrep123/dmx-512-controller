@@ -55,23 +55,6 @@ export default function EffectsView({
     const [editingBlocks, setEditingBlocks] = useState<EffectBlock[]>([])
     const blockExecutionRefs = useRef<Map<string, { currentIndex: number, loopStack: Array<{ startIndex: number, remainingLoops: number }> }>>(new Map())
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- applyEffect/executeBlockProgram jsou stabilní reference
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const activeEffects = effects.filter((e) => e.isActive)
-            if (activeEffects.length === 0) return
-
-            activeEffects.forEach((effect) => {
-                if (effect.type === 'block-program' && effect.blocks && effect.blocks.length > 0) {
-                    executeBlockProgram(effect)
-                } else {
-                    applyEffect(effect)
-                }
-            })
-        }, 100)
-
-        return () => clearInterval(interval)
-    }, [effects])
 
     const executeBlockProgram = (effect: Effect) => {
         if (!effect.blocks || effect.blocks.length === 0) return
@@ -294,6 +277,31 @@ export default function EffectsView({
                 break
         }
     }
+
+    const executeBlockProgramRef = useRef(executeBlockProgram)
+    executeBlockProgramRef.current = executeBlockProgram
+    const applyEffectRef = useRef(applyEffect)
+    applyEffectRef.current = applyEffect
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const activeEffects = effects.filter((e) => e.isActive)
+            if (activeEffects.length === 0) return
+
+            const runBlockProgram = executeBlockProgramRef.current
+            const runEffect = applyEffectRef.current
+
+            activeEffects.forEach((effect) => {
+                if (effect.type === 'block-program' && effect.blocks && effect.blocks.length > 0) {
+                    runBlockProgram(effect)
+                } else {
+                    runEffect(effect)
+                }
+            })
+        }, 100)
+
+        return () => clearInterval(interval)
+    }, [effects])
 
     const applyChaseEffect = (effect: Effect, time: number, speed: number) => {
         const fixtureCount = effect.fixtureIds.length

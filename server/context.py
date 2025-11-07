@@ -11,6 +11,7 @@ from .config import Settings
 from .engine import Engine, EngineMetrics
 from .persistence.dedupe import CommandDeduplicator
 from .persistence.store import StateStore
+from .persistence.scenes import ScenesStore
 from .ws_hub import WSHub
 from .util.ratelimit import RateLimiter
 from .util.metrics import CoreMetrics
@@ -18,6 +19,7 @@ from .drivers.ola_universe import OLAUniverseManager
 from .fixtures.profiles import Profile
 from .fixtures.patch import FixtureInstance
 from .dmx.engine import DMXEngine
+from .persistence.show import ShowStore
 
 
 @dataclass
@@ -38,6 +40,10 @@ class AppContext:
     dmx: DMXEngine = field(default_factory=DMXEngine)
     fixture_profiles: dict[str, Profile] | None = None
     fixture_instances: dict[str, FixtureInstance] | None = None
+    scenes_store: ScenesStore | None = None
+    scenes: list[dict[str, object]] = field(default_factory=list)
+    show_store: ShowStore | None = None
+    show_snapshot: dict[str, object] | None = None
 
     def set_mqtt_connected(self, value: bool) -> None:
         self.mqtt_connected = value

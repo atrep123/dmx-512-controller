@@ -11,6 +11,7 @@ import requests
 import uvicorn
 
 from server.inputs.sacn_receiver import SACNReceiver
+from server.tests.utils import channel_value
 
 
 def _free_port() -> int:
@@ -31,7 +32,13 @@ def test_sacn_integration_without_udp(monkeypatch):
     port = _free_port()
     # enable sACN for app, but we'll inject receiver manually
     monkeypatch.setenv("SACN_ENABLED", "false")
-    config = uvicorn.Config("server.app:app", host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(
+        "server.app:create_app",
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        factory=True,
+    )
     server = uvicorn.Server(config)
     t = threading.Thread(target=server.run, daemon=True)
     t.start()
@@ -68,7 +75,7 @@ def test_sacn_integration_without_udp(monkeypatch):
             timeout=2,
         )
         st1 = requests.get(f"{base}/state", timeout=2).json()
-        assert st1["universes"][0][1] == 7
+        assert channel_value(st1, 0, 1) == 7
         # higher local wins (>= sACN)
         requests.post(
             f"{base}/command",
@@ -83,8 +90,7 @@ def test_sacn_integration_without_udp(monkeypatch):
             timeout=2,
         )
         st2 = requests.get(f"{base}/state", timeout=2).json()
-        assert st2["universes"][0][1] == 10
+        assert channel_value(st2, 0, 1) == 10
     finally:
         server.should_exit = True
         t.join(timeout=5)
-

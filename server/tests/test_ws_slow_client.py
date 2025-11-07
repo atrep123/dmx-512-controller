@@ -11,9 +11,10 @@ pytestmark = pytest.mark.asyncio
 
 
 async def _drain_initial(ws):
-    for _ in range(2):
+    """Drain initial handshake frames (legacy state + full snapshots)."""
+    for _ in range(10):
         try:
-            await asyncio.wait_for(ws.recv(), timeout=1.0)
+            await asyncio.wait_for(ws.recv(), timeout=0.5)
         except asyncio.TimeoutError:
             break
 
@@ -50,4 +51,3 @@ async def test_ws_slow_client_does_not_block_others(live_server_url: str):
             assert {"ch": 1, "val": 15} in upd.get("delta", [])
             # Soft check: under ~0.5s indicates broadcast is not blocked by the slow client
             assert elapsed < 0.5
-

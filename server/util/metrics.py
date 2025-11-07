@@ -21,17 +21,25 @@ class Histogram:
         self.counts[float('inf')] = self.counts.get(float('inf'), 0) + 1
 
     def lines(self, name: str, labels: Dict[str, str] | None = None) -> list[str]:
-        lab = ''
-        if labels:
-            pairs = ",".join(f"{k}=\"{v}\"" for k, v in labels.items())
-            lab = f"{{{pairs}}}"
+        base_labels = dict(labels or {})
+
+        def fmt(extra: Dict[str, str] | None = None) -> str:
+            merged = dict(base_labels)
+            if extra:
+                merged.update(extra)
+            if not merged:
+                return ""
+            pairs = ",".join(f'{k}="{v}"' for k, v in merged.items())
+            return f"{{{pairs}}}"
+
         out: list[str] = []
-        for b in self.buckets:
-            out.append(f"{name}_bucket{lab,}".replace("'", "").replace(",)", ")")[:-1] + f'le="{b}"}} {self.counts.get(b, 0)}')
-        out.append(f"{name}_bucket{lab,}".replace("'", "").replace(",)", ")")[:-1] + 'le="+Inf"} ' + str(self.counts.get(float('inf'), 0)))
-        out.append(f"{name}_sum{lab} {self.sum}")
-        out.append(f"{name}_count{lab} {self.total}")
+        for bucket in self.buckets:
+            out.append(f"{name}_bucket{fmt({'le': str(bucket)})} {self.counts.get(bucket, 0)}")
+        out.append(f"{name}_bucket{fmt({'le': '+Inf'})} {self.counts.get(float('inf'), 0)}")
+        out.append(f"{name}_sum{fmt()} {self.sum}")
+        out.append(f"{name}_count{fmt()} {self.total}")
         return out
+
 
 
 @dataclass

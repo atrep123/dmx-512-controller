@@ -23,6 +23,8 @@ import {
 } from '@phosphor-icons/react'
 import { createServerClient, type ServerClient, type RgbStateMsg } from '@/lib/serverClient'
 import { registerServerClient } from '@/lib/transport'
+import { UsbDmxBridge, isWebSerialSupported, type UsbPortInfo } from '@/lib/usbDmx'
+import { registerPatchObserver } from '@/lib/dmxQueue'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
@@ -51,6 +53,15 @@ type Metrics = Partial<{
   dmx_ws_clients: number
   dmx_engine_last_latency_ms: number
 }>
+
+type UsbStatus = {
+  supported: boolean
+  isOpen: boolean
+  framesSent: number
+  lastFrameTs?: number
+  portInfo?: UsbPortInfo
+  error?: string
+}
 
 const DEFAULT_SETTINGS: ConnectionSettings = {
   protocol: 'artnet',
@@ -128,6 +139,11 @@ function randomColorValue() {
   return Math.floor(Math.random() * 256)
 }
 
+const formatHexId = (value?: number) => {
+  if (typeof value !== 'number') return '—'
+  return `0x${value.toString(16).toUpperCase().padStart(4, '0')}`
+}
+
 const metricsValueOrDash = (value?: number) => (typeof value === 'number' && Number.isFinite(value) ? value : '—')
 
 export default function ConnectionView() {
@@ -149,11 +165,19 @@ export default function ConnectionView() {
   const [editUniverse, setEditUniverse] = useState(connectionSettings?.universe?.toString() ?? String(DEFAULT_SETTINGS.universe))
   const [isSendingTest, setIsSendingTest] = useState(false)
   const [isRefreshingState, setIsRefreshingState] = useState(false)
+  const [usbStatus, setUsbStatus] = useState<UsbStatus>(() => ({
+    supported: isWebSerialSupported(),
+    isOpen: false,
+    framesSent: 0,
+  }))
 
   const clientRef = useRef<ServerClient | null>(null)
   const pendingCommandTsRef = useRef<number | null>(null)
   const connectToastShownRef = useRef(false)
   const autoConnectPrevRef = useRef(connectionSettings?.autoConnect ?? false)
+  const usbBridgeRef = useRef<UsbDmxBridge | null>(null)
+  const usbObserverCleanupRef = useRef<(() => void) | null>(null)
+  const isUsbProtocol = connectionSettings?.protocol === 'usb'
 
   useEffect(() => {
     if (!connectionSettings) return
@@ -161,6 +185,42 @@ export default function ConnectionView() {
     setEditPort(String(connectionSettings.port))
     setEditUniverse(String(connectionSettings.universe))
   }, [connectionSettings])
+
+  useEffect(() => {
+    if (!usbStatus.supported || typeof navigator === 'undefined') return
+    const serial = (navigator as Navigator & { serial?: Serial }).serial
+    if (!serial) return
+
+    const handleSerialDisconnect = () => {
+      usbObserverCleanupRef.current?.()
+      usbObserverCleanupRef.current = null
+      if (usbBridgeRef.current) {
+        void usbBridgeRef.current.close()
+        usbBridgeRef.current = null
+      }
+      setUsbStatus((prev) => ({
+        ...prev,
+        isOpen: false,
+        framesSent: 0,
+        lastFrameTs: undefined,
+        portInfo: undefined,
+      }))
+      toast.warning('USB DMX rozhraní bylo odpojeno')
+    }
+
+    serial.addEventListener('disconnect', handleSerialDisconnect as EventListener)
+    return () => serial.removeEventListener('disconnect', handleSerialDisconnect as EventListener)
+  }, [usbStatus.supported])
+
+  useEffect(() => {
+    return () => {
+      usbObserverCleanupRef.current?.()
+      usbObserverCleanupRef.current = null
+      if (usbBridgeRef.current) {
+        void usbBridgeRef.current.close()
+      }
+    }
+  }, [])
 
   const startClient = useCallback(() => {
     clientRef.current?.close()
@@ -286,7 +346,106 @@ export default function ConnectionView() {
     refreshMetrics().catch(() => undefined)
   }, [refreshMetrics])
 
+  useEffect(() => {
+    if (!isUsbProtocol || !usbStatus.isOpen) {
+      usbObserverCleanupRef.current?.()
+      usbObserverCleanupRef.current = null
+      return
+    }
+
+    usbObserverCleanupRef.current?.()
+    usbObserverCleanupRef.current = registerPatchObserver((universe, patch) => {
+      if (!usbBridgeRef.current) return
+      const targetUniverse = connectionSettings?.universe ?? universe
+      if (targetUniverse !== universe) return
+      void usbBridgeRef.current
+        .sendPatch(universe, patch)
+        .then((framesSent) => {
+          setUsbStatus((prev) => ({
+            ...prev,
+            framesSent,
+            lastFrameTs: usbBridgeRef.current?.getLastFrameTs(),
+            error: undefined,
+          }))
+        })
+        .catch((error) => {
+          console.error('usb_dmx_patch_error', error)
+          setUsbStatus((prev) => ({
+            ...prev,
+            error: 'Chyba p�i odesl��n�� DMX dat do USB rozhran��',
+          }))
+        })
+    })
+
+    return () => {
+      usbObserverCleanupRef.current?.()
+      usbObserverCleanupRef.current = null
+    }
+  }, [connectionSettings?.universe, isUsbProtocol, usbStatus.isOpen])
+
+  const handleUsbConnect = useCallback(async () => {
+    if (!usbStatus.supported) {
+      toast.error('Web Serial API není dostupná v tomto prohlížeči')
+      return
+    }
+    try {
+      if (!usbBridgeRef.current) {
+        usbBridgeRef.current = new UsbDmxBridge()
+      }
+      const info = await usbBridgeRef.current.open()
+      setUsbStatus((prev) => ({
+        ...prev,
+        isOpen: true,
+        framesSent: 0,
+        lastFrameTs: undefined,
+        portInfo: info,
+        error: undefined,
+      }))
+      toast.success('USB DMX rozhraní připojeno')
+    } catch (error) {
+      console.error('usb_dmx_connect_error', error)
+      if ((error as DOMException)?.name === 'AbortError') return
+      setUsbStatus((prev) => ({
+        ...prev,
+        isOpen: false,
+        error: error instanceof Error ? error.message : 'Neznámá USB chyba',
+      }))
+      toast.error('Nepodařilo se připojit USB DMX')
+    }
+  }, [usbStatus.supported])
+
+  const handleUsbDisconnect = useCallback(async () => {
+    usbObserverCleanupRef.current?.()
+    usbObserverCleanupRef.current = null
+    try {
+      if (usbBridgeRef.current) {
+        await usbBridgeRef.current.close()
+      }
+      toast.info('USB DMX rozhraní odpojeno')
+    } catch (error) {
+      console.error('usb_dmx_disconnect_error', error)
+    } finally {
+      usbBridgeRef.current = null
+      setUsbStatus((prev) => ({
+        ...prev,
+        isOpen: false,
+        framesSent: 0,
+        lastFrameTs: undefined,
+        portInfo: undefined,
+      }))
+    }
+  }, [])
+
   const handleConnect = useCallback(() => {
+    if (isUsbProtocol) {
+      if (usbStatus.isOpen) {
+        void handleUsbDisconnect()
+      } else {
+        void handleUsbConnect()
+      }
+      return
+    }
+
     if (isConnected || connectionStatus === 'connecting') {
       clientRef.current?.close()
       clientRef.current = null
@@ -296,7 +455,8 @@ export default function ConnectionView() {
       return
     }
     startClient()
-  }, [connectionStatus, isConnected, startClient])
+  }, [connectionStatus, handleUsbConnect, handleUsbDisconnect, isConnected, isUsbProtocol, startClient, usbStatus.isOpen])
+
 
   const handleProtocolChange = (protocol: ConnectionSettings['protocol']) => {
     setConnectionSettings((current) => ({
@@ -313,6 +473,10 @@ export default function ConnectionView() {
   }
 
   const handleAutoConnectChange = (enabled: boolean) => {
+    if (isUsbProtocol) {
+      toast.info('USB DMX vyžaduje manuální připojení (Web Serial povolení).')
+      return
+    }
     setConnectionSettings((current) => ({
       ...(current ?? DEFAULT_SETTINGS),
       autoConnect: enabled,
@@ -391,17 +555,34 @@ export default function ConnectionView() {
       setIsSendingTest(true)
       pendingCommandTsRef.current = performance.now()
       clientRef.current?.setRgb(r, g, b)
+      const testPatch = [
+        { ch: 1, val: r },
+        { ch: 2, val: g },
+        { ch: 3, val: b },
+      ]
+      if (isUsbProtocol && usbBridgeRef.current?.isOpen()) {
+        try {
+          const frames = await usbBridgeRef.current.sendPatch(connectionSettings?.universe ?? 0, testPatch)
+          setUsbStatus((prev) => ({
+            ...prev,
+            framesSent: frames,
+            lastFrameTs: usbBridgeRef.current?.getLastFrameTs(),
+          }))
+        } catch (usbError) {
+          console.error('usb_dmx_test_error', usbError)
+          setUsbStatus((prev) => ({
+            ...prev,
+            error: 'USB DMX test selhal',
+          }))
+        }
+      }
       if (connectionStatus !== 'connected') {
         const body = JSON.stringify({
           type: 'dmx.patch',
           id: crypto.randomUUID(),
           ts: Date.now(),
-          universe: 0,
-          patch: [
-            { ch: 1, val: r },
-            { ch: 2, val: g },
-            { ch: 3, val: b },
-          ],
+          universe: connectionSettings?.universe ?? 0,
+          patch: testPatch,
         })
         // Prefer legacy REST endpoint for compatibility; fallback to unified /command
         let ok = false
@@ -436,6 +617,16 @@ export default function ConnectionView() {
     ws: metrics.dmx_core_ws_clients ?? metrics.dmx_ws_clients,
     latency: metrics.dmx_core_apply_latency_ms_last ?? metrics.dmx_engine_last_latency_ms,
   }
+  const connectButtonLabel = isUsbProtocol
+    ? usbStatus.isOpen
+      ? 'Odpojit USB'
+      : 'Připojit USB'
+    : connectionStatus === 'connecting'
+      ? 'Připojování…'
+      : isConnected
+        ? 'Odpojit'
+        : 'Připojit'
+  const connectButtonDisabled = isUsbProtocol ? !usbStatus.supported : false
 
   return (
     <div className="space-y-6">
@@ -492,25 +683,39 @@ export default function ConnectionView() {
               )}
             </div>
           </div>
+              {isUsbProtocol && (
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                  <Badge variant={usbStatus.isOpen ? 'default' : 'outline'}>
+                    {usbStatus.supported
+                      ? usbStatus.isOpen
+                        ? 'USB rozhraní aktivní'
+                        : 'USB čeká na připojení'
+                      : 'Web Serial není podporován'}
+                  </Badge>
+                  {usbStatus.portInfo && (
+                    <span className="text-muted-foreground">
+                      VID {formatHexId(usbStatus.portInfo.usbVendorId)} · PID {formatHexId(usbStatus.portInfo.usbProductId)}
+                    </span>
+                  )}
+                </div>
+              )}
           <Badge variant={isConnected ? 'default' : 'outline'} className={isConnected ? STATUS_COLORS[connectionStatus] : ''}>
             {isConnected ? 'Aktivní' : 'Neaktivní'}
           </Badge>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <Button
+                    <Button
             onClick={handleConnect}
             className="flex-1 gap-2"
             size="lg"
-            variant={connectionStatus === 'error' ? 'destructive' : 'default'}
+            variant={isUsbProtocol ? 'default' : connectionStatus === 'error' ? 'destructive' : 'default'}
+            disabled={connectButtonDisabled}
           >
             <Plugs weight="bold" />
-            {connectionStatus === 'connecting'
-              ? 'Připojování…'
-              : isConnected
-                ? 'Odpojit'
-                : 'Připojit'}
+            {connectButtonLabel}
           </Button>
+
           <Button variant="secondary" onClick={() => handleSendTestCommand()} disabled={isSendingTest} className="flex-1 gap-2">
             <CloudArrowUp size={18} />
             {isSendingTest ? 'Odesílám…' : 'Testovací příkaz'}
@@ -546,6 +751,34 @@ export default function ConnectionView() {
             </p>
           </div>
         </div>
+        {isUsbProtocol && (
+          <div className="rounded-lg border border-dashed p-4 text-xs sm:text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-semibold text-sm">USB DMX diagnostika</span>
+              <span className="text-muted-foreground">
+                {usbStatus.isOpen
+                  ? 'Stream aktivní'
+                  : usbStatus.supported
+                    ? 'Čeká na připojení'
+                    : 'Nepodporováno'}
+              </span>
+            </div>
+            <div className="mt-3 grid gap-3 text-muted-foreground sm:grid-cols-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground/80">Frames</p>
+                <p className="text-lg font-semibold text-foreground">{usbStatus.framesSent}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground/80">Poslední frame</p>
+                <p className="text-lg font-semibold text-foreground">{formatTimestamp(usbStatus.lastFrameTs)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground/80">Stav</p>
+                <p className="text-lg font-semibold text-foreground">{usbStatus.error ?? 'OK'}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
 
       <Tabs defaultValue="settings" className="w-full">
@@ -647,6 +880,7 @@ export default function ConnectionView() {
                   id="auto-connect"
                   checked={connectionSettings?.autoConnect ?? false}
                   onCheckedChange={handleAutoConnectChange}
+                  disabled={isUsbProtocol}
                 />
               </div>
 

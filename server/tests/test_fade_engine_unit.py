@@ -30,9 +30,16 @@ def fake_clock(monkeypatch):
     monkeypatch.setattr(time, "monotonic", clk.now)
     monkeypatch.setattr(time, "time", clk.now_s)
 
-    async def fake_sleep(s: float, *_, **__):
-        await clk.sleep(s)
+    real_asyncio_sleep = asyncio.sleep
 
+    async def clock_sleep(s: float) -> None:
+        clk.t += s
+        await real_asyncio_sleep(0)
+
+    async def fake_sleep(s: float, *_, **__):
+        await clock_sleep(s)
+
+    monkeypatch.setattr(clk, "sleep", clock_sleep, raising=False)
     monkeypatch.setattr(asyncio, "sleep", fake_sleep, raising=True)
     return clk
 

@@ -4,25 +4,27 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
-const tsRecommended = tseslint.configs.recommended.map((config) => ({
+const tsTypeChecked = tseslint.configs.recommendedTypeChecked.map((config) => ({
   ...config,
   files: ['src/**/*.{ts,tsx}'],
+  languageOptions: {
+    ...config.languageOptions,
+    parserOptions: {
+      ...(config.languageOptions?.parserOptions ?? {}),
+      projectService: true,
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
 }))
 
 export default [
   {
-    ignores: ['dist', 'coverage', 'node_modules'],
+    ignores: ['dist', 'coverage', 'node_modules', '.venv'],
   },
   js.configs.recommended,
-  ...tsRecommended,
+  ...tsTypeChecked,
   {
     files: ['src/**/*.{ts,tsx}'],
-    languageOptions: {
-      parserOptions: {
-        project: ['tsconfig.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
@@ -36,8 +38,13 @@ export default [
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
       '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/require-await': 'off',
       'no-case-declarations': 'off',
     },
   },

@@ -29,9 +29,16 @@ def fake_clock(monkeypatch):
     monkeypatch.setattr(time, "monotonic", clk.now)
     monkeypatch.setattr(time, "time", clk.now_s)
 
-    async def fake_sleep(s: float, *_, **__):
-        await clk.sleep(s)
+    real_asyncio_sleep = asyncio.sleep
 
+    async def clock_sleep(s: float) -> None:
+        clk.t += s
+        await real_asyncio_sleep(0)
+
+    async def fake_sleep(s: float, *_, **__):
+        await clock_sleep(s)
+
+    monkeypatch.setattr(clk, "sleep", clock_sleep, raising=False)
     monkeypatch.setattr(asyncio, "sleep", fake_sleep, raising=True)
     return clk
 
@@ -83,4 +90,3 @@ async def test_jobs_gauge_parallel_fades(fake_clock):
     active2 = [ln for ln in lines2 if ln.startswith("dmx_core_fade_active") and 'universe="0"' in ln]
     assert jobs2 and jobs2[-1].split()[-1] == '0'
     assert active2 and active2[-1].split()[-1] == '0'
-
