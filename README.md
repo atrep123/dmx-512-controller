@@ -77,6 +77,8 @@ cd dmx-512-controller
 npm ci
 ```
 
+> **Poznámka**: Projekt používá Vite 7, který je kompatibilní s @github/spark díky `.npmrc` konfiguraci s `legacy-peer-deps=true`.
+
 ### Lokální vývoj
 
 ```bash
@@ -256,7 +258,7 @@ curl -s -X POST http://localhost:8080/command \
 ### Frontend Framework
 - **React 19** - UI knihovna s nejnovějšími features
 - **TypeScript 5.7** - Type-safe development
-- **Vite** - Rychlý build tool
+- **Vite 7** - Rychlý build tool s nejnovějšími optimalizacemi
 
 ### UI Components
 - **Radix UI** - Primitives pro přístupné komponenty
