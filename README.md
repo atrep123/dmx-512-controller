@@ -9,6 +9,15 @@
 
 Mobilní aplikace pro řízení DMX 512 stage osvětlení, stepper motorů a serv. Navrženo jako Progressive Web App (PWA) s intuitivním touch rozhraním pro profesionální použití na Android a iOS zařízeních.
 
+### AI automation (Codex / GPT)
+
+- `docs/AI_AUTOMATION.md` popisuje, jak spouštět agentní režim OpenAI Codexu, lokální skript
+  `npm run ai:generate` a plánované běhy v CI nebo cron.
+- `.vscode/tasks.json` obsahuje hotové tasky **AI: Generate via OpenAI API** a **AI: Codex
+  full-auto** – stačí doplnit API key / Codex CLI.
+- Nové soubory generované AI se ukládají do `tmp/ai-output/` a metadatové logy do `tmp/ai-history/`
+  (oba adresáře jsou ignorované v Gitu).
+
 ---
 
 ## ✨ Klíčové funkce

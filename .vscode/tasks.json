@@ -24,6 +24,44 @@
       "type": "shell",
       "command": "black server",
       "problemMatcher": []
+    },
+    {
+      "label": "AI: Generate via OpenAI API",
+      "type": "shell",
+      "command": "npm run ai:generate -- --prompt ${input:aiPromptFile} --out tmp/ai-output/latest.md --model ${input:aiModel}",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "AI: Codex full-auto",
+      "type": "shell",
+      "command": "codex exec --full-auto \"${input:codexPrompt}\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "aiPromptFile",
+      "type": "promptString",
+      "description": "Path to the AI prompt file",
+      "default": "prompts/ai/sample-task.md"
+    },
+    {
+      "id": "aiModel",
+      "type": "promptString",
+      "description": "OpenAI model (e.g., gpt-4.1-mini, gpt-4o-mini)",
+      "default": "gpt-4.1-mini"
+    },
+    {
+      "id": "codexPrompt",
+      "type": "promptString",
+      "description": "Instruction for Codex full-auto task",
+      "default": "Review README.md and propose doc improvements."
     }
   ]
 }
