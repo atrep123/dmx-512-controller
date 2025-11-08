@@ -102,3 +102,23 @@ export interface AppState {
   servos: Servo[]
   effects: Effect[]
 }
+
+export interface ProjectMeta {
+  id: string
+  name: string
+  venue?: string | null
+  eventDate?: string | null
+  notes?: string | null
+  createdAt: number
+  updatedAt: number
+  lastBackupAt?: number | null
+}
+
+export interface BackupVersion {
+  versionId: string
+  createdAt: number
+  size: number
+  label?: string | null
+  provider: string
+  encrypted: boolean
+}

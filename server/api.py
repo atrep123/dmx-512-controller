@@ -13,10 +13,28 @@ from fastapi.responses import JSONResponse, PlainTextResponse, Response, Streami
 
 from .context import AppContext
 from .engine import Engine
-from .models import CMD_SCHEMA, RESTCommand, RGBCommand, RGBState, WSSetMessage, SceneModel
+from .models import (
+    CMD_SCHEMA,
+    RESTCommand,
+    RGBCommand,
+    RGBState,
+    WSSetMessage,
+    SceneModel,
+    ProjectsResponse,
+    ProjectCreateModel,
+    ProjectUpdateModel,
+    ProjectMetaModel,
+    BackupVersionModel,
+    BackupListModel,
+    BackupCreateModel,
+    BackupRestoreModel,
+)
 from .util.schema import load_schemas
 from .fixtures.mapper import resolve_attrs
 from .util.ulid import ulid_from_string
+from .drivers.enttec import EnttecDMXUSBPro, USBDeviceInfo, find_enttec_device
+from .services.projects import switch_active_project, create_project_backup, list_backups, restore_backup, serialize_project
+from .backups.base import BackupVersion
 
 _schemas = load_schemas()
 
@@ -42,6 +60,181 @@ def get_engine(context: AppContext = Depends(get_context)) -> Engine:
     if context.engine is None:
         raise HTTPException(status_code=503, detail="engine not ready")
     return context.engine
+
+
+def _projects_enabled(context: AppContext) -> None:
+    if not context.projects_enabled or context.projects_store is None or context.projects_index is None:
+        raise HTTPException(status_code=404, detail="projects feature disabled")
+
+
+def _backups_enabled(context: AppContext) -> None:
+    if context.backup_client is None:
+        raise HTTPException(status_code=404, detail="cloud backup disabled")
+
+
+def _projects_payload(context: AppContext) -> dict[str, Any]:
+    assert context.projects_index is not None
+    return {
+        "activeId": context.projects_index.activeId,
+        "projects": [serialize_project(meta) for meta in context.projects_index.projects],
+    }
+
+
+def _serialize_backup(version: BackupVersion) -> dict[str, Any]:
+    return {
+        "versionId": version.version_id,
+        "createdAt": version.created_at,
+        "size": version.size,
+        "label": version.label,
+        "provider": version.provider,
+        "encrypted": version.encrypted,
+    }
+
+
+def _serialize_usb_device(info: USBDeviceInfo) -> dict[str, Any]:
+    return {
+        "port": info.port,
+        "vendorId": info.vid,
+        "productId": info.pid,
+        "manufacturer": info.manufacturer,
+        "product": info.product,
+        "serialNumber": info.serial_number,
+    }
+
+
+@router.get("/usb/devices")
+async def list_usb_devices(context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    devices = context.usb_devices or []
+    return {"devices": [_serialize_usb_device(dev) for dev in devices]}
+
+
+@router.post("/usb/refresh")
+async def refresh_usb_devices(context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    monitor = context.usb_monitor
+    if monitor is None:
+        raise HTTPException(status_code=404, detail="usb monitor disabled")
+    devices = await monitor.refresh_now()
+    context.usb_devices = devices
+    return {"devices": [_serialize_usb_device(dev) for dev in devices]}
+
+
+@router.post("/usb/reconnect")
+async def reconnect_usb_driver(context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    settings = context.settings
+    candidate = find_enttec_device(settings.usb_port, settings.usb_vendor_ids, settings.usb_product_ids)
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="no enttec-compatible device found")
+    driver = EnttecDMXUSBPro(
+        port=candidate.port,
+        baudrate=settings.usb_baudrate,
+        fps=settings.usb_fps,
+    )
+    try:
+        await driver.open()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"failed to open {candidate.port}: {exc}") from exc
+    # swap driver in context/engine
+    if context.usb_driver is not None:
+        try:
+            await context.usb_driver.close()
+        except Exception:
+            pass
+    context.usb_driver = driver
+    if context.engine is not None:
+        context.engine.ola_cb = driver  # type: ignore[assignment]
+    return {"port": candidate.port}
+
+
+@router.get("/projects", response_model=ProjectsResponse)
+async def api_list_projects(context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    _projects_enabled(context)
+    return _projects_payload(context)
+
+
+@router.post("/projects", response_model=ProjectsResponse, status_code=201)
+async def api_create_project(payload: ProjectCreateModel, context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    _projects_enabled(context)
+    assert context.projects_store is not None
+    assert context.projects_index is not None
+    await context.projects_store.create_project(
+        context.projects_index,
+        name=payload.name,
+        venue=payload.venue,
+        event_date=payload.eventDate,
+        notes=payload.notes,
+        template_id=payload.templateId,
+    )
+    return _projects_payload(context)
+
+
+@router.put("/projects/{project_id}", response_model=ProjectMetaModel)
+async def api_update_project(
+    project_id: str,
+    payload: ProjectUpdateModel,
+    context: AppContext = Depends(get_context),
+) -> dict[str, Any]:
+    _projects_enabled(context)
+    assert context.projects_store is not None
+    assert context.projects_index is not None
+    updates = payload.model_dump(exclude_none=True)
+    try:
+        project = await context.projects_store.update_project(context.projects_index, project_id, updates)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="project not found") from None
+    return serialize_project(project)
+
+
+@router.post("/projects/{project_id}/select", response_model=ProjectsResponse)
+async def api_select_project(project_id: str, context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    _projects_enabled(context)
+    try:
+        await switch_active_project(context, project_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="project not found") from None
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return _projects_payload(context)
+
+
+@router.get("/projects/{project_id}/backups", response_model=BackupListModel)
+async def api_list_backups(project_id: str, context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    _projects_enabled(context)
+    _backups_enabled(context)
+    versions = await list_backups(context, project_id)
+    return {"projectId": project_id, "versions": [_serialize_backup(v) for v in versions]}
+
+
+@router.post("/projects/{project_id}/backups", response_model=BackupVersionModel, status_code=201)
+async def api_create_backup(
+    project_id: str,
+    payload: BackupCreateModel,
+    context: AppContext = Depends(get_context),
+) -> dict[str, Any]:
+    _projects_enabled(context)
+    _backups_enabled(context)
+    if context.active_project is None or context.active_project.id != project_id:
+        raise HTTPException(status_code=409, detail="select project before creating backup")
+    version = await create_project_backup(context, label=payload.label)
+    return _serialize_backup(version)
+
+
+@router.post("/projects/{project_id}/restore")
+async def api_restore_backup(
+    project_id: str,
+    payload: BackupRestoreModel,
+    context: AppContext = Depends(get_context),
+) -> dict[str, Any]:
+    _projects_enabled(context)
+    _backups_enabled(context)
+    if context.active_project is None or context.active_project.id != project_id:
+        raise HTTPException(status_code=409, detail="select project before restoring backup")
+    try:
+        await restore_backup(context, project_id, payload.versionId)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="backup not found") from None
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"status": "ok"}
 
 
 @router.get("/rgb", response_model=RGBState)

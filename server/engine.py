@@ -50,6 +50,7 @@ class Engine:
         self._queue: asyncio.Queue[RGBCommand] = asyncio.Queue(maxsize=self.queue_limit)
         self._queue_lock = asyncio.Lock()
         self._running = False
+        self._state_lock = asyncio.Lock()
 
     async def submit(self, cmd: RGBCommand) -> bool:
         """Submit a command for processing, respecting backpressure."""
@@ -88,7 +89,8 @@ class Engine:
     async def bootstrap(self, state: dict[str, int | str]) -> None:
         """Seed engine state from persisted data."""
 
-        self.state.update(state)
+        async with self._state_lock:
+            self.state.update(state)
 
     async def run(self) -> None:
         """Main processing loop."""
@@ -119,28 +121,52 @@ class Engine:
         r = max(0, min(255, int(cmd.r)))
         g = max(0, min(255, int(cmd.g)))
         b = max(0, min(255, int(cmd.b)))
-        prev_rgb = (self.state["r"], self.state["g"], self.state["b"])
-        if prev_rgb == (r, g, b):
-            return False
-        seq = int(self.state["seq"]) + 1
-        now_ms = int(time.time() * 1000)
-        self.state.update(
-            {
-                "schema": STATE_SCHEMA,
-                "r": r,
-                "g": g,
-                "b": b,
-                "seq": seq,
-                "updatedBy": cmd.src,
-                "ts": now_ms,
-            }
-        )
-        await self.persist_state_cb(self.state)
-        await self.publish_state_cb(self.state)
-        await self.broadcast_state_cb(self.state)
+        async with self._state_lock:
+            prev_rgb = (self.state["r"], self.state["g"], self.state["b"])
+            if prev_rgb == (r, g, b):
+                return False
+            seq = int(self.state["seq"]) + 1
+            now_ms = int(time.time() * 1000)
+            self.state.update(
+                {
+                    "schema": STATE_SCHEMA,
+                    "r": r,
+                    "g": g,
+                    "b": b,
+                    "seq": seq,
+                    "updatedBy": cmd.src,
+                    "ts": now_ms,
+                }
+            )
+            snapshot = dict(self.state)
+        await self.persist_state_cb(snapshot)
+        await self.publish_state_cb(snapshot)
+        await self.broadcast_state_cb(snapshot)
         if self.ola_cb is not None:
-            await self.ola_cb(self.state)
+            await self.ola_cb(snapshot)
         return True
+
+    async def replace_state(self, state: dict[str, int | str], src: str = "project-switch") -> dict[str, int | str]:
+        """Forcefully replace canonical state (used for project restore)."""
+
+        sanitized = {
+            "schema": STATE_SCHEMA,
+            "r": max(0, min(255, int(state.get("r", 0)))),
+            "g": max(0, min(255, int(state.get("g", 0)))),
+            "b": max(0, min(255, int(state.get("b", 0)))),
+            "seq": max(0, int(state.get("seq", 0))),
+            "updatedBy": state.get("updatedBy") or src,
+            "ts": int(state.get("ts") or int(time.time() * 1000)),
+        }
+        async with self._state_lock:
+            self.state.update(sanitized)
+            snapshot = dict(self.state)
+        await self.persist_state_cb(snapshot)
+        await self.publish_state_cb(snapshot)
+        await self.broadcast_state_cb(snapshot)
+        if self.ola_cb is not None:
+            await self.ola_cb(snapshot)
+        return snapshot
 
 
 __all__ = ["Engine", "EngineMetrics"]

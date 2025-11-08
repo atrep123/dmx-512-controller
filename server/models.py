@@ -123,6 +123,59 @@ class SceneModel(BaseModel):
         return value
 
 
+class ProjectMetaModel(BaseModel):
+    id: str
+    name: str
+    venue: str | None = None
+    eventDate: str | None = None
+    notes: str | None = None
+    createdAt: PositiveInt
+    updatedAt: PositiveInt
+    lastBackupAt: PositiveInt | None = None
+
+
+class ProjectsResponse(BaseModel):
+    activeId: str
+    projects: list[ProjectMetaModel]
+
+
+class ProjectCreateModel(BaseModel):
+    name: str
+    venue: str | None = None
+    eventDate: str | None = None
+    notes: str | None = None
+    templateId: str | None = None
+
+
+class ProjectUpdateModel(BaseModel):
+    name: str | None = None
+    venue: str | None = None
+    eventDate: str | None = None
+    notes: str | None = None
+
+
+class BackupVersionModel(BaseModel):
+    versionId: str
+    createdAt: PositiveInt
+    size: PositiveInt
+    label: str | None = None
+    provider: str
+    encrypted: bool
+
+
+class BackupListModel(BaseModel):
+    projectId: str
+    versions: list[BackupVersionModel]
+
+
+class BackupCreateModel(BaseModel):
+    label: str | None = None
+
+
+class BackupRestoreModel(BaseModel):
+    versionId: str
+
+
 __all__ = [
     "RGBCommand",
     "RGBState",
@@ -130,6 +183,14 @@ __all__ = [
     "WSStateMessage",
     "RESTCommand",
     "SceneModel",
+    "ProjectMetaModel",
+    "ProjectsResponse",
+    "ProjectCreateModel",
+    "ProjectUpdateModel",
+    "BackupVersionModel",
+    "BackupListModel",
+    "BackupCreateModel",
+    "BackupRestoreModel",
     "CMD_SCHEMA",
     "STATE_SCHEMA",
 ]

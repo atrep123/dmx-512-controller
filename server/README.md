@@ -48,6 +48,32 @@ Environment variables are prefixed with `DMX_`.  A starter file lives in `infra/
 | `DMX_OLA_URL` | `http://localhost:9090/set_dmx` | OLA HTTP endpoint |
 | `DMX_OLA_UNIVERSE` | `1` | DMX universe |
 | `DMX_OLA_FPS` | `44` | Max frame rate for OLA |
+| `DMX_USB_ENABLED` | `false` | Enable Enttec DMX USB PRO output |
+| `DMX_USB_PORT` | _auto_ | Serial port for Enttec device (e.g. `/dev/ttyUSB0`, `COM5`) |
+| `DMX_USB_VENDOR_IDS` | `0x0403` | CSV of vendor IDs used for auto-detect |
+| `DMX_USB_PRODUCT_IDS` | `0x6001,0x6010,0x0400` | CSV of product IDs used for auto-detect |
+| `DMX_USB_BAUDRATE` | `57600` | Serial baudrate |
+| `DMX_USB_FPS` | `40` | Max frames per second sent to the USB interface |
+| `DMX_USB_SCAN_INTERVAL` | `5` | Auto-detect polling interval (seconds) |
+| `DMX_INPUT_ENABLED` | `false` | Enable SparkFun DMX serial input |
+| `DMX_INPUT_PORT` | _unset_ | Serial port name for DMX input |
+| `DMX_INPUT_BAUDRATE` | `115200` | DMX input baudrate |
+| `DMX_INPUT_CHANNELS` | `3` | Number of channels mapped (1→R, 2→G, 3→B) |
+| `DMX_INPUT_UNIVERSE` | `0` | Universe index for DMX input |
+| `DMX_INPUT_SRC` | `dmx-input` | Source label for DMX input commands |
+| `DMX_PROJECTS_ENABLED` | `false` | Enable multi-project mode |
+| `DMX_PROJECTS_ROOT` | `data/projects` | Root directory for project data |
+| `DMX_CLOUD_BACKUP_ENABLED` | `false` | Enable project backup client |
+| `DMX_CLOUD_BACKUP_PROVIDER` | `local` | Backup provider (`local` or `s3`) |
+| `DMX_CLOUD_BACKUP_LOCAL_PATH` | `data/backups` | Directory for local backups |
+| `DMX_CLOUD_BACKUP_ENCRYPTION_KEY` | _unset_ | Optional Fernet key for encrypted backups |
+| `DMX_CLOUD_BACKUP_AUTO_INTERVAL` | `0` | Auto-backup interval in minutes (0 disables) |
+| `DMX_CLOUD_BACKUP_S3_BUCKET` | _unset_ | S3 bucket for backups |
+| `DMX_CLOUD_BACKUP_S3_PREFIX` | `dmx-controller/backups` | S3 key prefix |
+| `DMX_CLOUD_BACKUP_S3_REGION` | _unset_ | AWS region |
+| `DMX_CLOUD_BACKUP_S3_ACCESS_KEY` | _unset_ | AWS access key |
+| `DMX_CLOUD_BACKUP_S3_SECRET_KEY` | _unset_ | AWS secret key |
+| `DMX_CLOUD_BACKUP_S3_SESSION_TOKEN` | _unset_ | AWS session token (optional) |
 
 Persistent files land in `server/data/` inside the container: last known state and dedupe cache.
 Mount `server_state` volume if you need durability between runs.
@@ -120,6 +146,43 @@ JSON Schemas for the command and state payloads live in `server/schemas/`.
 * Disabled by default.
 * When enabled, RGB values map to channels 1–3 of the configured universe.
 * Rate limited to 44 fps with duplicate frame suppression.  Fail-open (logs only).
+
+### USB DMX (Enttec DMX USB PRO)
+
+* Enable with `OUTPUT_MODE=enttec` (or `DMX_USB_ENABLED=true`).  The server tries to auto-detect an
+  Enttec-compatible interface unless `DMX_USB_PORT` is set explicitly.
+* Auto-detection watches VID/PID (defaults to FTDI 0x0403 / 0x6001, 0x6010, 0x0400) and exposes the
+  current snapshot via `GET /usb/devices`.
+* Health & control endpoints:
+  * `POST /usb/refresh` – re-scan USB devices without restarting the service.
+  * `POST /usb/reconnect` – close the active driver and reopen with the latest detected port.
+* Driver is rate-limited (`DMX_USB_FPS`, default 40 fps) and reconnects automatically if writes fail.
+
+### SparkFun DMX Input (Serial)
+
+* Enable with `DMX_INPUT_ENABLED=true` and point `DMX_INPUT_PORT` to the serial device exposed by a
+  SparkFun DMX shield (e.g. `COM5`, `/dev/ttyUSB0`). Default baudrate is 115200 (configurable via
+  `DMX_INPUT_BAUDRATE`).
+* Expected firmware: SparkFun Arduino example printing lines such as
+  `DMX: read value from channel 1: 123`. The driver parses these logs, tracks the first three
+  channels, and submits RGB commands to the engine with source `DMX_INPUT_SRC` (default `dmx-input`).
+* Works great when the shield is connected directly to the server over USB (no ESP/Wi-Fi needed).
+
+### Projects & Cloud Backups
+
+* Turn on `DMX_PROJECTS_ENABLED=true` to keep multiple independent shows. The active project controls which
+  `state.json`, `scenes.json`, `show.json` and dedupe cache are mounted.
+* Manage projects via REST:
+  * `GET /projects` – list all projects + active ID.
+  * `POST /projects` – create new project (optionally cloning current data using `templateId`).
+  * `PUT /projects/{id}` – update metadata (name, venue, date, notes).
+  * `POST /projects/{id}/select` – persist selection and rebroadcast the new state.
+* Backups:
+  * Enable `DMX_CLOUD_BACKUP_ENABLED=true` and choose a provider (`local` directory or `s3` bucket).
+  * `POST /projects/{id}/backups` creates a snapshot (state + scenes + show snapshot). `GET` lists versions.
+  * `POST /projects/{id}/restore` downloads the snapshot, rewrites project files and replaces engine state.
+  * Optional encryption via `DMX_CLOUD_BACKUP_ENCRYPTION_KEY` (Fernet key). Auto-backup interval configured by `DMX_CLOUD_BACKUP_AUTO_INTERVAL`.
+* Frontend Data Management panel surfaces project selector, metadata fields, backup log and restore actions.
 
 ## Observability & Operations
 

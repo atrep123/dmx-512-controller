@@ -5,6 +5,9 @@ from typing import Any, Callable
 
 from fastapi.testclient import TestClient
 
+from server.drivers.enttec import USBDeviceInfo
+from server import api as api_module
+from server.persistence.projects import ProjectMetadata, ProjectsIndex
 
 def wait_for_condition(condition: Callable[[], bool], timeout: float = 1.0) -> None:
     deadline = time.monotonic() + timeout
@@ -71,3 +74,102 @@ def test_websocket_receives_updates(test_app: tuple) -> None:
             assert message is not None, "State update after command not received"
             assert message["type"] == "state"
             assert (message["r"], message["g"], message["b"]) == (90, 91, 92)
+
+
+def test_usb_devices_endpoint_returns_snapshot(test_app: tuple) -> None:
+    app, context, _ = test_app
+    context.usb_devices = [
+        USBDeviceInfo(
+            port="COM9",
+            vid=0x0403,
+            pid=0x6001,
+            manufacturer="Enttec",
+            product="DMX USB PRO",
+            serial_number="ABC",
+        )
+    ]
+    with TestClient(app) as client:
+        response = client.get("/usb/devices")
+        assert response.status_code == 200
+        devices = response.json()["devices"]
+        assert devices[0]["port"] == "COM9"
+
+
+def test_usb_refresh_endpoint_calls_monitor(test_app: tuple) -> None:
+    app, context, _ = test_app
+
+    class DummyMonitor:
+        async def refresh_now(self):
+            return [
+                USBDeviceInfo(
+                    port="COM10",
+                    vid=0x0403,
+                    pid=0x6001,
+                    manufacturer="Enttec",
+                    product="DMX",
+                    serial_number="XYZ",
+                )
+            ]
+
+    context.usb_monitor = DummyMonitor()  # type: ignore[assignment]
+    with TestClient(app) as client:
+        response = client.post("/usb/refresh")
+        assert response.status_code == 200
+        devices = response.json()["devices"]
+        assert devices[0]["port"] == "COM10"
+        assert context.usb_devices and context.usb_devices[0].port == "COM10"
+
+
+def test_usb_reconnect_endpoint_swaps_driver(monkeypatch, test_app: tuple) -> None:
+    app, context, _ = test_app
+
+    def fake_find(*args, **kwargs):
+        return USBDeviceInfo(
+            port="COM11",
+            vid=0x0403,
+            pid=0x6001,
+            manufacturer="Enttec",
+            product="DMX",
+            serial_number="123",
+        )
+
+    class DummyDriver:
+        def __init__(self, port, baudrate, fps):
+            self.port = port
+            self.opened = False
+
+        async def open(self):
+            self.opened = True
+
+        async def close(self):
+            self.opened = False
+
+    monkeypatch.setattr(api_module, "find_enttec_device", fake_find)
+    monkeypatch.setattr(api_module, "EnttecDMXUSBPro", DummyDriver)
+
+    with TestClient(app) as client:
+        response = client.post("/usb/reconnect")
+        assert response.status_code == 200
+        assert context.usb_driver is not None
+        assert context.engine.ola_cb is context.usb_driver
+
+
+def test_projects_endpoints_handle_disabled_feature(test_app: tuple) -> None:
+    app, _, _ = test_app
+    with TestClient(app) as client:
+        response = client.get("/projects")
+        assert response.status_code == 404
+
+
+def test_projects_endpoint_returns_data(test_app: tuple) -> None:
+    app, context, _ = test_app
+    meta = ProjectMetadata(id="p1", name="Show A", createdAt=1, updatedAt=1)
+    context.projects_enabled = True
+    context.projects_store = object()  # sentinel
+    context.projects_index = ProjectsIndex(activeId="p1", projects=[meta])
+    with TestClient(app) as client:
+        response = client.get("/projects")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["activeId"] == "p1"
+        assert body["projects"][0]["name"] == "Show A"
