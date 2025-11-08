@@ -97,6 +97,28 @@ jobs:
             --version $env:RELEASE_VERSION `
             --tag desktop-v$env:RELEASE_VERSION
 
+      - name: Capture artifact paths
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem ".\desktop\src-tauri\target\release\bundle\msi\*.msi" | Select-Object -First 1
+          $exe = Get-ChildItem ".\desktop\src-tauri\target\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (-not $msi) { throw 'No MSI artifact found.' }
+          if (-not $exe) { throw 'No NSIS artifact found.' }
+          $manifest = Join-Path $env:GITHUB_WORKSPACE "dist\desktop\$env:RELEASE_CHANNEL-release.json"
+          if (-not (Test-Path $manifest)) { throw "Missing release manifest at $manifest" }
+          "MSI_PATH=$($msi.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "EXE_PATH=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "MANIFEST_PATH=$manifest" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Prepare release notes
+        shell: pwsh
+        run: |
+          $body = if ($env:RELEASE_NOTES) { $env:RELEASE_NOTES } else { "Automated desktop release for channel $env:RELEASE_CHANNEL." }
+          $notesPath = Join-Path $env:GITHUB_WORKSPACE "dist\desktop\release-notes.txt"
+          New-Item -ItemType Directory -Path (Split-Path $notesPath) -Force | Out-Null
+          Set-Content -Path $notesPath -Value $body -Encoding UTF8
+          "RELEASE_BODY_PATH=$notesPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Upload MSI artifact
         uses: actions/upload-artifact@v4
         with:
@@ -114,3 +136,30 @@ jobs:
         with:
           name: desktop-release-json-${{ inputs.channel }}-${{ inputs.version }}
           path: dist/desktop/${{ inputs.channel }}-release.json
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: desktop-v${{ inputs.version }}
+          name: Atmosfil Desktop v${{ inputs.version }} (${{ inputs.channel }})
+          body_path: ${{ env.RELEASE_BODY_PATH }}
+          prerelease: ${{ inputs.channel == 'beta' }}
+          files: |
+            ${{ env.MSI_PATH }}
+            ${{ env.EXE_PATH }}
+            ${{ env.MANIFEST_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload manifest to updates bucket
+        if: ${{ secrets.UPDATES_BUCKET != '' && secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+        shell: pwsh
+        run: |
+          pip install awscli
+          $target = "s3://${{ secrets.UPDATES_BUCKET }}/desktop/$env:RELEASE_CHANNEL/release.json"
+          aws s3 cp $env:MANIFEST_PATH $target --acl public-read
+          "UPDATES_MANIFEST_URL=https://updates.atmosfil.cz/desktop/$env:RELEASE_CHANNEL/release.json" | Out-File -FilePath $env:GITHUB_ENV -Append

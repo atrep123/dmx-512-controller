@@ -86,6 +86,25 @@ npm run build
   - Open **Nastavení → Desktop onboarding** card in the app and click *Spustit průvodce*
   - Or, in the Tauri system tray, pick *Run Onboarding* (sends an event that reopens the wizard)
 
+### GitHub Actions release workflow
+
+- Use **Actions > Desktop Release > Run workflow** to build/sign/publish MSI/NSIS + `release.json`.
+- Inputs:
+  - `channel`: `stable` or `beta`
+  - `version`: SemVer string (e.g., `1.4.0`)
+  - `release_notes`: optional markdown/plain text; stored in the GitHub Release body.
+- Secrets expected:
+  - `TAURI_PRIVATE_KEY` + `TAURI_KEY_PASSWORD` – signing Tauri updates
+  - `WINDOWS_CERTIFICATE_B64` + `WINDOWS_CERTIFICATE_PASSWORD` (optional Authenticode)
+  - `TAURI_UPDATE_SIGNATURE` – used by `desktop/scripts/create-release-json.mjs`
+  - Optional S3 upload for update feed:
+    - `UPDATES_BUCKET` (e.g., `updates.atmosfil.cz`)
+    - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
+- Output:
+  - GitHub Release `desktop-v<version>` marked as prerelease for beta channel
+  - Assets: `.msi`, `.exe`, `<channel>-release.json`
+  - Workflow artifacts remain for debugging (`desktop-msi-*`, `desktop-nsis-*`, `desktop-release-json-*`)
+
 ## 6. Next steps
 
 - Wire the updater channel + telemetry toggles from the wizard into the backend/Tauri settings file.

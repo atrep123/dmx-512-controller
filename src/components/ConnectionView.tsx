@@ -24,6 +24,7 @@ import {
 import { createServerClient, type ServerClient, type RgbStateMsg } from '@/lib/serverClient'
 import { registerServerClient } from '@/lib/transport'
 import { UsbDmxBridge, isWebSerialSupported, type UsbPortInfo } from '@/lib/usbDmx'
+import { DesktopIndicator } from '@/components/DesktopIndicator'
 import { registerPatchObserver } from '@/lib/dmxQueue'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'

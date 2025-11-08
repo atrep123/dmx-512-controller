@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash, Lightbulb } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { fixtureTemplates, findFixtureTemplate } from '@/lib/fixtureTemplates'
 
@@ -31,6 +31,40 @@ export default function SetupView({ universes, setUniverses, fixtures, setFixtur
     const [fixtureType, setFixtureType] = useState<Fixture['fixtureType']>('generic')
     const [fixtureTemplateId, setFixtureTemplateId] = useState('')
     const selectedTemplate = useMemo(() => findFixtureTemplate(fixtureTemplateId), [fixtureTemplateId])
+    const [desktopPrefs, setDesktopPrefs] = useState<{ channel?: string; telemetryOptIn?: boolean } | null>(null)
+    const [desktopPrefsLoading, setDesktopPrefsLoading] = useState(false)
+    const [desktopPrefsError, setDesktopPrefsError] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!onRestartDesktopWizard) {
+            return
+        }
+        let cancelled = false
+        const load = async () => {
+            setDesktopPrefsLoading(true)
+            setDesktopPrefsError(null)
+            try {
+                const response = await fetch('/desktop/preferences')
+                if (!response.ok) throw new Error(`HTTP ${response.status}`)
+                const body = await response.json()
+                if (!cancelled) {
+                    setDesktopPrefs(body.preferences ?? {})
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setDesktopPrefsError('Nepodařilo se načíst aktuální nastavení.')
+                }
+            } finally {
+                if (!cancelled) {
+                    setDesktopPrefsLoading(false)
+                }
+            }
+        }
+        load()
+        return () => {
+            cancelled = true
+        }
+    }, [onRestartDesktopWizard])
 
     const addUniverse = () => {
         if (!universeName.trim()) {
@@ -183,16 +217,27 @@ const deleteFixture = (fixtureId: string) => {
         <div className="space-y-8">
             {onRestartDesktopWizard ? (
                 <Card className="border-dashed">
-                    <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
+                    <div className="flex flex-col gap-3 p-4">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                             <p className="font-semibold">Desktop onboarding</p>
-                            <p className="text-sm text-muted-foreground">
-                                Spusť znovu průvodce pro výběr DMX zařízení a aktualizačního kanálu.
-                            </p>
+                            <Button variant="outline" onClick={onRestartDesktopWizard} className="sm:w-auto">
+                                Spustit průvodce
+                            </Button>
                         </div>
-                        <Button variant="outline" onClick={onRestartDesktopWizard}>
-                            Spustit průvodce
-                        </Button>
+                        <div className="text-sm text-muted-foreground">
+                            {desktopPrefsLoading ? (
+                                <span>Načítám aktuální kanál…</span>
+                            ) : desktopPrefsError ? (
+                                <span className="text-destructive">{desktopPrefsError}</span>
+                            ) : desktopPrefs ? (
+                                <span>
+                                    Aktuální kanál: <strong>{desktopPrefs.channel === 'beta' ? 'Beta' : 'Stable'}</strong>, telemetrie:{' '}
+                                    {desktopPrefs.telemetryOptIn ? 'zapnuta' : 'vypnuta'}.
+                                </span>
+                            ) : (
+                                <span>Preference zatím nejsou k dispozici.</span>
+                            )}
+                        </div>
                     </div>
                 </Card>
             ) : null}

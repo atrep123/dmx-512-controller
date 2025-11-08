@@ -95,6 +95,12 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 3. První spuštění řeší wizard (`src/components/DesktopOnboarding.tsx`) – licence, DMX detekce/test, kanál updatů, telemetrie.
    - Wizard lze kdykoli restartovat z Nastavení (karta „Desktop onboarding“) nebo přes Tauri tray menu (*Run Onboarding*).
 4. Updater je nastavený v `desktop/src-tauri/tauri.conf.json` (`https://updates.atmosfil.cz/desktop/release.json`). V CI nahraj skutečný public key a publikuj podepsané `release.json`.
+5. Publikace release: spusť workflow **Desktop Release** (Actions → _Desktop Release_ → Run workflow), zadej `channel` (`stable`/`beta`) a verzi. Workflow:
+   - postaví PyInstaller + Tauri (`scripts/build-server-exe.bat`, `desktop/npm run build`)
+   - podepíše (pokud jsou secrets)
+   - vygeneruje `release.json` (stable/beta)
+   - vytvoří GitHub release s MSI, NSIS a manifestem
+   - pokud nastavíš `UPDATES_BUCKET` + AWS klíče, pushne `<channel>-release.json` i na `https://updates.atmosfil.cz/desktop/<channel>/release.json` pro backend proxy
 
 ---
 

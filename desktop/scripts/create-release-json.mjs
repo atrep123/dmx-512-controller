@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import process from 'node:process'
+import console from 'node:console'
 /**
  * Generate a Tauri-compatible release manifest for a given channel.
  *

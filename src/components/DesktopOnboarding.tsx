@@ -139,6 +139,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
   const [testMessage, setTestMessage] = useState<string | null>(null)
   const [updateChannel, setUpdateChannel] = useState<UpdateChannel>('stable')
   const [prefsHydrated, setPrefsHydrated] = useState(false)
+  const [prefsError, setPrefsError] = useState<string | null>(null)
 
   const apiBase = useMemo(() => {
     if (typeof window === 'undefined') return ''
@@ -203,6 +204,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     }
     let cancelled = false
     const loadPrefs = async () => {
+      setPrefsError(null)
       try {
         const response = await fetch(buildUrl('/desktop/preferences'))
         if (!response.ok) return
@@ -219,6 +221,9 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
         }
       } catch (error) {
         console.warn('desktop_prefs_load_failed', error)
+        if (!cancelled) {
+          setPrefsError('Nepodařilo se načíst uložené nastavení.')
+        }
       } finally {
         if (!cancelled) {
           setPrefsHydrated(true)
@@ -265,11 +270,11 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
       case 'test':
         return testStatus !== 'success'
       case 'channel':
-        return !updateChannel
+        return !updateChannel || !prefsHydrated
       default:
         return false
     }
-  }, [acceptedTerms, selectedDevice, step.id, testStatus, updateChannel])
+  }, [acceptedTerms, prefsHydrated, selectedDevice, step.id, testStatus, updateChannel])
 
   const goNext = () => {
     if (isLastStep) {
@@ -529,12 +534,22 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
       case 'channel':
         return (
           <div className="space-y-4">
+            {!prefsHydrated ? (
+              <div className="flex items-center gap-2 rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
+                <CircleNotch className="animate-spin" size={14} />
+                Načítám uložené nastavení…
+              </div>
+            ) : prefsError ? (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                {prefsError}
+              </div>
+            ) : null}
             <p className="text-sm text-muted-foreground">
               Tauri updater kontroluje GitHub Releases. Stable kanál obsahuje podepsané buildy po QA, beta přináší nejnovější
               DMX funkce (může být méně stabilní).
             </p>
             <RadioGroup value={updateChannel} onValueChange={(value) => setUpdateChannel(value as UpdateChannel)}>
-              <div className="rounded-xl border p-4">
+              <div className="rounded-xl border p-4 opacity-100">
                 <div className="flex items-start gap-3">
                   <RadioGroupItem id="channel-stable" value="stable" className="mt-1" />
                   <div>
@@ -547,7 +562,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border p-4">
+              <div className="rounded-xl border p-4 opacity-100">
                 <div className="flex items-start gap-3">
                   <RadioGroupItem id="channel-beta" value="beta" className="mt-1" />
                   <div>
