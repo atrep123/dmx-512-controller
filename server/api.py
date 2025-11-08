@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 import time
 import json
 import logging
@@ -12,6 +13,7 @@ import socket
 import struct
 
 import serial  # type: ignore
+import httpx
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, PlainTextResponse, Response, StreamingResponse
@@ -34,6 +36,7 @@ from .models import (
     BackupCreateModel,
     BackupRestoreModel,
     DMXTestRequest,
+    DesktopPreferences,
 )
 from .util.schema import load_schemas
 from .fixtures.mapper import resolve_attrs
@@ -42,6 +45,7 @@ from .drivers.enttec import EnttecDMXUSBPro, USBDeviceInfo, find_enttec_device
 from .dmx.autodetect import enumerate_serial_devices, enumerate_artnet_nodes
 from .services.projects import switch_active_project, create_project_backup, list_backups, restore_backup, serialize_project
 from .backups.base import BackupVersion
+from .services.desktop_prefs import save_desktop_preferences
 
 _schemas = load_schemas()
 
@@ -81,6 +85,27 @@ async def _safe_enumerate(label: str, func: Callable[[], list[dict[str, Any]]]) 
     except Exception as exc:  # pragma: no cover - defensive logging
         logger.warning("dmx %s enumeration failed: %s", label, exc)
         return []
+
+
+def _desktop_preferences(context: AppContext) -> DesktopPreferences:
+    if context.desktop_prefs is None:
+        context.desktop_prefs = DesktopPreferences()
+    return context.desktop_prefs
+
+
+def _desktop_prefs_path(context: AppContext) -> Path:
+    path = context.desktop_prefs_path
+    if path is not None:
+        return path
+    context.desktop_prefs_path = context.settings.desktop_prefs_path
+    return context.desktop_prefs_path
+
+
+def _desktop_release_url(context: AppContext) -> str:
+    prefs = _desktop_preferences(context)
+    if prefs.channel == "beta":
+        return context.settings.desktop_update_beta_url
+    return context.settings.desktop_update_stable_url
 
 
 def _projects_enabled(context: AppContext) -> None:
@@ -229,6 +254,46 @@ async def api_test_dmx(payload: DMXTestRequest) -> dict[str, Any]:
             raise HTTPException(status_code=502, detail=f"artnet test failed: {exc}") from exc
         target = payload.ip
     return {"status": "ok", "type": payload.type, "target": target, "channel": channel, "value": value}
+
+
+@router.get("/desktop/preferences")
+async def api_get_desktop_preferences(context: AppContext = Depends(get_context)) -> dict[str, Any]:
+    prefs = _desktop_preferences(context)
+    return {"preferences": prefs.model_dump()}
+
+
+@router.post("/desktop/preferences")
+async def api_set_desktop_preferences(
+    payload: DesktopPreferences,
+    context: AppContext = Depends(get_context),
+) -> dict[str, Any]:
+    prefs = DesktopPreferences.model_validate(payload.model_dump())
+    context.desktop_prefs = prefs
+    path = _desktop_prefs_path(context)
+    try:
+        await _run_blocking(save_desktop_preferences, path, prefs)
+    except Exception as exc:  # pragma: no cover - disk failures
+        logger.exception("desktop_prefs_save_failed path=%s", path)
+        raise HTTPException(status_code=500, detail="failed to persist desktop preferences") from exc
+    return {"preferences": prefs.model_dump()}
+
+
+@router.get("/desktop/update-feed")
+async def api_desktop_update_feed(context: AppContext = Depends(get_context)) -> Response:
+    url = _desktop_release_url(context)
+    timeout = context.settings.desktop_update_timeout_seconds
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            upstream = await client.get(url)
+    except httpx.HTTPError as exc:
+        logger.exception("desktop_update_feed_fetch_failed url=%s", url)
+        raise HTTPException(status_code=502, detail="failed to fetch update feed") from exc
+    return Response(
+        content=upstream.content,
+        media_type=upstream.headers.get("content-type", "application/json"),
+        status_code=upstream.status_code,
+        headers={"Cache-Control": "no-cache"},
+    )
 
 
 @router.get("/projects", response_model=ProjectsResponse)

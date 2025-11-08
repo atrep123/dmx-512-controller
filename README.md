@@ -93,6 +93,7 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
    ```
    Výstup: `desktop/src-tauri/target/release/bundle/{msi,nsis}`.
 3. První spuštění řeší wizard (`src/components/DesktopOnboarding.tsx`) – licence, DMX detekce/test, kanál updatů, telemetrie.
+   - Wizard lze kdykoli restartovat z Nastavení (karta „Desktop onboarding“) nebo přes Tauri tray menu (*Run Onboarding*).
 4. Updater je nastavený v `desktop/src-tauri/tauri.conf.json` (`https://updates.atmosfil.cz/desktop/release.json`). V CI nahraj skutečný public key a publikuj podepsané `release.json`.
 
 ---

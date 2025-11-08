@@ -61,6 +61,12 @@ type DiscoveredDevice = SerialDevice | ArtNetNode
 
 type UpdateChannel = 'stable' | 'beta'
 
+type DesktopPreferencesPayload = {
+  channel: UpdateChannel
+  telemetryOptIn: boolean
+  completedAt: number
+}
+
 interface DesktopOnboardingProps {
   onComplete?: () => void
 }
@@ -132,6 +138,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
   const [testStatus, setTestStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle')
   const [testMessage, setTestMessage] = useState<string | null>(null)
   const [updateChannel, setUpdateChannel] = useState<UpdateChannel>('stable')
+  const [prefsHydrated, setPrefsHydrated] = useState(false)
 
   const apiBase = useMemo(() => {
     if (typeof window === 'undefined') return ''
@@ -190,6 +197,60 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     }
   }, [step.id])
 
+  useEffect(() => {
+    if (prefsHydrated) {
+      return
+    }
+    let cancelled = false
+    const loadPrefs = async () => {
+      try {
+        const response = await fetch(buildUrl('/desktop/preferences'))
+        if (!response.ok) return
+        const body = (await response.json()) as {
+          preferences?: Partial<DesktopPreferencesPayload> & { telemetryOptIn?: boolean }
+        }
+        if (cancelled) return
+        const prefs = body.preferences ?? {}
+        if (prefs.channel === 'beta' || prefs.channel === 'stable') {
+          setUpdateChannel(prefs.channel)
+        }
+        if (typeof prefs.telemetryOptIn === 'boolean') {
+          setTelemetryOptIn(prefs.telemetryOptIn)
+        }
+      } catch (error) {
+        console.warn('desktop_prefs_load_failed', error)
+      } finally {
+        if (!cancelled) {
+          setPrefsHydrated(true)
+        }
+      }
+    }
+    loadPrefs()
+    return () => {
+      cancelled = true
+    }
+  }, [buildUrl, prefsHydrated])
+
+  const persistPreferences = useCallback(
+    async (payload: DesktopPreferencesPayload) => {
+      try {
+        const response = await fetch(buildUrl('/desktop/preferences'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(text || `HTTP ${response.status}`)
+        }
+      } catch (error) {
+        console.warn('desktop_prefs_save_failed', error)
+        toast.error('Nepodařilo se uložit desktopové nastavení')
+      }
+    },
+    [buildUrl]
+  )
+
   const allDevices: DiscoveredDevice[] = useMemo(
     () => [...devices.serial, ...devices.artnet],
     [devices.serial, devices.artnet]
@@ -212,7 +273,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
 
   const goNext = () => {
     if (isLastStep) {
-      finishOnboarding()
+      void finishOnboarding()
     } else {
       setStepIndex((prev) => Math.min(prev + 1, STEPS.length - 1))
     }
@@ -222,11 +283,12 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     setStepIndex((prev) => Math.max(prev - 1, 0))
   }
 
-  const finishOnboarding = useCallback(() => {
+  const finishOnboarding = useCallback(async () => {
+    const completedAt = Date.now()
     if (typeof window !== 'undefined') {
       try {
         const record = {
-          completedAt: new Date().toISOString(),
+          completedAt: new Date(completedAt).toISOString(),
           telemetryOptIn,
           updateChannel,
           device:
@@ -251,9 +313,10 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
         console.warn('onboarding_persist_failed', error)
       }
     }
+    await persistPreferences({ channel: updateChannel, telemetryOptIn, completedAt })
     toast.success('Desktop průvodce dokončen. Spouštíme aplikaci.')
     onComplete?.()
-  }, [onComplete, selectedDevice, telemetryOptIn, updateChannel])
+  }, [onComplete, persistPreferences, selectedDevice, telemetryOptIn, updateChannel])
 
   const handleTest = async () => {
     if (!selectedDevice) {
@@ -553,7 +616,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
             </Button>
             <div className="flex items-center gap-3">
               {step.id === 'finish' ? (
-                <Button onClick={finishOnboarding}>Dokončit a spustit</Button>
+                <Button onClick={() => void finishOnboarding()}>Dokončit a spustit</Button>
               ) : (
                 <Button onClick={goNext} disabled={nextDisabled}>
                   Pokračovat

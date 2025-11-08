@@ -28,6 +28,7 @@ from server.persistence.store import RGBState, StateStore
 from server.persistence.scenes import ScenesStore
 from server.persistence.show import ShowStore
 from server.ws_hub import WSHub
+from server.models import DesktopPreferences
 
 
 @pytest.fixture
@@ -35,6 +36,7 @@ def test_app(tmp_path):
     settings = Settings(
         persistence_path=tmp_path / "state.json",
         dedupe_path=tmp_path / "dedupe.json",
+        desktop_prefs_path=tmp_path / "desktop_prefs.json",
         metrics_enabled=True,
         mqtt_host="localhost",
         mqtt_port=1883,
@@ -79,6 +81,8 @@ def test_app(tmp_path):
     context.show_store = ShowStore(tmp_path / "show.json")
     context.scenes = []
     context.show_snapshot = {}
+    context.desktop_prefs_path = settings.desktop_prefs_path
+    context.desktop_prefs = DesktopPreferences()
 
     app = FastAPI()
     app.include_router(router)

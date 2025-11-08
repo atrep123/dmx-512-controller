@@ -184,6 +184,12 @@ class DMXTestRequest(BaseModel):
     value: PositiveInt = Field(255, le=255)
 
 
+class DesktopPreferences(BaseModel):
+    channel: Literal["stable", "beta"] = "stable"
+    telemetryOptIn: bool = False
+    completedAt: PositiveInt | None = None
+
+
 __all__ = [
     "RGBCommand",
     "RGBState",
@@ -200,6 +206,7 @@ __all__ = [
     "BackupCreateModel",
     "BackupRestoreModel",
     "DMXTestRequest",
+    "DesktopPreferences",
     "CMD_SCHEMA",
     "STATE_SCHEMA",
 ]

@@ -77,6 +77,17 @@ function App() {
         }
     }, [flushPendingShowSnapshot])
 
+    const restartDesktopOnboarding = useCallback(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                window.localStorage.removeItem(ONBOARDING_STORAGE_KEY)
+            } catch (error) {
+                console.warn('onboarding_reset_failed', error)
+            }
+        }
+        setNeedsDesktopOnboarding(true)
+    }, [])
+
     useEffect(() => {
         if (typeof window === 'undefined') {
             return
@@ -94,6 +105,34 @@ function App() {
             setNeedsDesktopOnboarding(true)
         }
     }, [])
+
+    useEffect(() => {
+        if (!isDesktopShell) {
+            return
+        }
+        let active = true
+        let unlisten: (() => void) | undefined
+        const bind = async () => {
+            try {
+                const { listen } = await import('@tauri-apps/api/event')
+                if (!active) {
+                    return
+                }
+                unlisten = await listen('desktop://onboarding/reset', () => {
+                    restartDesktopOnboarding()
+                })
+            } catch (error) {
+                console.warn('desktop_onboarding_event_failed', error)
+            }
+        }
+        bind()
+        return () => {
+            active = false
+            if (typeof unlisten === 'function') {
+                void unlisten()
+            }
+        }
+    }, [isDesktopShell, restartDesktopOnboarding])
 
     const refreshShow = useCallback(async (): Promise<boolean> => {
         setShowLoading(true)
@@ -435,6 +474,7 @@ function App() {
                                 setUniverses={setUniverses}
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
+                                onRestartDesktopWizard={isDesktopShell ? restartDesktopOnboarding : undefined}
                             />
                         </Suspense>
                         <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>

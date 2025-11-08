@@ -1,4 +1,4 @@
-# Desktop Wrapper – Implementation Plan
+﻿# Desktop Wrapper â€“ Implementation Plan
 
 ## 1. Goal
 
@@ -16,39 +16,39 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 ## 3. Architecture overview
 
 ```
-┌────────────────────────────────┐
-│ Tauri Shell (Rust)             │
-│  - window displaying PWA       │
-│  - sidecar process manager     │
-│  - tray / status icon          │
-└────────────┬───────────────────┘
-             │ launches / monitors
-┌────────────▼────────────┐
-│ FastAPI backend (PyInstaller) │
-│  - listens on 127.0.0.1:8080  │
-│  - DMX drivers, MQTT, etc.    │
-└──────────────────────────┘
+â”Śâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ Tauri Shell (Rust)             â”‚
+â”‚  - window displaying PWA       â”‚
+â”‚  - sidecar process manager     â”‚
+â”‚  - tray / status icon          â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+             â”‚ launches / monitors
+â”Śâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–Ľâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚ FastAPI backend (PyInstaller) â”‚
+â”‚  - listens on 127.0.0.1:8080  â”‚
+â”‚  - DMX drivers, MQTT, etc.    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
 ```
 
 ## 4. Work packages
 
 ### A. PyInstaller packaging
-1. ✅ `server/desktop.spec` (PyInstaller onefile) with entry script `server/run_desktop.py` and bundled schemas/config.
-2. ✅ Build helper `scripts/build-server-exe.bat` → `server/dist/dmx-backend.exe`.
-3. ✅ `docs/DESKTOP_INSTALL.md` documents the build/run process.
+1. âś… `server/desktop.spec` (PyInstaller onefile) with entry script `server/run_desktop.py` and bundled schemas/config.
+2. âś… Build helper `scripts/build-server-exe.bat` â†’ `server/dist/dmx-backend.exe`.
+3. âś… `docs/DESKTOP_INSTALL.md` documents the build/run process.
 4. Tests: _TODO_ (CI job to exercise the executable).
 
 ### B. Tauri shell
-1. ✅ `desktop/` workspace scaffolded with Tauri (Rust) + npm scripts.
-2. ✅ Build pipeline links Vite `dist/` → Tauri resources via `npm run prepare:resources`.
-3. ✅ Sidecar management: Tauri spawns `dmx-backend.exe`, streams logs to window events.
-4. ✅ System tray (open/restart/quit) + splash window styling.
+1. âś… `desktop/` workspace scaffolded with Tauri (Rust) + npm scripts.
+2. âś… Build pipeline links Vite `dist/` â†’ Tauri resources via `npm run prepare:resources`.
+3. âś… Sidecar management: Tauri spawns `dmx-backend.exe`, streams logs to window events.
+4. âś… System tray (open/restart/quit) + splash window styling.
 
 ### C. Installer + first-run wizard
 1. Use `tauri.conf.json > bundle` to generate `.msi/.exe`.
 2. First launch wizard (React component inside PWA):
    - check DMX hardware (USB, IP)
-   - select quick-start profile (e.g., “Club RGB Rig”, “Stage DMX”)
+   - select quick-start profile (e.g., â€śClub RGB Rigâ€ť, â€śStage DMXâ€ť)
    - store config in `%APPDATA%\DMXController`.
 3. Auto-update story: rely on Tauri updater (later milestone).
 
@@ -67,7 +67,7 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 - macOS notarization & Apple Developer ID (future step).
 
 ## 6. Next steps
-1. Create GitHub issue “Desktop Wrapper (.exe) – Windows MVP” referencing this plan.
+1. Create GitHub issue â€śDesktop Wrapper (.exe) â€“ Windows MVPâ€ť referencing this plan.
 2. Break into subtasks:
    - `#1 PyInstaller backend`
    - `#2 Tauri shell scaffold`
@@ -77,7 +77,7 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 
 ## 7. Onboarding wizard status (desktop build)
 
-- ✅ Frontend ships with `DesktopOnboarding` React flow (see `src/components/DesktopOnboarding.tsx`). It launches automatically inside the Tauri wrapper (detected via `window.__TAURI_INTERNALS__`) until completion is persisted under `localStorage.desktop.onboarding`.
-- ✅ Wizard steps: Welcome → Licence + telemetry → DMX auto-detect (`GET /dmx/devices`) → DMX test shot (`POST /dmx/test`) → Update channel select → Finish summary.
-- ✅ Desktop-only mode: when the wizard is visible the rest of the SPA is hidden so users must finish the checklist before controlling fixtures. Web/PWA users keep the regular landing page.
-- 🔁 Follow-up: bind the selected update channel + telemetry opt-in to the Tauri updater config (currently stored locally only) and expose a Settings entry to relaunch the wizard if hardware changes.
+- Frontend ships with DesktopOnboarding React flow (see src/components/DesktopOnboarding.tsx). It launches automatically inside the Tauri wrapper (detected via window.__TAURI_INTERNALS__) until completion is persisted under localStorage.desktop.onboarding.
+- Wizard steps: Welcome -> Licence + telemetry -> DMX auto-detect (GET /dmx/devices) -> DMX test shot (POST /dmx/test) -> Update channel select -> Finish summary.
+- Desktop-only mode: when the wizard is visible the rest of the SPA is hidden so users must finish the checklist before controlling fixtures. Web/PWA users keep the regular landing page.
+- Preferences persist via /desktop/preferences; onboarding lze znovu spustit ze sekce Nastavení (karta "Desktop onboarding") nebo z Tauri tray menu (*Run Onboarding*). Dalším krokem je napojení volby kanálu/telemetrie na updater feed a CI release proces.

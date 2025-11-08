@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import time
 from typing import Any, Callable
 
@@ -8,6 +9,7 @@ from fastapi.testclient import TestClient
 from server.drivers.enttec import USBDeviceInfo
 from server import api as api_module
 from server.persistence.projects import ProjectMetadata, ProjectsIndex
+from server.models import DesktopPreferences
 
 def wait_for_condition(condition: Callable[[], bool], timeout: float = 1.0) -> None:
     deadline = time.monotonic() + timeout
@@ -225,3 +227,70 @@ def test_dmx_test_endpoint_artnet(monkeypatch, test_app: tuple) -> None:
         )
         assert response.status_code == 200
         assert captured == {"ip": "10.0.0.5", "channel": 1, "value": 123}
+
+
+def test_desktop_preferences_default_roundtrip(test_app: tuple) -> None:
+    app, context, _ = test_app
+    prefs_path = context.settings.desktop_prefs_path
+    if prefs_path.exists():
+        prefs_path.unlink()
+    with TestClient(app) as client:
+        response = client.get("/desktop/preferences")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["preferences"]["channel"] == "stable"
+        assert body["preferences"]["telemetryOptIn"] is False
+
+
+def test_desktop_preferences_post_persists(test_app: tuple) -> None:
+    app, context, _ = test_app
+    prefs_path = context.settings.desktop_prefs_path
+    with TestClient(app) as client:
+        response = client.post(
+            "/desktop/preferences",
+            json={"channel": "beta", "telemetryOptIn": True, "completedAt": 123456},
+        )
+        assert response.status_code == 200
+        data = response.json()["preferences"]
+        assert data["channel"] == "beta"
+        assert data["telemetryOptIn"] is True
+    assert prefs_path.exists()
+    payload = json.loads(prefs_path.read_text("utf-8"))
+    assert payload["channel"] == "beta"
+
+
+def test_desktop_update_feed_uses_channel(monkeypatch, test_app: tuple) -> None:
+    app, context, _ = test_app
+    context.settings.desktop_update_stable_url = "http://example/stable/release.json"
+    context.settings.desktop_update_beta_url = "http://example/beta/release.json"
+    context.desktop_prefs = DesktopPreferences(channel="beta")
+
+    class DummyResponse:
+        def __init__(self):
+            self.content = b'{"version":"2.0.0"}'
+            self.headers = {"content-type": "application/json"}
+            self.status_code = 200
+
+    captured: dict[str, Any] = {}
+
+    class DummyClient:
+        def __init__(self, *args, **kwargs):
+            captured["timeout"] = kwargs.get("timeout")
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def get(self, url: str):
+            captured["url"] = url
+            return DummyResponse()
+
+    monkeypatch.setattr(api_module, "httpx", type("Stub", (), {"AsyncClient": DummyClient}))
+
+    with TestClient(app) as client:
+        response = client.get("/desktop/update-feed")
+        assert response.status_code == 200
+        assert response.json()["version"] == "2.0.0"
+    assert captured["url"] == "http://example/beta/release.json"

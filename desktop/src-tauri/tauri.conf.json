@@ -72,7 +72,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://updates.atmosfil.cz/desktop/release.json"
+        "http://127.0.0.1:8080/desktop/update-feed"
       ],
       "dialog": false,
       "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY_BASE64"

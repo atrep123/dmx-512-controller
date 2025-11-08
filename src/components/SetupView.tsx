@@ -16,9 +16,10 @@ interface SetupViewProps {
     setUniverses: (updater: (universes: Universe[]) => Universe[]) => void
     fixtures: Fixture[]
     setFixtures: (updater: (fixtures: Fixture[]) => Fixture[]) => void
+    onRestartDesktopWizard?: () => void
 }
 
-export default function SetupView({ universes, setUniverses, fixtures, setFixtures }: SetupViewProps) {
+export default function SetupView({ universes, setUniverses, fixtures, setFixtures, onRestartDesktopWizard }: SetupViewProps) {
     const [isUniverseDialogOpen, setIsUniverseDialogOpen] = useState(false)
     const [isFixtureDialogOpen, setIsFixtureDialogOpen] = useState(false)
     const [universeName, setUniverseName] = useState('')
@@ -180,6 +181,21 @@ const deleteFixture = (fixtureId: string) => {
 
     return (
         <div className="space-y-8">
+            {onRestartDesktopWizard ? (
+                <Card className="border-dashed">
+                    <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="font-semibold">Desktop onboarding</p>
+                            <p className="text-sm text-muted-foreground">
+                                Spusť znovu průvodce pro výběr DMX zařízení a aktualizačního kanálu.
+                            </p>
+                        </div>
+                        <Button variant="outline" onClick={onRestartDesktopWizard}>
+                            Spustit průvodce
+                        </Button>
+                    </div>
+                </Card>
+            ) : null}
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <div>

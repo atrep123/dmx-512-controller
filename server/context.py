@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from asyncio_mqtt import Client
@@ -24,6 +25,7 @@ from .persistence.show import ShowStore
 from .persistence.projects import ProjectsStore, ProjectsIndex, ProjectMetadata, ProjectPaths
 from .backups.base import BackupClient
 from .drivers.dmx_input import SparkFunDMXInput
+from .models import DesktopPreferences
 
 if TYPE_CHECKING:  # pragma: no cover
     from .drivers.enttec import USBDeviceMonitor, USBDeviceInfo, EnttecDMXUSBPro
@@ -66,6 +68,8 @@ class AppContext:
     dmx_input: SparkFunDMXInput | None = None
     dmx_input_state: dict[str, int] = field(default_factory=lambda: {"r": 0, "g": 0, "b": 0})
     dmx_input_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    desktop_prefs_path: Path | None = None
+    desktop_prefs: DesktopPreferences | None = None
 
     def set_mqtt_connected(self, value: bool) -> None:
         self.mqtt_connected = value

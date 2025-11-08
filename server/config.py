@@ -46,6 +46,26 @@ class Settings(BaseSettings):
         Path("data/cmd_seen.json"),
         description="Path for persisted dedupe information.",
     )
+    desktop_prefs_path: Path = Field(
+        Path("data/desktop_prefs.json"),
+        description="Path where desktop onboarding preferences are stored.",
+        json_schema_extra={"env": "DESKTOP_PREFS_PATH"},
+    )
+    desktop_update_stable_url: str = Field(
+        "https://updates.atmosfil.cz/desktop/stable/release.json",
+        description="Updater feed URL for the stable channel.",
+        json_schema_extra={"env": "DESKTOP_UPDATE_STABLE_URL"},
+    )
+    desktop_update_beta_url: str = Field(
+        "https://updates.atmosfil.cz/desktop/beta/release.json",
+        description="Updater feed URL for the beta channel.",
+        json_schema_extra={"env": "DESKTOP_UPDATE_BETA_URL"},
+    )
+    desktop_update_timeout_seconds: PositiveInt = Field(
+        10,
+        description="Timeout (seconds) for fetching desktop updater feeds.",
+        json_schema_extra={"env": "DESKTOP_UPDATE_TIMEOUT"},
+    )
     ola_enabled: bool = Field(False, description="Enable OLA DMX output.")
     ola_url: str = Field("http://localhost:9090/set_dmx", description="OLA HTTP endpoint.")
     ola_universe: PositiveInt = Field(1, description="OLA DMX universe to drive.")

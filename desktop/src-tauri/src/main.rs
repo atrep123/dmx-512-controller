@@ -50,6 +50,13 @@ fn main() {
                     "restart-backend" => {
                         spawn_backend(app.app_handle());
                     }
+                    "run-onboarding" => {
+                        if let Some(window) = app.get_window("main") {
+                            let _ = window.emit("desktop://onboarding/reset", ());
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
                     "quit" => {
                         app.exit(0);
                     }
@@ -63,7 +70,8 @@ fn main() {
 
 fn build_tray() -> SystemTray {
     let open = CustomMenuItem::new("open".to_string(), "Open");
+    let onboarding = CustomMenuItem::new("run-onboarding".to_string(), "Run Onboarding");
     let restart = CustomMenuItem::new("restart-backend".to_string(), "Restart Backend");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    SystemTray::new().with_menu(SystemTrayMenu::new().add_item(open).add_item(restart).add_item(quit))
+    SystemTray::new().with_menu(SystemTrayMenu::new().add_item(open).add_item(onboarding).add_item(restart).add_item(quit))
 }

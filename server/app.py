@@ -23,7 +23,7 @@ from .inputs.sacn_receiver import SACNReceiver
 from .fixtures.profiles import load_profiles
 from .fixtures.patch import load_patch
 from .engine import Engine
-from .models import SceneModel, RGBCommand, CMD_SCHEMA
+from .models import SceneModel, RGBCommand, CMD_SCHEMA, DesktopPreferences
 from .mqtt_in import run_mqtt_in
 from .mqtt_out import build_publisher, publish_state
 from .persistence.dedupe import CommandDeduplicator
@@ -36,6 +36,7 @@ from .util.ulid import new_ulid
 from .ws_hub import WSHub
 from .services.data import load_scenes, load_show_snapshot
 from .services.projects import create_project_backup, switch_active_project
+from .services.desktop_prefs import load_desktop_preferences, save_desktop_preferences
 from .backups.factory import create_backup_client
 from .backups.base import BackupClient
 
@@ -63,6 +64,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     dedupe_path = settings.dedupe_path
     scenes_path = data_root / "scenes.json"
     show_path = data_root / "show.json"
+    desktop_prefs_path = settings.desktop_prefs_path
     projects_store: ProjectsStore | None = None
     projects_index: ProjectsIndex | None = None
     active_project: ProjectMetadata | None = None
@@ -76,6 +78,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         dedupe_path = project_paths.dedupe_path
         scenes_path = project_paths.scenes_path
         show_path = project_paths.show_path
+        desktop_prefs_path = project_paths.base / "desktop_prefs.json"
     store = StateStore(state_path)
     dedupe = CommandDeduplicator(
         ttl_seconds=settings.cmd_dedupe_ttl_seconds,
@@ -93,6 +96,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     context.show_store = ShowStore(show_path)
     context.scenes = await load_scenes(context.scenes_store)
     context.show_snapshot = await load_show_snapshot(context.show_store)
+    context.desktop_prefs_path = desktop_prefs_path
+    try:
+        context.desktop_prefs = load_desktop_preferences(desktop_prefs_path)
+    except Exception:
+        context.desktop_prefs = DesktopPreferences()
     if not context.scenes:
         fallback = list(context.show_snapshot.get("scenes") or [])
         if fallback:

@@ -74,6 +74,18 @@ npm run build
 - Replace the `REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY_BASE64` placeholder with your real updater public key (CI secret).
 - The onboarding wizard asks users for their preferred channel (stable/beta). Persisted preferences will later inform the updater service which `release.json` to return.
 
+### Desktop onboarding preferences & reset
+
+- The desktop wizard writes its choices to two places:
+  1. `localStorage.desktop.onboarding` (client-side gate)
+  2. Backend file `data/desktop_prefs.json` via the API below
+- New API endpoints:
+  - `GET /desktop/preferences` → returns `{ "preferences": { "channel": "stable", "telemetryOptIn": false, "completedAt": 1700000000000 } }`
+  - `POST /desktop/preferences` → accepts the same payload to persist choices (used by the wizard)
+- To rerun the wizard without clearing the browser manually:
+  - Open **Nastavení → Desktop onboarding** card in the app and click *Spustit průvodce*
+  - Or, in the Tauri system tray, pick *Run Onboarding* (sends an event that reopens the wizard)
+
 ## 6. Next steps
 
 - Wire the updater channel + telemetry toggles from the wizard into the backend/Tauri settings file.
