@@ -1,28 +1,26 @@
 import fs from "fs";
+import defaultTailwindTheme from "tailwindcss/defaultTheme";
+import plugin from "tailwindcss/plugin";
 
 /** @type {import('tailwindcss').Config} */
 
-let theme = {};
+let customTheme = {};
 try {
   const themePath = "./theme.json";
 
   if (fs.existsSync(themePath)) {
-    theme = JSON.parse(fs.readFileSync(themePath, "utf-8"));
+    customTheme = JSON.parse(fs.readFileSync(themePath, "utf-8"));
   }
 } catch (err) {
   console.error('failed to parse custom styles', err)
 }
-const defaultTheme = {
+const baseTheme = {
   container: {
     center: true,
     padding: "2rem",
+    screens: defaultTailwindTheme.screens,
   },
   extend: {
-    screens: {
-      coarse: { raw: "(pointer: coarse)" },
-      fine: { raw: "(pointer: fine)" },
-      pwa: { raw: "(display-mode: standalone)" },
-    },
     colors: {
       neutral: {
         1: "var(--color-neutral-1)",
@@ -143,5 +141,48 @@ const defaultTheme = {
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: { ...defaultTheme, ...theme },
+  theme: (() => {
+    const mergedTheme = {
+      ...baseTheme,
+      ...customTheme,
+      container: {
+        ...baseTheme.container,
+        ...customTheme.container,
+      },
+      spacing: {
+        ...baseTheme.spacing,
+        ...customTheme.spacing,
+      },
+    };
+
+    const mergedExtend = {
+      ...baseTheme.extend,
+      ...customTheme.extend,
+    };
+
+    if (baseTheme.extend?.colors || customTheme.extend?.colors) {
+      mergedExtend.colors = {
+        ...baseTheme.extend?.colors,
+        ...customTheme.extend?.colors,
+      };
+    }
+
+    if (baseTheme.extend?.borderRadius || customTheme.extend?.borderRadius) {
+      mergedExtend.borderRadius = {
+        ...baseTheme.extend?.borderRadius,
+        ...customTheme.extend?.borderRadius,
+      };
+    }
+
+    mergedTheme.extend = mergedExtend;
+
+    return mergedTheme;
+  })(),
+  plugins: [
+    plugin(({ addVariant }) => {
+      addVariant("coarse", "@media (pointer: coarse)");
+      addVariant("fine", "@media (pointer: fine)");
+      addVariant("pwa", "@media (display-mode: standalone)");
+    }),
+  ],
 };
