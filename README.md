@@ -1,6 +1,6 @@
 # Atmosfil DMX 512 Controller
 
-Profesionální DMX 512 řízení osvětlení a motion prvků, které běží jako Progressive Web App, Python FastAPI backend a volitelný desktopový wrapper (Tauri + PyInstaller). Cílíme na mobilní stage instalace, kde je potřeba moderní UI, vzdálená automatizace a flexibilní DMX integrace (USB, Art-Net, SparkFun DMX vstup).
+Profesionální DMX 512 řízení osvětlení a motion prvků, které běží jako Progressive Web App, Python FastAPI backend a volitelný desktopový wrapper (Tauri + PyInstaller). Zaměřujeme se na mobilní stage instalace, kde je potřeba moderní UI, vzdálená automatizace a flexibilní DMX integrace (USB, Art-Net, SparkFun DMX vstup).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PWA Ready](https://img.shields.io/badge/PWA-ready-success.svg)](manifest.json)
@@ -23,13 +23,13 @@ Detailní přehled funkcí: [`docs/FEATURES.md`](docs/FEATURES.md).
 
 ## Technologický stack
 
-| Layer      | Details                                                                 |
-| ---------- | ----------------------------------------------------------------------- |
-| Frontend   | React 19 + TypeScript, Vite 6, Radix UI, Tailwind utilities             |
-| Backend    | FastAPI, Uvicorn, asyncio MQTT, sACN receiver, Enttec USB driver        |
-| Firmware   | `firmware/esp32-dmx-gateway` Arduino sketch (SparkFun DMX shield)       |
-| Desktop    | Tauri 2.x wrapper (Rust) + PyInstaller sidecar (`dmx-backend.exe`)      |
-| Automation | Codex / GPT workflows (`scripts/ai/*`, `docs/AI_AUTOMATION.md`)         |
+| Vrstva    | Detaily                                                                 |
+| --------- | ----------------------------------------------------------------------- |
+| Frontend  | React 19 + TypeScript, Vite 6, Radix UI, Tailwind utilities             |
+| Backend   | FastAPI, Uvicorn, asyncio MQTT, sACN receiver, Enttec USB driver        |
+| Firmware  | `firmware/esp32-dmx-gateway` Arduino sketch (SparkFun DMX shield)       |
+| Desktop   | Tauri 2.x wrapper (Rust) + PyInstaller sidecar (`dmx-backend.exe`)      |
+| Automatizace | Codex / GPT workflowy (`scripts/ai/*`, `docs/AI_AUTOMATION.md`)      |
 
 ---
 
@@ -63,11 +63,11 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 ## DMX integrace
 
 | Mód | Jak zapnout |
-| ---- | ------------- |
+| --- | ----------- |
 | **USB (Enttec/DMXKing)** | `DMX_OUTPUT_MODE=enttec`, případně `DMX_USB_PORT=COM3`. Autodetekce používá FTDI VID/PID. Diagnostika: `GET /usb/devices`, `POST /usb/refresh`, `POST /usb/reconnect`. |
 | **Art-Net & sACN** | `DMX_SACN_ENABLED=true` (E1.31 vstup). `/dmx/test` pošle Art-Net rámec pro rychlé ověření. |
-| **SparkFun DMX input** | Nahraj ESP32 + SparkFun shield sketch z `firmware/esp32-dmx-gateway/`; backend konzumuje DMX -> RGB příkazy. |
-| **DMX autodetect API** | `GET /dmx/devices` spojuje USB + Art-Net discovery, `POST /dmx/test` vyšle jednorázový frame (serial/Art-Net). Využívá ho i desktopový onboarding. |
+| **SparkFun DMX input** | Nahraj ESP32 + SparkFun shield sketch z `firmware/esp32-dmx-gateway/`; backend konzumuje DMX → RGB příkazy. |
+| **DMX autodetect API** | `GET /dmx/devices` spojuje USB + Art-Net discovery, `POST /dmx/test` vyšle jednorázový frame (serial/Art-Net). Využívá to i desktopový onboarding. |
 
 ---
 
@@ -97,11 +97,11 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 
 ---
 
-## Repository structure
+## Struktura repozitáře
 
 ```
 .
-|-- server/             # FastAPI backend, drivers, persistence layers
+|-- server/             # FastAPI backend, drivery, persistence layers
 |-- src/                # React app (Vite)
 |-- desktop/            # Tauri wrapper (Rust + npm workspace)
 |-- firmware/           # ESP32 SparkFun DMX gateway sketch
@@ -136,4 +136,7 @@ Bugreporty, nápady a poznámky z hardware testování posílej přes [GitHub Is
 
 ## Licence
 
-MIT License – viz [LICENSE](LICENSE).
+Projekt vzniká pod vedením společnosti [ActionProps](https://actionprops.cz/) a hlavního autora **Filipa Jelena**  
+📧 `atrep.filip1@gmail.com`
+
+Projekt je licencován pod MIT licencí – viz [LICENSE](LICENSE).
