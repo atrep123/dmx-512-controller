@@ -13,6 +13,12 @@
 - [Progressive Web App](#progressive-web-app)
 - [Pokročilé funkce](#pokročilé-funkce)
 - [AI automatizace](#ai-automatizace)
+- [Technické schopnosti](#technické-schopnosti)
+- [Kapacity a limity](#kapacity-a-limity)
+- [Bezpečnost](#bezpečnost)
+- [Lokalizace](#lokalizace)
+- [Související dokumentace](#související-dokumentace)
+- [Shrnutí](#shrnutí)
 
 ---
 
