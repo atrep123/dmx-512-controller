@@ -40,9 +40,17 @@ services:
     environment:
       - VITE_WS_URL=/ws
       - VITE_API_KEY=${VITE_API_KEY:-demo-key}
+      - CADDY_DOMAIN=${CADDY_DOMAIN:-localhost}
+      - CADDY_EMAIL=${CADDY_EMAIL:-admin@example.com}
     ports:
-      - "5173:80"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
 
 volumes:
   mosquitto_data:
   server_state:
+  caddy_data:
+  caddy_config:

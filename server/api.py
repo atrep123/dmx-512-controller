@@ -6,7 +6,12 @@ import asyncio
 import time
 import json
 import logging
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Callable, TypeVar
+import contextlib
+import socket
+import struct
+
+import serial  # type: ignore
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, PlainTextResponse, Response, StreamingResponse
@@ -28,11 +33,13 @@ from .models import (
     BackupListModel,
     BackupCreateModel,
     BackupRestoreModel,
+    DMXTestRequest,
 )
 from .util.schema import load_schemas
 from .fixtures.mapper import resolve_attrs
 from .util.ulid import ulid_from_string
 from .drivers.enttec import EnttecDMXUSBPro, USBDeviceInfo, find_enttec_device
+from .dmx.autodetect import enumerate_serial_devices, enumerate_artnet_nodes
 from .services.projects import switch_active_project, create_project_backup, list_backups, restore_backup, serialize_project
 from .backups.base import BackupVersion
 
@@ -40,6 +47,7 @@ _schemas = load_schemas()
 
 router = APIRouter()
 logger = logging.getLogger("api")
+T = TypeVar("T")
 
 
 def get_context(request: Request) -> AppContext:
@@ -60,6 +68,19 @@ def get_engine(context: AppContext = Depends(get_context)) -> Engine:
     if context.engine is None:
         raise HTTPException(status_code=503, detail="engine not ready")
     return context.engine
+
+
+async def _run_blocking(func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
+
+async def _safe_enumerate(label: str, func: Callable[[], list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    try:
+        return await _run_blocking(func)
+    except Exception as exc:  # pragma: no cover - defensive logging
+        logger.warning("dmx %s enumeration failed: %s", label, exc)
+        return []
 
 
 def _projects_enabled(context: AppContext) -> None:
@@ -89,6 +110,37 @@ def _serialize_backup(version: BackupVersion) -> dict[str, Any]:
         "provider": version.provider,
         "encrypted": version.encrypted,
     }
+
+
+def _send_dmx_serial_frame(path: str, channel: int, value: int) -> None:
+    frame = bytearray(513)
+    frame[0] = 0  # start code
+    if 1 <= channel <= 512:
+        frame[channel] = value
+    length = len(frame)
+    packet = bytearray([0x7E, 0x06, length & 0xFF, (length >> 8) & 0xFF])
+    packet.extend(frame)
+    packet.append(0xE7)
+    with serial.Serial(path, baudrate=57600, timeout=0.2) as handle:  # type: ignore[attr-defined]
+        handle.write(packet)
+
+
+def _send_artnet_frame(ip: str, channel: int, value: int) -> None:
+    frame = bytearray(512)
+    if 1 <= channel <= 512:
+        frame[channel - 1] = value
+    header = bytearray()
+    header.extend(b"Art-Net\x00")
+    header.extend(struct.pack("<H", 0x5000))
+    header.extend(struct.pack("<H", 14 + len(frame)))
+    header.extend(b"\x00\x00")  # protocol version
+    header.extend(b"\x00\x00")  # sequence + physical
+    header.extend(struct.pack("<H", 0))  # universe
+    header.extend(struct.pack(">H", len(frame)))
+    payload = header + frame
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    with contextlib.closing(sock):
+        sock.sendto(payload, (ip, 6454))
 
 
 def _serialize_usb_device(info: USBDeviceInfo) -> dict[str, Any]:
@@ -143,6 +195,40 @@ async def reconnect_usb_driver(context: AppContext = Depends(get_context)) -> di
     if context.engine is not None:
         context.engine.ola_cb = driver  # type: ignore[assignment]
     return {"port": candidate.port}
+
+
+@router.get("/dmx/devices")
+async def api_list_dmx_devices() -> dict[str, Any]:
+    serial_devices, artnet_nodes = await asyncio.gather(
+        _safe_enumerate("serial", enumerate_serial_devices),
+        _safe_enumerate("artnet", enumerate_artnet_nodes),
+    )
+    return {"serial": serial_devices, "artnet": artnet_nodes}
+
+
+@router.post("/dmx/test")
+async def api_test_dmx(payload: DMXTestRequest) -> dict[str, Any]:
+    channel = payload.channel
+    value = payload.value
+    if payload.type == "serial":
+        if not payload.path:
+            raise HTTPException(status_code=400, detail="serial path required")
+        try:
+            await _run_blocking(_send_dmx_serial_frame, payload.path, channel, value)
+        except Exception as exc:
+            logger.exception("serial DMX test failed for %s: %s", payload.path, exc)
+            raise HTTPException(status_code=502, detail=f"serial test failed: {exc}") from exc
+        target = payload.path
+    else:
+        if not payload.ip:
+            raise HTTPException(status_code=400, detail="artnet ip required")
+        try:
+            await _run_blocking(_send_artnet_frame, payload.ip, channel, value)
+        except Exception as exc:
+            logger.exception("Art-Net DMX test failed for %s: %s", payload.ip, exc)
+            raise HTTPException(status_code=502, detail=f"artnet test failed: {exc}") from exc
+        target = payload.ip
+    return {"status": "ok", "type": payload.type, "target": target, "channel": channel, "value": value}
 
 
 @router.get("/projects", response_model=ProjectsResponse)

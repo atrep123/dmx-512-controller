@@ -1,0 +1,58 @@
+# Desktop Build & Installation
+
+This guide explains how to build the standalone backend executable (`dmx-backend.exe`)
+and how to run it on Windows as part of the desktop wrapper effort.
+
+## 1. Prerequisites
+
+| Requirement | Notes |
+|-------------|-------|
+| Windows 10/11 (x64) | Dev box for building / testing. |
+| Python 3.12 + pip   | Same version we use for the server. |
+| Visual C++ Build Tools | PyInstaller needs the MSVC runtime (already present on most dev boxes). |
+
+Optional but recommended: create a virtual environment before installing build
+dependencies.
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+## 2. Build the backend executable
+
+1. Install dependencies and run PyInstaller:
+
+   ```powershell
+   scripts\build-server-exe.bat
+   ```
+
+   The script installs `server/requirements.txt` (which now contains PyInstaller)
+   and generates the onedir bundle under `server\dist\dmx-backend\`.
+
+2. Výstup je jediný soubor `server\dist\dmx-backend.exe`. PyInstaller onefile obsahuje všechny potřebné zdroje; při startu se rozbalí do `%TEMP%`.
+
+## 3. Running the packaged backend
+
+```powershell
+server\dist\dmx-backend.exe --host 127.0.0.1 --port 8080
+```
+
+Environment variables (`DMX_HOST`, `DMX_PORT`, `DMX_*`) work the same way as in
+the Docker/dev setup. The executable starts uvicorn with the embedded FastAPI
+app, so the UI (Tauri/Electron) can talk to `http://127.0.0.1:8080`.
+
+## 4. Troubleshooting
+
+- **Missing DLLs / VC runtime** – install the “Microsoft Visual C++ Redistributable”
+  or Visual Studio Build Tools.
+- **Config/data files** – `config/patch.yaml` and JSON schemas are bundled automatically,
+  but if you add new data files remember to update `server/desktop.spec`.
+- **Antivirus false positives** – sign the executable before distributing or add the
+  build directory to Defender exclusions during development.
+
+## 5. Next steps
+
+- Integrate the executable as a Tauri sidecar – see `desktop/` folder for the current shell scaffold (npm + tauri).
+- Automate the build in CI (GitHub Actions Windows runner).
+- Add an installer (MSI/EXE) once the shell is ready.

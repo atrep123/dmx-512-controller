@@ -1,21 +1,26 @@
-:80
-encode gzip zstd
-
-root * /srv
-file_server
-
-@api path /rgb* /healthz /readyz /metrics /version /debug*
-reverse_proxy @api server:8080
-
-@ws path /ws
-reverse_proxy @ws server:8080 {
-  header_up Connection {>Connection}
-  header_up Upgrade {>Upgrade}
+{
+    email {$CADDY_EMAIL:admin@example.com}
 }
 
-header {
-  Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
-  X-Frame-Options DENY
-  X-Content-Type-Options nosniff
-  Referrer-Policy same-origin
+{$CADDY_DOMAIN:localhost} {
+    encode gzip zstd
+
+    root * /srv
+    file_server
+
+    @api path /rgb* /healthz /readyz /metrics /version /debug*
+    reverse_proxy @api server:8080
+
+    @ws path /ws
+    reverse_proxy @ws server:8080 {
+        header_up Connection {>Connection}
+        header_up Upgrade {>Upgrade}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        X-Frame-Options DENY
+        X-Content-Type-Options nosniff
+        Referrer-Policy same-origin
+    }
 }

@@ -173,3 +173,55 @@ def test_projects_endpoint_returns_data(test_app: tuple) -> None:
         body = response.json()
         assert body["activeId"] == "p1"
         assert body["projects"][0]["name"] == "Show A"
+
+
+def test_dmx_devices_endpoint_merges_sources(monkeypatch, test_app: tuple) -> None:
+    app, _, _ = test_app
+    monkeypatch.setattr(api_module, "enumerate_serial_devices", lambda: [{"path": "COM5"}])
+    monkeypatch.setattr(api_module, "enumerate_artnet_nodes", lambda: [{"ip": "192.168.1.10"}])
+    with TestClient(app) as client:
+        response = client.get("/dmx/devices")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["serial"][0]["path"] == "COM5"
+        assert body["artnet"][0]["ip"] == "192.168.1.10"
+
+
+def test_dmx_test_endpoint_serial(monkeypatch, test_app: tuple) -> None:
+    app, _, _ = test_app
+    captured: dict[str, Any] = {}
+
+    def fake_send(path: str, channel: int, value: int) -> None:
+        captured["path"] = path
+        captured["channel"] = channel
+        captured["value"] = value
+
+    monkeypatch.setattr(api_module, "_send_dmx_serial_frame", fake_send)
+    with TestClient(app) as client:
+        response = client.post(
+            "/dmx/test",
+            json={"type": "serial", "path": "COM7", "channel": 5, "value": 200},
+        )
+        assert response.status_code == 200
+        assert captured == {"path": "COM7", "channel": 5, "value": 200}
+        body = response.json()
+        assert body["target"] == "COM7"
+
+
+def test_dmx_test_endpoint_artnet(monkeypatch, test_app: tuple) -> None:
+    app, _, _ = test_app
+    captured: dict[str, Any] = {}
+
+    def fake_send(ip: str, channel: int, value: int) -> None:
+        captured["ip"] = ip
+        captured["channel"] = channel
+        captured["value"] = value
+
+    monkeypatch.setattr(api_module, "_send_artnet_frame", fake_send)
+    with TestClient(app) as client:
+        response = client.post(
+            "/dmx/test",
+            json={"type": "artnet", "ip": "10.0.0.5", "channel": 1, "value": 123},
+        )
+        assert response.status_code == 200
+        assert captured == {"ip": "10.0.0.5", "channel": 1, "value": 123}

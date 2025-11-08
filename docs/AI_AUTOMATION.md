@@ -123,3 +123,21 @@ untrusted code before it touches your workstation.
 
 With these pieces in place you can let an AI agent bootstrap features, regenerate boilerplate,
 produce documentation, and still keep the human-in-the-loop bar for quality.
+
+## 7. Desktop DMX helper endpoints
+
+The desktop wrapper and onboarding wizard now rely on two backend APIs so that automation tasks (or
+human QA) can quickly verify device connectivity without wiring custom scripts:
+
+- `GET /dmx/devices` &rightarrow; enumerates USB/serial interfaces (FTDI/ENTTEC/DMXKing) and
+  Art-Net nodes via broadcast ArtPoll. Returns `{ "serial": [...], "artnet": [...] }`. The call is
+  safe to repeat in quick succession and falls back to empty lists if the underlying enumeration
+  raises.
+- `POST /dmx/test` &rightarrow; sends a one-shot DMX frame for sanity checks. Payload examples:
+  - Serial: `{"type":"serial","path":"COM5","channel":1,"value":255}`
+  - Art-Net: `{"type":"artnet","ip":"10.0.0.5","channel":1,"value":200}`
+
+Both operations run their blocking work in worker threads so they are compatible with AI-driven CLI
+loops (Codex/Tauri agents can call them directly before deciding how to patch configs). Any errors
+result in `502` for easier retries, and successes include the `target`, `channel`, and `value` that
+were sent—handy for scripted smoke tests.

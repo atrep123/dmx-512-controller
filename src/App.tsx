@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+import { DesktopOnboarding, ONBOARDING_STORAGE_KEY } from '@/components/DesktopOnboarding'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { saveScenes } from '@/lib/scenesClient'
@@ -36,6 +37,8 @@ function App() {
     const [showError, setShowError] = useState<string | null>(null)
     const [lastExportedAt, setLastExportedAt] = useState<string | number | null>(null)
     const [showDirty, setShowDirty] = useState<boolean>(false)
+    const [isDesktopShell, setIsDesktopShell] = useState<boolean>(false)
+    const [needsDesktopOnboarding, setNeedsDesktopOnboarding] = useState<boolean>(false)
     const isMountedRef = useRef(true)
     const showPersistTimerRef = useRef<number | null>(null)
     const pendingShowSnapshotRef = useRef<ShowSnapshot | null>(null)
@@ -73,6 +76,24 @@ function App() {
             void flushPendingShowSnapshot()
         }
     }, [flushPendingShowSnapshot])
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return
+        }
+        const desktopDetected = '__TAURI_INTERNALS__' in window
+        setIsDesktopShell(desktopDetected)
+        if (!desktopDetected) {
+            setNeedsDesktopOnboarding(false)
+            return
+        }
+        try {
+            const stored = window.localStorage.getItem(ONBOARDING_STORAGE_KEY)
+            setNeedsDesktopOnboarding(!stored)
+        } catch {
+            setNeedsDesktopOnboarding(true)
+        }
+    }, [])
 
     const refreshShow = useCallback(async (): Promise<boolean> => {
         setShowLoading(true)
@@ -244,6 +265,15 @@ function App() {
     )
 
     const tabButtonClass = 'flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 min-h-[48px] rounded-lg text-xs sm:text-sm font-medium transition-colors data-[state=active]:bg-background data-[state=active]:text-foreground'
+
+    if (isDesktopShell && needsDesktopOnboarding) {
+        return (
+            <>
+                <DesktopOnboarding onComplete={() => setNeedsDesktopOnboarding(false)} />
+                <Toaster />
+            </>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground">

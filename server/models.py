@@ -176,6 +176,14 @@ class BackupRestoreModel(BaseModel):
     versionId: str
 
 
+class DMXTestRequest(BaseModel):
+    type: Literal["serial", "artnet"]
+    path: str | None = None
+    ip: str | None = None
+    channel: PositiveInt = Field(1, le=512)
+    value: PositiveInt = Field(255, le=255)
+
+
 __all__ = [
     "RGBCommand",
     "RGBState",
@@ -191,6 +199,7 @@ __all__ = [
     "BackupListModel",
     "BackupCreateModel",
     "BackupRestoreModel",
+    "DMXTestRequest",
     "CMD_SCHEMA",
     "STATE_SCHEMA",
 ]

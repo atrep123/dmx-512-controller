@@ -1,0 +1,14 @@
+{
+  "name": "dmx-desktop-shell",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "prepare:resources": "node scripts/copy-dist.js",
+    "dev": "npm run prepare:resources && tauri dev",
+    "build": "npm run prepare:resources && tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.11"
+  }
+}

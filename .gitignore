@@ -38,3 +38,6 @@ pids
 data/*.json
 tmp/ai-history/
 tmp/ai-output/
+desktop/node_modules/
+desktop/src-tauri/target/
+desktop/src-tauri/resources/app/

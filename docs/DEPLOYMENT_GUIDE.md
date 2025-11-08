@@ -55,6 +55,19 @@ netlify deploy --prod
 ```
 
 **Možnost C: GitHub Pages**
+
+**Možnost D: Docker Compose + Caddy (automatický HTTPS)**
+```bash
+cp infra/.env.example infra/.env
+# uprav CADDY_DOMAIN/CADDY_EMAIL
+cd infra
+docker compose up --build -d
+```
+- Caddy v kontejneru `ui` terminujete HTTP(S) a proxyje backend.
+- Nastav `CADDY_DOMAIN` na svou doménu a otevři porty `80/443`.
+- Certifikáty se ukládají do volumes `caddy_data`/`caddy_config`, vydrží i po restartu.
+- Pokud ponecháš `CADDY_DOMAIN=localhost`, běží čistě HTTP (lokální vývoj).
+
 1. Push kódu na GitHub
 2. Jděte do Settings → Pages
 3. Vyberte branch `main` a složku `/root`
@@ -233,9 +246,19 @@ Po spuštění sledujte:
 ## 🔐 Bezpečnost
 
 ### HTTPS
-- **POVINNÉ** pro PWA
-- Většina hostingů poskytuje SSL zdarma
-- Never hostovat na HTTP
+- **POVINNÉ** pro PWA – nikdy nenasazuj jen na HTTP
+- Docker/Caddy varianta získá cert automaticky (jen nastav `CADDY_DOMAIN` a směruj DNS)
+- Pro lokální vývoj můžeš zůstat na `http://localhost` nebo použít self-signed certy ve Vite:
+  ```ts
+  export default defineConfig({
+    server: {
+      https: {
+        key: './cert/dev.key',
+        cert: './cert/dev.crt',
+      },
+    },
+  });
+  ```
 
 ### Content Security Policy
 Přidejte do `index.html` pro lepší bezpečnost:

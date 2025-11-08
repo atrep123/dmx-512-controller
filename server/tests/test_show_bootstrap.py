@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from server.app import _load_scenes_from_store, _load_show_snapshot
+from server.services.data import load_scenes, load_show_snapshot
 from server.persistence.scenes import ScenesStore
 from server.persistence.show import ShowStore
 
@@ -22,7 +22,7 @@ async def test_load_scenes_from_store_validates_payload(tmp_path) -> None:
         ]
     )
 
-    scenes = await _load_scenes_from_store(store)
+    scenes = await load_scenes(store)
 
     assert len(scenes) == 1
     assert scenes[0]["id"] == "scene-ok"
@@ -50,7 +50,7 @@ async def test_load_show_snapshot_sanitizes_lists(tmp_path) -> None:
     }
     await store.save(payload)
 
-    snapshot = await _load_show_snapshot(store)
+    snapshot = await load_show_snapshot(store)
 
     assert snapshot["universes"] == [{"id": "u1"}]
     assert snapshot["fixtures"] == [{"id": "fx1"}]
