@@ -8,6 +8,7 @@ Vítejte v dokumentaci DMX 512 Kontrolér projektu! Zde najdete veškeré inform
 
 | Dokument | Popis | Úroveň |
 |----------|-------|--------|
+| [**Features**](FEATURES.md) | Kompletní přehled všech funkcí a schopností | Všichni |
 | [**User Guide**](USER_GUIDE.md) | Kompletní návod k použití aplikace | Začátečník |
 | [**Quick Start Android**](QUICKSTART_ANDROID.md) | Rychlý start pro Android zařízení | Začátečník |
 | [**Android Setup**](ANDROID_SETUP.md) | Detailní instalace na Android | Pokročilý |
