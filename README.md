@@ -391,6 +391,7 @@ npm run optimize     # Vite optimalizace
 
 ## đź“– Dokumentace
 
+- **[FEATURES.md](docs/FEATURES.md)** - Kompletní přehled všech funkcí a schopností
 - **[PRD.md](PRD.md)** - Product Requirements Document s kompletnĂ­m designem
 - **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** - NĂˇvod na deployment
 - **[ANDROID_SETUP.md](ANDROID_SETUP.md)** - NastavenĂ­ pro Android
