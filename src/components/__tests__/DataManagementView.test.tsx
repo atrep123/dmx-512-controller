@@ -3,6 +3,11 @@ import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DataManagementView from '../DataManagementView'
+import { useState } from 'react'
+
+vi.mock('@github/spark/hooks', () => ({
+  useKV: <T,>(key: string, initial: T) => useState(initial),
+}))
 
 vi.mock('@/lib/projectsClient', () => {
   const now = Date.now()

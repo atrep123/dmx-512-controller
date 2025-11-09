@@ -14,6 +14,11 @@ from server.drivers.enttec import (
 )
 
 
+@pytest.fixture(name="anyio_backend")
+def anyio_backend_fixture():
+    return "asyncio"
+
+
 def test_enttec_packet_structure() -> None:
     driver = EnttecDMXUSBPro("COM1", fps=30)
     packet = driver._build_packet((10, 20, 30))
@@ -38,7 +43,7 @@ def test_find_enttec_device_prefers_vendor_match(monkeypatch: pytest.MonkeyPatch
     assert found.port == "COMY"
 
 
-@pytest.mark.anyio
+@pytest.mark.anyio("asyncio")
 async def test_usb_monitor_refresh(monkeypatch: pytest.MonkeyPatch) -> None:
     sequence = [
         [USBDeviceInfo(port="A", vid=1, pid=2, manufacturer=None, product=None, serial_number=None)],

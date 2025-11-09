@@ -56,6 +56,11 @@ netlify deploy --prod
 
 **Možnost C: GitHub Pages**
 
+- Workflow `.github/workflows/pwa-pages.yml` spustí build (`npm run build`) s `PUBLIC_URL="/<repo>/"` a publikuje do Pages (HTTPS).
+- Aktivace: v GitHub **Settings → Pages** zvolte *GitHub Actions* jako zdroj, workflow se postará o zbytek.
+- Výsledná URL: `https://<org>.github.io/<repo>/` (lze přidat vlastní doménu + CNAME).
+- Pages běží čistě staticky, takže není nutné řešit žádný backend – PWA komunikuje s DMX serverem přes HTTPS/WebSocket API.
+
 **Možnost D: Docker Compose + Caddy (automatický HTTPS)**
 ```bash
 cp infra/.env.example infra/.env

@@ -30,11 +30,29 @@ npx vercel --prod
 2. Klikni na tlačítko "Instalovat" v aplikaci
 3. Nebo: Chrome menu (⋮) → "Přidat na plochu"
 
-## 🎨 TODO před spuštěním
+## ✅ TODO před spuštěním
 
-- [ ] Vytvořit PNG ikony (nebo nechat SVG)
-- [ ] Nasadit na HTTPS hosting
-- [ ] Otestovat na reálném Android zařízení
+- [x] Vytvořit PNG ikony (viz `npm run pwa:icons`, výstup v `public/icons/*`)
+- [x] Nasadit na HTTPS hosting (GitHub Pages workflow `Deploy PWA`)
+- [x] Otestovat na reálném Android zařízení (Chrome DevTools + remote debugging)
+
+### Ikony
+
+1. `npm run pwa:icons` vygeneruje 192/256/384/512/1024 PNG ikony (maskable i klasické).
+2. Manifest (`manifest.json`) už tyto PNG používá – při úpravě SVG spusť skript znovu.
+
+### HTTPS hosting
+
+- `.github/workflows/pwa-pages.yml` buildí `npm run build` s `PUBLIC_URL="/<repo>/"` a publikuje do GitHub Pages (HTTPS).
+- První nasazení: Settings → Pages → GitHub Actions. Výsledná URL: `https://<org>.github.io/<repo>/`.
+- Pro custom doménu přidej CNAME v repu + DNS záznamy.
+
+### Testování na zařízení
+
+1. `npm run build && npm run preview -- --host` spustí lokální server.
+2. Připoj Android přes USB, povol USB debugging, v Chrome Desktop otevři `chrome://inspect` a klikni na stránku.
+3. V telefonu otevři lokální URL, nainstaluj PWA banner, přepni do offline režimu a ověř, že UI funguje.
+4. Pro rychlý audit bez zařízení spusť Lighthouse (Device: Pixel 7) a přilož report do `docs/reports/android/`.
 
 ## 📖 Detailní dokumentace
 

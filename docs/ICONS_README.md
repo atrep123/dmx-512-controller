@@ -129,6 +129,4 @@ Run PWA audit to verify icon requirements:
 
 ## Current Status
 
-⚠️ **Action Required**: Icon files need to be created and placed in `/public` directory.
-
-The application is currently configured to use these icons, but they don't exist yet. Create them based on the guidelines above.
+✅ PNG ikony se generují z `public/icon.svg` pomocí `npm run pwa:icons`. Výsledky jsou v `public/icons` a manifest je už využívá. Při každé změně SVG spusť skript znovu a commitni nové PNG soubory.

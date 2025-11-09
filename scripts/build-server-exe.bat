@@ -3,7 +3,8 @@ setlocal
 
 REM Usage: scripts\build-server-exe.bat
 
-pushd %~dp0\..
+for %%I in ("%~dp0..") do set "DMX_PROJECT_ROOT=%%~fI"
+pushd "%DMX_PROJECT_ROOT%"
 if not exist .venv (
     echo [i] Consider creating a virtualenv to keep build deps isolated.
 )
@@ -12,8 +13,13 @@ echo [1/3] Installing backend dependencies (including PyInstaller)...
 python -m pip install --upgrade pip >nul
 python -m pip install -r server/requirements.txt
 
-echo [2/3] Building PyInstaller onefile bundle...
-pyinstaller --noconfirm --onefile --clean server/desktop.spec
+echo [2/3] Building PyInstaller bundle...
+pyinstaller ^
+    --noconfirm ^
+    --clean ^
+    --distpath "%DMX_PROJECT_ROOT%\server\dist" ^
+    --workpath "%DMX_PROJECT_ROOT%\server\build" ^
+    "%DMX_PROJECT_ROOT%\server\desktop.spec"
 if errorlevel 1 (
     echo Build failed.
     popd

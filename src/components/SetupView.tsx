@@ -1,4 +1,4 @@
-import { Universe, Fixture, DMXChannel } from '@/lib/types'
+import { Universe, Fixture, DMXChannel, Scene, Effect } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,16 +10,29 @@ import { Plus, Trash, Lightbulb } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { fixtureTemplates, findFixtureTemplate } from '@/lib/fixtureTemplates'
+import MidiPanel from '@/components/MidiPanel'
+import MidiMappingsPanel from '@/components/MidiMappingsPanel'
+import { DesktopBackendConsole } from '@/components/DesktopBackendConsole'
 
 interface SetupViewProps {
     universes: Universe[]
     setUniverses: (updater: (universes: Universe[]) => Universe[]) => void
     fixtures: Fixture[]
     setFixtures: (updater: (fixtures: Fixture[]) => Fixture[]) => void
+    scenes: Scene[]
+    effects: Effect[]
     onRestartDesktopWizard?: () => void
 }
 
-export default function SetupView({ universes, setUniverses, fixtures, setFixtures, onRestartDesktopWizard }: SetupViewProps) {
+export default function SetupView({
+    universes,
+    setUniverses,
+    fixtures,
+    setFixtures,
+    scenes,
+    effects,
+    onRestartDesktopWizard,
+}: SetupViewProps) {
     const [isUniverseDialogOpen, setIsUniverseDialogOpen] = useState(false)
     const [isFixtureDialogOpen, setIsFixtureDialogOpen] = useState(false)
     const [universeName, setUniverseName] = useState('')
@@ -490,6 +503,11 @@ const deleteFixture = (fixtureId: string) => {
                         })}
                     </div>
                 )}
+            </div>
+            <div className="mt-6 space-y-6">
+                <MidiPanel />
+                <MidiMappingsPanel scenes={scenes} effects={effects} />
+                <DesktopBackendConsole />
             </div>
         </div>
     )

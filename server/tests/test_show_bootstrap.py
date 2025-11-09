@@ -39,6 +39,14 @@ async def test_load_show_snapshot_sanitizes_lists(tmp_path) -> None:
         "effects": "nope",
         "stepperMotors": [{"id": "m1"}],
         "servos": [{"id": "s1"}],
+        "midiMappings": [
+            {
+                "id": "m1",
+                "command": "controlchange",
+                "controller": 7,
+                "action": {"type": "channel", "channel": 3},
+            }
+        ],
         "scenes": [
             {
                 "id": "scene-ok",
@@ -57,4 +65,5 @@ async def test_load_show_snapshot_sanitizes_lists(tmp_path) -> None:
     assert snapshot["effects"] == []  # coerced to list
     assert snapshot["stepperMotors"] == [{"id": "m1"}]
     assert snapshot["servos"] == [{"id": "s1"}]
+    assert snapshot["midiMappings"][0]["id"] == "m1"
     assert snapshot["scenes"][0]["id"] == "scene-ok"

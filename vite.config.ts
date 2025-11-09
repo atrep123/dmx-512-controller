@@ -4,23 +4,35 @@ import { defineConfig, PluginOption } from "vite";
 
 import sparkPlugin from "@github/spark/spark-vite-plugin";
 import createIconImportProxy from "@github/spark/vitePhosphorIconProxyPlugin";
-import { resolve } from 'path'
+import { resolve } from "path";
+import { realpathSync } from "node:fs";
 
-const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
+const projectRoot = realpathSync(process.env.PROJECT_ROOT || import.meta.dirname);
+const baseHref = process.env.PUBLIC_URL || "/";
+const serverPort = Number(process.env.PORT || 5173);
+
+if (process.cwd() !== projectRoot) {
+  process.chdir(projectRoot);
+}
 
 // https://vite.dev/config/
 export default defineConfig({
+  root: projectRoot,
+  base: baseHref,
   plugins: [
     react(),
     tailwindcss(),
     // DO NOT REMOVE
     createIconImportProxy() as PluginOption,
-    sparkPlugin() as PluginOption,
+    sparkPlugin({ port: serverPort }) as PluginOption,
   ],
   server: {
+    port: serverPort,
+    strictPort: true,
+    host: "localhost",
     proxy: {
-      '^/(ws|rgb|command|state|healthz|readyz|metrics|version|debug)': {
-        target: 'http://localhost:8080',
+      "^/(ws|rgb|command|state|healthz|readyz|metrics|version|debug)": {
+        target: "http://localhost:8080",
         changeOrigin: true,
         ws: true,
       },
@@ -39,7 +51,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(projectRoot, 'src')
-    }
+      "@": resolve(projectRoot, "src"),
+    },
   },
 });

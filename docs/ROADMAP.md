@@ -133,12 +133,14 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 ### NovĂ© funkce
 
 #### 1. MIDI Input đźŽ›ď¸Ź VysokĂˇ priorita
-- [ ] Web MIDI API integration
-- [ ] MIDI device detection
+- [x] Web MIDI API integration
+- [x] MIDI device detection
 - [ ] MIDI learn funkce
-- [ ] Fader mapping
-- [ ] Button mapping
+- [x] Fader mapping (CC → DMX kanĂˇly)
+- [x] Button mapping (note-on → scĂ©ny/efekty)
 - [ ] Encoder support
+
+> ✅ **Preview dostupné**: Web MIDI bridge (Nastavení → karta „MIDI (preview)“) už umí číst vstupní zprávy v Chromu/HTTPS. Sbíráme feedback v issue [#421](https://github.com/atrep123/dmx-512-controller/issues/421).
 
 **PodporovanĂ© kontrolĂ©ry:**
 - AKAI APC mini/40
@@ -147,15 +149,16 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 - Generic MIDI controllers
 
 #### 2. MIDI Mapping đź”— VysokĂˇ priorita
-- [ ] Visual mapping interface
-- [ ] Save/load mappings
+- [x] Visual mapping interface
+- [x] Save/load mappings (IndexedDB + show snapshot)
 - [ ] Multiple mapping profiles
 - [ ] MIDI feedback (LED sync)
 
-**MapovatelnĂ© funkce:**
+**MapovatelnĂ© funkce (preview):**
 - Channel faders â†’ MIDI CC
 - Scene triggers â†’ MIDI notes
-- Effect toggle â†’ MIDI notes
+- Effect toggle/intensity â†’ MIDI notes & CC
+- Master dimmer â†’ MIDI CC
 - Color picker â†’ MIDI encoder
 
 #### 3. MIDI Clock Sync âŹ±ď¸Ź StĹ™ednĂ­ priorita

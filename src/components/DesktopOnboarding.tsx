@@ -18,6 +18,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/lib/i18n'
 import {
   Broadcast,
   CheckCircle,
@@ -30,16 +31,40 @@ import {
 
 export const ONBOARDING_STORAGE_KEY = 'desktop.onboarding'
 
-const STEPS = [
-  { id: 'welcome', title: 'Vítej v Atmosfil Desktop', description: 'Nastavíme DMX uzly, ochranu a aktualizace.' },
-  { id: 'consent', title: 'Licence a diagnostika', description: 'Potvrď podmínky a sběr anonymních logů.' },
-  { id: 'detect', title: 'Detekce DMX zařízení', description: 'Prohledáme USB/Art-Net a připravíme test.' },
-  { id: 'test', title: 'Ověření výstupu', description: 'Vyšleme krátký DMX impuls na zvolený kanál.' },
-  { id: 'channel', title: 'Aktualizační kanál', description: 'Zvol beta nebo stable feed pro auto-update.' },
-  { id: 'finish', title: 'Hotovo', description: 'Uložíme nastavení a spustíme hlavní aplikaci.' },
+const STEP_DEFS = [
+  {
+    id: 'welcome',
+    titleKey: 'desktop.onboarding.steps.welcome.title',
+    descriptionKey: 'desktop.onboarding.steps.welcome.description',
+  },
+  {
+    id: 'consent',
+    titleKey: 'desktop.onboarding.steps.consent.title',
+    descriptionKey: 'desktop.onboarding.steps.consent.description',
+  },
+  {
+    id: 'detect',
+    titleKey: 'desktop.onboarding.steps.detect.title',
+    descriptionKey: 'desktop.onboarding.steps.detect.description',
+  },
+  {
+    id: 'test',
+    titleKey: 'desktop.onboarding.steps.test.title',
+    descriptionKey: 'desktop.onboarding.steps.test.description',
+  },
+  {
+    id: 'channel',
+    titleKey: 'desktop.onboarding.steps.channel.title',
+    descriptionKey: 'desktop.onboarding.steps.channel.description',
+  },
+  {
+    id: 'finish',
+    titleKey: 'desktop.onboarding.steps.finish.title',
+    descriptionKey: 'desktop.onboarding.steps.finish.description',
+  },
 ] as const
 
-type StepId = (typeof STEPS)[number]['id']
+type StepId = (typeof STEP_DEFS)[number]['id']
 
 type SerialDevice = {
   type: 'serial'
@@ -125,6 +150,7 @@ function DeviceCard({
 }
 
 export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
+  const { t } = useI18n()
   const [stepIndex, setStepIndex] = useState(0)
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [telemetryOptIn, setTelemetryOptIn] = useState(false)
@@ -146,9 +172,20 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     return '__TAURI_INTERNALS__' in window ? 'http://127.0.0.1:8080' : ''
   }, [])
 
-  const step = STEPS[stepIndex]
-  const progressValue = (stepIndex / (STEPS.length - 1)) * 100
-  const isLastStep = stepIndex === STEPS.length - 1
+  const steps = useMemo(
+    () =>
+      STEP_DEFS.map((entry) => ({
+        id: entry.id,
+        title: t(entry.titleKey),
+        description: t(entry.descriptionKey),
+      })),
+    [t]
+  )
+  const totalSteps = steps.length || 1
+  const fallbackStep = steps[0] ?? { id: STEP_DEFS[0].id, title: '', description: '' }
+  const step = steps[Math.min(stepIndex, totalSteps - 1)] ?? fallbackStep
+  const progressValue = ((stepIndex + 1) / totalSteps) * 100
+  const isLastStep = stepIndex >= totalSteps - 1
 
   const buildUrl = useCallback(
     (path: string) => {
@@ -222,7 +259,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
       } catch (error) {
         console.warn('desktop_prefs_load_failed', error)
         if (!cancelled) {
-          setPrefsError('Nepodařilo se načíst uložené nastavení.')
+          setPrefsError(t('desktop.onboarding.error.load_prefs'))
         }
       } finally {
         if (!cancelled) {
@@ -234,7 +271,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     return () => {
       cancelled = true
     }
-  }, [buildUrl, prefsHydrated])
+  }, [buildUrl, prefsHydrated, t])
 
   const persistPreferences = useCallback(
     async (payload: DesktopPreferencesPayload) => {
@@ -250,10 +287,10 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
         }
       } catch (error) {
         console.warn('desktop_prefs_save_failed', error)
-        toast.error('Nepodařilo se uložit desktopové nastavení')
+        toast.error(t('desktop.onboarding.error.save_prefs'))
       }
     },
-    [buildUrl]
+    [buildUrl, t]
   )
 
   const allDevices: DiscoveredDevice[] = useMemo(
@@ -280,7 +317,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
     if (isLastStep) {
       void finishOnboarding()
     } else {
-      setStepIndex((prev) => Math.min(prev + 1, STEPS.length - 1))
+      setStepIndex((prev) => Math.min(prev + 1, totalSteps - 1))
     }
   }
 
@@ -319,13 +356,13 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
       }
     }
     await persistPreferences({ channel: updateChannel, telemetryOptIn, completedAt })
-    toast.success('Desktop průvodce dokončen. Spouštíme aplikaci.')
+    toast.success(t('desktop.onboarding.toast.complete'))
     onComplete?.()
-  }, [onComplete, persistPreferences, selectedDevice, telemetryOptIn, updateChannel])
+  }, [onComplete, persistPreferences, selectedDevice, telemetryOptIn, t, updateChannel])
 
   const handleTest = async () => {
     if (!selectedDevice) {
-      toast.error('Vyber zařízení pro test DMX rámce.')
+      toast.error(t('desktop.onboarding.toast.no_device'))
       return
     }
 
@@ -357,12 +394,12 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
       }
       const body = (await response.json()) as { target: string }
       setTestStatus('success')
-      setTestMessage(`Rámec doručen (${body.target})`)
-      toast.success('Testovací DMX rámec odeslán')
+      setTestMessage(t('desktop.onboarding.test.success', { target: body.target }))
+      toast.success(t('desktop.onboarding.toast.test_success'))
     } catch (error) {
       setTestStatus('error')
-      setTestMessage(error instanceof Error ? error.message : 'Test DMX selhal')
-      toast.error('DMX test selhal – zkontroluj kabeláž nebo IP adresu.')
+      setTestMessage(error instanceof Error ? error.message : t('desktop.onboarding.test.errorUnknown'))
+      toast.error(t('desktop.onboarding.toast.test_error'))
     }
   }
 
@@ -537,27 +574,24 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
             {!prefsHydrated ? (
               <div className="flex items-center gap-2 rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
                 <CircleNotch className="animate-spin" size={14} />
-                Načítám uložené nastavení…
+                {t('desktop.onboarding.status.loadingPrefs')}
               </div>
             ) : prefsError ? (
               <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
                 {prefsError}
               </div>
             ) : null}
-            <p className="text-sm text-muted-foreground">
-              Tauri updater kontroluje GitHub Releases. Stable kanál obsahuje podepsané buildy po QA, beta přináší nejnovější
-              DMX funkce (může být méně stabilní).
-            </p>
+            <p className="text-sm text-muted-foreground">{t('desktop.onboarding.channel.helper')}</p>
             <RadioGroup value={updateChannel} onValueChange={(value) => setUpdateChannel(value as UpdateChannel)}>
               <div className="rounded-xl border p-4 opacity-100">
                 <div className="flex items-start gap-3">
                   <RadioGroupItem id="channel-stable" value="stable" className="mt-1" />
                   <div>
                     <Label htmlFor="channel-stable" className="font-medium">
-                      Stable
+                      {t('desktop.onboarding.channel.stable.title')}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Doporučeno pro živé eventy. Aktualizace jen po plné QA.
+                      {t('desktop.onboarding.channel.stable.description')}
                     </p>
                   </div>
                 </div>
@@ -567,10 +601,10 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
                   <RadioGroupItem id="channel-beta" value="beta" className="mt-1" />
                   <div>
                     <Label htmlFor="channel-beta" className="font-medium flex items-center gap-1">
-                      Beta <Sparkle size={14} className="text-primary" />
+                      {t('desktop.onboarding.channel.beta.title')} <Sparkle size={14} className="text-primary" />
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Nejnovější funkce (wizard, timecode, AI asistence). Může obsahovat breaking changes.
+                      {t('desktop.onboarding.channel.beta.description')}
                     </p>
                   </div>
                 </div>
@@ -582,17 +616,27 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
         return (
           <div className="space-y-4">
             <div className="rounded-xl border p-4">
-              <p className="text-sm font-semibold">Shrnutí</p>
+              <p className="text-sm font-semibold">{t('desktop.onboarding.summary.title')}</p>
               <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                <li>• Zařízení: {selectedDevice ? buildDeviceLabel(selectedDevice) : 'není vybráno'}</li>
-                <li>• Telemetrie: {telemetryOptIn ? 'zapnuta' : 'vypnuta'}</li>
-                <li>• Update kanál: {updateChannel === 'beta' ? 'beta' : 'stable'}</li>
+                <li>
+                  • {t('desktop.onboarding.summary.device')}:{' '}
+                  {selectedDevice ? buildDeviceLabel(selectedDevice) : t('desktop.onboarding.summary.device.none')}
+                </li>
+                <li>
+                  • {t('desktop.onboarding.summary.telemetry')}:{' '}
+                  {telemetryOptIn
+                    ? t('desktop.onboarding.summary.telemetry.enabled')
+                    : t('desktop.onboarding.summary.telemetry.disabled')}
+                </li>
+                <li>
+                  • {t('desktop.onboarding.summary.channel')}:{' '}
+                  {updateChannel === 'beta'
+                    ? t('desktop.onboarding.channel.beta.title')
+                    : t('desktop.onboarding.channel.stable.title')}
+                </li>
               </ul>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Po dokončení spustíme hlavní UI, backend zůstane běžet jako sidecar (PyInstaller). Průvodce můžete kdykoliv znovu otevřít
-              v Nastavení &gt; Desktop.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('desktop.onboarding.summary.body')}</p>
           </div>
         )
       default:
@@ -610,7 +654,7 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
             <div className="mt-4">
               <Progress value={progressValue} />
               <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                {STEPS.map((entry, index) => (
+                {steps.map((entry, index) => (
                   <span
                     key={entry.id}
                     className={cn(
@@ -627,14 +671,14 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
           <CardContent>{renderStepContent()}</CardContent>
           <CardFooter className="flex items-center justify-between">
             <Button variant="ghost" disabled={stepIndex === 0} onClick={goBack}>
-              Zpět
+              {t('desktop.onboarding.actions.back')}
             </Button>
             <div className="flex items-center gap-3">
               {step.id === 'finish' ? (
-                <Button onClick={() => void finishOnboarding()}>Dokončit a spustit</Button>
+                <Button onClick={() => void finishOnboarding()}>{t('desktop.onboarding.actions.finish')}</Button>
               ) : (
                 <Button onClick={goNext} disabled={nextDisabled}>
-                  Pokračovat
+                  {t('desktop.onboarding.actions.next')}
                 </Button>
               )}
             </div>

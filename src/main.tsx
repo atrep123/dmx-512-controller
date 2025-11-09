@@ -5,6 +5,7 @@ import "@github/spark/spark"
 import App from './App.tsx'
 import { ErrorFallback } from './ErrorFallback.tsx'
 import { ThemeProvider } from './components/ThemeProvider'
+import { I18nProvider } from './lib/i18n'
 
 import "./main.css"
 import "./styles/theme.css"
@@ -12,8 +13,10 @@ import "./index.css"
 
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider>
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <App />
-    </ErrorBoundary>
+    <I18nProvider>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <App />
+      </ErrorBoundary>
+    </I18nProvider>
   </ThemeProvider>
 )

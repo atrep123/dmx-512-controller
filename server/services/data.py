@@ -49,6 +49,7 @@ async def load_show_snapshot(store: ShowStore | None) -> dict[str, Any]:
         "effects": raw.get("effects") if isinstance(raw.get("effects"), list) else [],
         "stepperMotors": raw.get("stepperMotors") if isinstance(raw.get("stepperMotors"), list) else [],
         "servos": raw.get("servos") if isinstance(raw.get("servos"), list) else [],
+        "midiMappings": raw.get("midiMappings") if isinstance(raw.get("midiMappings"), list) else [],
         "scenes": sanitize_scene_list(raw.get("scenes")),
     }
     return snapshot

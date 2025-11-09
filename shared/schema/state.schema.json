@@ -12,6 +12,14 @@
         "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 255 }
       }
     },
+    "universesSparse": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    },
+    "sparse": { "type": "boolean" },
     "motors": {
       "type": "object",
       "additionalProperties": {
@@ -39,4 +47,3 @@
   "required": ["ts", "universes"],
   "additionalProperties": false
 }
-

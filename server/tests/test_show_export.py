@@ -2,6 +2,13 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+MIDI_MAPPING = {
+    "id": "m1",
+    "command": "controlchange",
+    "controller": 12,
+    "action": {"type": "channel", "channel": 1},
+}
+
 
 def test_export_returns_snapshot(test_app: tuple) -> None:
     app, context, _ = test_app
@@ -13,6 +20,7 @@ def test_export_returns_snapshot(test_app: tuple) -> None:
         "effects": [],
         "stepperMotors": [],
         "servos": [],
+        "midiMappings": [MIDI_MAPPING],
         "scenes": [
             {
                 "id": "scene-1",
@@ -28,6 +36,7 @@ def test_export_returns_snapshot(test_app: tuple) -> None:
         body = response.json()
         assert body["scenes"][0]["id"] == "scene-1"
         assert body["universes"][0]["id"] == "u1"
+        assert body["midiMappings"][0]["id"] == "m1"
 
 
 def test_import_show_updates_scenes_store(test_app: tuple) -> None:
@@ -40,6 +49,14 @@ def test_import_show_updates_scenes_store(test_app: tuple) -> None:
         "effects": [],
         "stepperMotors": [],
         "servos": [],
+        "midiMappings": [
+            {
+                "id": "m-in",
+                "command": "controlchange",
+                "controller": 10,
+                "action": {"type": "channel", "channel": 5},
+            }
+        ],
         "scenes": [
             {
                 "id": "scene-new",
@@ -54,8 +71,10 @@ def test_import_show_updates_scenes_store(test_app: tuple) -> None:
         assert resp.status_code == 200
         data = resp.json()
         assert data["scenes"][0]["id"] == "scene-new"
+        assert data["midiMappings"][0]["id"] == "m-in"
         assert context.scenes[0]["name"] == "Showtime"
         assert context.show_snapshot["scenes"][0]["id"] == "scene-new"
+        assert context.show_snapshot["midiMappings"][0]["id"] == "m-in"
         scenes_file = context.scenes_store.path
         assert scenes_file.exists()
         assert "scene-new" in scenes_file.read_text("utf-8")

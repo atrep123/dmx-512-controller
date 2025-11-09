@@ -1,58 +1,37 @@
 {
-  "package": {
-    "productName": "Atmosfil DMX Desktop",
-    "version": "0.1.0"
-  },
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeDevCommand": "npm run prepare:resources",
     "beforeBuildCommand": "npm run prepare:resources",
-    "devPath": "http://localhost:5173",
-    "distDir": "../resources/app"
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../resources/app"
   },
-  "tauri": {
-    "bundle": {
-      "active": true,
-      "identifier": "cz.atmosfil.dmx",
-      "icon": [
-        "../../public/favicon.ico"
-      ],
-      "targets": [
-        "msi",
-        "nsis"
-      ],
-      "resources": [
-        "../resources/license.rtf"
-      ],
-      "externalBin": [
-        "../resources/bin/dmx-backend.exe"
-      ],
-      "windows": {
-        "wix": {
-          "fragmentPaths": [],
-          "language": "en-US",
-          "template": null,
-          "license": "../resources/license.rtf"
-        },
-        "nsis": {
-          "installerIcon": "../resources/icon.ico",
-          "displayLanguageSelector": true
-        }
-      }
-    },
+  "productName": "Atmosfil DMX Desktop",
+  "version": "0.1.0",
+  "identifier": "cz.atmosfil.dmx",
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "icon": ["../../public/favicon.ico"],
+    "resources": ["../resources/license.rtf"],
+    "externalBin": ["../resources/bin/dmx-backend.exe"]
+  },
+  "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
         "title": "Atmosfil DMX Desktop",
         "width": 1280,
         "height": 800,
-        "fullscreen": false,
         "resizable": true,
+        "fullscreen": false,
         "visible": false
       },
       {
         "label": "splash",
+        "title": "Atmosfil DMX — Loading",
         "url": "splash.html",
-        "title": "Atmosfil DMX – Loading",
         "width": 400,
         "height": 260,
         "resizable": false,
@@ -60,41 +39,20 @@
         "alwaysOnTop": true
       }
     ],
-    "allowlist": {
-      "shell": {
-        "all": false,
-        "sidecar": true
-      },
-      "http": {
-        "all": true
-      }
-    },
-    "updater": {
-      "active": true,
-      "endpoints": [
-        "http://127.0.0.1:8080/desktop/update-feed"
-      ],
-      "dialog": false,
-      "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY_BASE64"
-    },
-    "systemTray": {
+    "trayIcon": {
       "iconPath": "../../public/favicon.ico",
       "iconAsTemplate": true
     },
     "security": {
       "csp": "default-src 'self'; img-src 'self' data: https://*; script-src 'self'; style-src 'self' 'unsafe-inline'"
-    },
-    "sidecar": [
-      {
-        "id": "dmx-backend",
-        "path": "../resources/bin/dmx-backend.exe",
-        "args": [
-          "--host",
-          "127.0.0.1",
-          "--port",
-          "8080"
-        ]
-      }
-    ]
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": ["http://127.0.0.1:8080/desktop/update-feed"],
+      "dialog": false,
+      "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY_BASE64"
+    }
   }
 }

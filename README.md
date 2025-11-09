@@ -121,12 +121,45 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 
 ## Užitečné dokumenty
 
-- `docs/FEATURES.md` – kompletní seznam funkcí (osvětlení, motion, automaty, limity).
-- `docs/AI_AUTOMATION.md` – autonomní Codex / GPT workflowy, CI/cron příklady.
-- `docs/DESKTOP_INSTALL.md` – PyInstaller + Tauri build guide a poznámky k updateru.
-- `docs/DESKTOP_WRAPPER_PLAN.md` – roadmapa desktop verze (signing, CI, QA).
-- `docs/DEPLOYMENT_GUIDE.md` – deployment backendu (Docker, infra/Caddy).
-- `docs/TROUBLESHOOTING.md` – rady pro DMX hardware, firewall a ovladače.
+- docs/FEATURES.md – kompletní seznam funkcí (osvětlení, motion, automaty, limity).
+- docs/AI_AUTOMATION.md – autonomní Codex / GPT workflowy, CI/cron příklady.
+- docs/DESKTOP_INSTALL.md – PyInstaller + Tauri build guide a poznámky k updateru.
+- docs/DESKTOP_WRAPPER_PLAN.md – roadmapa desktop verze (signing, CI, QA).
+- docs/DEPLOYMENT_GUIDE.md – deployment backendu (Docker, infra/Caddy).
+- docs/TROUBLESHOOTING.md – rady pro DMX hardware, firewall a ovladače.
+- docs/ROADMAP.md – dlouhodobá roadmapa (MIDI, OSC, timecode, multi-user, cloud backup).
+- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa – stav rozpracovaných funkcí s odkazy na GitHub issues.
+- docs/FAQ.md – nejčastější otázky + přímé odkazy na roadmapové požadavky.
+
+## Roadmap & advanced funkce
+
+Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme veřejně:
+
+- docs/ROADMAP.md (sekce V1.2–V2.0) + issues [#421](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [#422](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [#423](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [#318](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user).
+- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa a docs/FAQ.md – shrnutí pro koncové uživatele (včetně MIDI preview panelu v Nastavení).
+- docs/FEATURES.md#web-midi-preview – detail Web MIDI bridge + mapování (custom event `dmx-midi`, fallback CC0→kanál1, atd.).
+- Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
+
+
+
+## Roadmap & advanced funkce
+
+Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme veřejně:
+
+- docs/ROADMAP.md (sekce V1.2–V2.0) + issues [#421](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [#422](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [#423](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [#318](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user).
+- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa a docs/FAQ.md – shrnutí pro koncové uživatele.
+- Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
+
+
+
+## Roadmap & advanced funkce
+
+Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme veřejně:
+
+- docs/ROADMAP.md (sekce V1.2–V2.0) + issues [#421](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [#422](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [#423](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [#318](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user).
+- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa a docs/FAQ.md – shrnutí pro koncové uživatele.
+- Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
+
 
 ---
 

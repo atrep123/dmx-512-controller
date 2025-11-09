@@ -265,6 +265,8 @@ Aplikace obsahuje **14 předpřipravených efektů**:
 
 ## 🎨 Pokročilé funkce
 
+> **Tip:** Rozpracované integrace (MIDI, OSC, timecode, multi-user) sledujeme ve [`docs/ROADMAP.md`](./ROADMAP.md) a na issue trackeru – např. [`#421`](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [`#422`](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [`#423`](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [`#318`](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user). Připoj se komentářem nebo 👍 a dej vědět, jaké workflow potřebuješ.
+
 ### Custom Page Builder
 - **Vlastní layout** - Vytvoření personalizovaného ovládacího panelu
 - **Drag-and-drop** - Přetahování UI bloků
@@ -306,6 +308,12 @@ Aplikace obsahuje **14 předpřipravených efektů**:
 - **Debug panel** - Pokročilé debugovací informace
 - **Network monitoring** - Sledování síťové aktivity
 - **Performance metrics** - Měření výkonu aplikace
+
+### Web MIDI (preview)
+- **MIDI bridge** - Nastavení → "MIDI (preview)" umožňuje zapnout Web MIDI API v Chrome/HTTPS, zobrazit připojená zařízení a streamovat zprávy (publikujeme custom event `dmx-midi`).
+- **Mapping panel** - Sekce "MIDI mapování" nově zachytí CC i note-on/off a dovolí je namapovat na DMX kanály, scénické presety, zapnutí/vypnutí efektů, plynulou intenzitu efektu nebo master dimmer (persistuje se do `useKV('midi-mappings')` a show snapshotu).
+- **Runtime napojení** - `LiveControlView` poslouchá `dmx-midi`, aplikuje hodnoty na DMX kanály, vyvolává scény, přepíná/škáluje efekty a přepočítává master dimmer před odesláním patchů (což funguje i mimo MIDI díky sdílenému stavu).
+- **Roadmapa** - Další akce (např. MIDI feedback/clock, encoder režimy) sleduj v [V1.3 - MIDI Support](./ROADMAP.md#v13---midi-support).
 
 ### OLA výstup (Open Lighting Architecture)
 - **OLA integrace** - Výstup přes OLA framework

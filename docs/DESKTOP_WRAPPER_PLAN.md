@@ -1,4 +1,4 @@
-﻿# Desktop Wrapper â€“ Implementation Plan
+# Desktop Wrapper â€“ Implementation Plan
 
 ## 1. Goal
 
@@ -8,7 +8,7 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 
 | Component   | Option                        | Notes |
 |-------------|-------------------------------|-------|
-| Shell       | **Tauri**                     | Lightweight WebView (Rust core), smaller installer than Electron, good Windows `.msi/.exe` support. |
+| Shell       | **Tauri 2.x**                     | Lightweight WebView (Rust core), smaller installer than Electron, good Windows `.msi/.exe` support. |
 | Frontend    | Existing `dist/` build        | Served as static assets within Tauri window. |
 | Backend     | Python FastAPI packaged via **PyInstaller** | Produces self-contained `server.exe` with embedded Python runtime. Controlled via Tauri sidecar. |
 | Installer   | `tauri-bundler` + optional NSIS | Generates signed `.msi/.exe`; can run scripts pre/post install. |
@@ -45,19 +45,24 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 4. âś… System tray (open/restart/quit) + splash window styling.
 
 ### C. Installer + first-run wizard
-1. Use `tauri.conf.json > bundle` to generate `.msi/.exe`.
+1. Use 	auri.conf.json > bundle to generate .msi/.exe.
 2. First launch wizard (React component inside PWA):
    - check DMX hardware (USB, IP)
-   - select quick-start profile (e.g., â€śClub RGB Rigâ€ť, â€śStage DMXâ€ť)
-   - store config in `%APPDATA%\DMXController`.
-3. Auto-update story: rely on Tauri updater (later milestone).
-
+   - select quick-start profile (e.g., �Club RGB Rig�, �Stage DMX�)
+   - store config in %APPDATA%\DMXController.
+3. Auto-update feed & signing:
+   - Generate Tauri signing keys (
+px tauri signer generate) and place the public key in 	auri.conf.json.
+   - After each desktop build run 
+ode desktop/scripts/create-release-json.mjs --channel <name> --version <semver> with TAURI_SIGNING_PRIVATE_KEY(_PATH) so the script can invoke 	auri signer sign internally.
+   - Publish installers and the matching dist/desktop/<channel>-release.json; backend endpoint /desktop/update-feed proxies to the chosen channel.
 ### D. Quality gates
 1. End-to-end QA checklist (installation, DMX USB detection, firewall prompts).
 2. CI job for Windows runner:
    - build PyInstaller exe
    - build Tauri bundle
    - attach artifacts to GitHub Release.
+   - ✅ Added `Desktop QA` workflow (`.github/workflows/desktop-qa.yml`) that runs on PRs/pushes touching desktop/back-end code. It compiles the frontend, PyInstaller backend, and Tauri shell on `windows-latest`, then uploads MSI/NSIS artifacts for manual testing.
 3. Documentation: `docs/DESKTOP_INSTALL.md` covering requirements, troubleshooting, signed binary info.
 
 ## 5. Open questions
@@ -82,3 +87,4 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 - Desktop-only mode: when the wizard is visible the rest of the SPA is hidden so users must finish the checklist before controlling fixtures. Web/PWA users keep the regular landing page.
 - Preferences persist via /desktop/preferences; onboarding lze znovu spustit ze sekce Nastavení (karta "Desktop onboarding") nebo z Tauri tray menu (*Run Onboarding*). GitHub workflow `desktop-release.yml` už buildí MSI/NSIS + release manifesty a publikuje release `desktop-vX.Y.Z` (beta = prerelease).
 - Workflow volitelně uploaduje `<channel>-release.json` na updates bucket (viz secrets `UPDATES_BUCKET` + `AWS_*`), aby backend proxy `/desktop/update-feed` měl vždy aktuální feed.
+

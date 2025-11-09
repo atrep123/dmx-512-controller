@@ -21,6 +21,11 @@ from server.services.data import load_scenes, load_show_snapshot
 from server.ws_hub import WSHub
 
 
+@pytest.fixture(name="anyio_backend")
+def anyio_backend_fixture():
+    return "asyncio"
+
+
 async def _noop(_: dict[str, Any]) -> None:  # pragma: no cover - helper
     return None
 
@@ -74,7 +79,7 @@ async def build_context(tmp_path: Path) -> AppContext:
     return context
 
 
-@pytest.mark.anyio
+@pytest.mark.anyio("asyncio")
 async def test_switch_active_project(tmp_path: Path) -> None:
     context = await build_context(tmp_path)
     assert context.projects_store is not None
@@ -98,7 +103,7 @@ async def test_switch_active_project(tmp_path: Path) -> None:
     assert len(context.scenes) == 1
 
 
-@pytest.mark.anyio
+@pytest.mark.anyio("asyncio")
 async def test_create_and_restore_backup(tmp_path: Path) -> None:
     context = await build_context(tmp_path)
     assert context.active_project is not None

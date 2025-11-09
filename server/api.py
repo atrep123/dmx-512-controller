@@ -54,6 +54,15 @@ logger = logging.getLogger("api")
 T = TypeVar("T")
 
 
+def _validate_state_payload(payload: dict[str, Any]) -> None:
+    errors = sorted(_schemas.state().iter_errors(payload), key=lambda e: e.path)
+    if errors:
+        err = errors[0]
+        path = "/" + "/".join(map(str, err.path))
+        logger.error("state_schema_invalid", extra={"path": path, "schema_error": err.message})
+        raise HTTPException(status_code=500, detail="state schema invalid")
+
+
 def get_context(request: Request) -> AppContext:
     context = getattr(request.app.state, "context", None)
     if not isinstance(context, AppContext):
@@ -675,6 +684,7 @@ async def get_state(request: Request, sparse: int = 0, context: AppContext = Dep
             universes_sparse[str(u)] = sparse_map
         body["universesSparse"] = universes_sparse
         body["sparse"] = True
+    _validate_state_payload(body)
     return JSONResponse(content=body, headers={"ETag": etag})
 
 
@@ -714,6 +724,7 @@ def _current_show_payload(context: AppContext) -> dict[str, Any]:
         "effects": snapshot.get("effects") or [],
         "stepperMotors": snapshot.get("stepperMotors") or [],
         "servos": snapshot.get("servos") or [],
+        "midiMappings": snapshot.get("midiMappings") or [],
     }
     return payload
 

@@ -1,6 +1,7 @@
 import type { Command, DmxPatchEntry } from '@/shared/types'
 import { getServerClient } from '@/lib/transport'
 import { isTestEnv } from '@/lib/isTestEnv'
+import { getMasterDimmerScale } from '@/lib/masterDimmer'
 
 type UniverseKey = number
 type PatchObserver = (universe: number, patch: DmxPatchEntry[]) => void
@@ -104,7 +105,10 @@ export function setChannel(universe: number, ch: number, val: number) {
     chMap = new Map()
     pending.set(universe, chMap)
   }
-  chMap.set(ch, Math.max(0, Math.min(255, Math.round(val))))
+  const scale = getMasterDimmerScale()
+  const clamped = Math.max(0, Math.min(255, Math.round(val)))
+  const scaled = Math.round(clamped * Math.max(0, Math.min(1, scale)))
+  chMap.set(ch, scaled)
   scheduleFlush()
 }
 

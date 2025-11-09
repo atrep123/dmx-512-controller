@@ -8,13 +8,14 @@
         "kill": "fuser -k 5000/tcp",
         "typecheck": "tsc -b",
         "build": "npm run typecheck && vite build",
-        "lint": "eslint .",
-        "optimize": "vite optimize",
-        "preview": "vite preview",
-        "test": "vitest run",
-        "test:watch": "vitest",
-        "ai:generate": "node scripts/ai/generate.mjs"
-    },
+    "lint": "eslint .",
+    "optimize": "vite optimize",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "ai:generate": "node scripts/ai/generate.mjs",
+    "pwa:icons": "node scripts/generate-pwa-icons.mjs"
+  },
     "dependencies": {
         "@github/spark": "^0.39.0",
         "@heroicons/react": "^2.2.0",
@@ -95,6 +96,7 @@
         "eslint-plugin-react-refresh": "^0.4.19",
         "globals": "^16.0.0",
         "jsdom": "^27.1.0",
+        "sharp": "^0.34.5",
         "tailwindcss": "^4.1.11",
         "typescript": "~5.7.2",
         "typescript-eslint": "^8.38.0",
@@ -102,7 +104,8 @@
         "vitest": "^2.1.5"
     },
     "overrides": {
-        "vite": "^6.4.1"
+        "vite": "^6.4.1",
+        "sharp": "^0.34.5"
     },
     "workspaces": {
         "packages": [

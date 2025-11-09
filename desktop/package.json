@@ -9,6 +9,6 @@
     "build": "npm run prepare:resources && tauri build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.5.11"
+    "@tauri-apps/cli": "^2.0.0"
   }
 }

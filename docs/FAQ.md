@@ -64,164 +64,24 @@ Podrobný návod: [Android Setup Guide](ANDROID_SETUP.md)
 
 Data jsou uložená lokálně ve vašem prohlížeči pomocí IndexedDB. Nikam se neodesílají a zůstávají na vašem zařízení.
 
-### Mohu používat aplikaci na více zařízeních?
-
-Ano, ale data se automaticky nesynchronizují. Každé zařízení má vlastní lokální kopii dat. V budoucnu plánujeme přidat export/import funkcionalitu.
-
-### Jak aktualizuji aplikaci na novou verzi?
-
-PWA se aktualizuje automaticky na pozadí. Při příštím spuštění se načte nová verze. Případně můžete obnovit stránku (refresh).
-
-## 🎮 Používání aplikace
-
-### Kolik fixtures mohu přidat?
-
-Technicky není limit, ale doporučujeme:
-- **Mobil**: Max 30-40 fixtures pro optimální výkon
-- **Tablet**: Max 50-60 fixtures
-- **Desktop**: 100+ fixtures
-
-### Mohu ovládat více univerzí současně?
-
-Ano! Můžete přidat neomezený počet univerzí. Každé universe má 512 DMX kanálů.
-
-### Jak vytvořím vlastní efekt?
-
-Máte dvě možnosti:
-
-**1. Přednastavené efekty:**
-- Vyberte typ (chase, strobe, atd.)
-- Nastavte rychlost a intenzitu
-- Vyberte fixtures
-
-**2. Blokové programování:**
-- Vytvořte efekt typu "Block Program"
-- Přetahujte bloky (barvy, pohyb, čekání)
-- Sestavte sekvenci
-- Spusťte
-
-Návod: [User Guide - Efekty](USER_GUIDE.md#efekty)
-
-### Můžu spustit více efektů najednou?
-
-Ano! Můžete spustit více efektů současně. Efekty na různých fixtures běží nezávisle. Pokud se efekty překrývají na stejných fixtures, výsledek závisí na pořadí aplikace.
-
-### Jak uložím aktuální nastavení?
-
-Použijte funkci **Scény**:
-1. Nastavte všechna světla
-2. Záložka "Scény" → "Uložit novou scénu"
-3. Pojmenujte scénu
-4. Klikněte "Uložit"
-
-### Co je rozdíl mezi RGB a RGBW?
-
-- **RGB**: 3 kanály (Red, Green, Blue) - barevné světlo
-- **RGBW**: 4 kanály (Red, Green, Blue, White) - barevné světlo + čistě bílý kanál pro vyšší intenzitu
-
-## 🌐 DMX a hardware
-
-### Jaké DMX rozhraní potřebuji?
-
-Podporujeme:
-- **Art-Net**: Ethernet DMX interface (nejčastější)
-- **sACN (E1.31)**: Profesionální streaming ACN
-- **USB DMX**: USB DMX interface (v přípravě)
-
-### Jak připojím Art-Net interface?
-
-1. Připojte Art-Net node k síti (Ethernet/WiFi)
-2. Zjistěte IP adresu node (obvykle 192.168.x.x nebo 2.x.x.x)
-3. V aplikaci: Připojení → Art-Net → Zadejte IP
-4. Nastavte universe číslo
-5. Klikněte "Připojit"
-
-### Jakou IP adresu mám zadat?
-
-IP adresa závisí na vašem Art-Net zařízení:
-- Zkontrolujte manuál zařízení
-- Obvykle 192.168.1.x nebo 2.x.x.x
-- Můžete použít aplikaci pro skenování sítě
-- Některá zařízení mají displej s IP adresou
-
-### Funguje aplikace s DMX512 kabely?
-
-Aplikace sama nepodporuje přímé DMX512 připojení. Potřebujete:
-- **Art-Net nebo sACN node** - převádí Ethernet na DMX512
-- **USB DMX interface** - převádí USB na DMX512 (v přípravě)
-
-### Jaký je doporučený send rate pro Art-Net?
-
-**Standardní**: 40-44 packets/second (DMX standard je 44 Hz)
-
-Pro stabilnější připojení můžete zkusit nižší hodnoty (30-35), ale některé rychlé efekty mohou být méně plynulé.
-
-## 🔧 Řešení problémů
-
-### Aplikace se nepřipojí k Art-Net
-
-**Checklist:**
-1. ✓ Je Art-Net node zapnutá?
-2. ✓ Je mobil ve stejné síti jako node?
-3. ✓ Je IP adresa správná?
-4. ✓ Je firewall vypnutý nebo má výjimku?
-5. ✓ Je port 6454 otevřený?
-
-**Řešení:**
-- Pingněte IP adresu node z mobilu
-- Zkuste jiné zařízení ve stejné síti
-- Restartujte Art-Net node
-- Zkontrolujte síťové nastavení
-
-### Světla nereagují na změny
-
-**Možné příčiny:**
-1. **Špatná DMX adresa** - Zkontrolujte fixture setup
-2. **Nesprávný universe** - Ověřte universe číslo
-3. **Odpojeno od sítě** - Zkontrolujte connection status
-4. **Fixture vypnuto** - Zkontrolujte napájení fixtures
-
-### Aplikace je pomalá
-
-**Optimalizace:**
-- Snižte počet fixtures (ideálně pod 40 na mobilu)
-- Vypněte nepoužívané efekty
-- Zavřete jiné aplikace
-- Snižte send rate v připojení
-- Použijte silnější WiFi signál
-
-### Efekty nejsou plynulé
-
-**Příčiny a řešení:**
-- **Nízký send rate** → Zvyšte na 40-44 Hz
-- **Slabý WiFi** → Přesuňte se blíž k routeru nebo použijte kabel
-- **Přetížený mobil** → Zavřete jiné aplikace
-- **Příliš mnoho fixtures** → Rozdělte do více univerzí
-
-### Data se ztratila po update
-
-Data jsou uložená v browseru. Pokud:
-- Vymazali jste cache prohlížeče → Data jsou pryč
-- Odinstalovali aplikaci → Data zůstávají (pouze ikona zmizí)
-- Přešli na jiný prohlížeč → Data jsou oddělená
-
-**Prevence:** V budoucnu přidáme export/import funkcionalitu.
-
-### Joystick nereaguje správně
-
-**Možné problémy:**
-1. **Fixture není moving head** → Zkontrolujte typ fixture
-2. **Špatné channel mapování** → Ověřte Pan/Tilt kanály
-3. **Touchscreen kalibrace** → Zkuste jiný joystick size
-
-## 🚀 Pokročilé funkce
-
 ### Můžu ovládat aplikaci pomocí MIDI kontroléru?
 
-Momentálně ne, ale je to v roadmapě. Plánovaná podpora pro:
-- MIDI note mapping
-- MIDI CC (Control Change) pro faders
-- MIDI clock sync
+Preview režim je dostupný: otevři **Nastavení → MIDI (preview)**, klikni na *Zapnout MIDI bridge* a Chrome (HTTPS) začne číst MIDI vstupy (loguje do konzole + událost `dmx-midi`).
+
+1. Otevři **Nastavení → MIDI (preview)**.
+2. Klikni na **"Zapnout MIDI bridge"** a v dialogu povol přístup k zařízení.
+3. Panel zobrazí aktivní zařízení + poslední zprávu (hodí se pro ladění/konzoli).
+4. Přejdi do sekce **MIDI mapování**, klikni na **"Zachytit MIDI zprávu"** a stiskni tlačítko nebo pohni faderem.
+5. Vyber akci (DMX kanál, scéna, efekt toggle/intenzita nebo master dimmer) a klikni **"Uložit mapování"**.
+6. Mapování se ukládají lokálně (IndexedDB) i do show snapshotu – bez vlastního mappingu platí fallback CC `0` → DMX kanál 1 (hodnota 0–127 se škáluje na 0–255).
+
+Co je v roadmapě ([V1.3 - MIDI Support](ROADMAP.md#v13---midi-support), issue [`#421`](https://github.com/atrep123/dmx-512-controller/issues/421))?
+- ✅ MIDI note mapping pro scény a efekt toggle (preview v Nastavení → MIDI)
+- ✅ MIDI CC pro DMX kanály, efekt intenzitu a master dimmer
+- 🔜 MIDI clock sync
+- 🔜 MIDI learn režim pro tlačítka/LED feedback
+
+Používáš Launchpad/APC/NanoKontrol? Sdílej nastavení v issue – hodí se mapy CC/notes i tvoje workflow.
 
 ### Podporuje aplikace timecode sync?
 
@@ -240,10 +100,10 @@ Momentálně ne, ale můžete použít:
 
 ### Jak můžu spolupracovat s více operátory?
 
-Single-user režim je aktuální. Pro multi-user:
-- **Workaround**: Export/import konfigurace (plánováno)
-- **Budoucnost**: Server-based multi-user mode
-- **Alternative**: Každý operátor má vlastní universe
+Aktuální verze je single-user, ale serverový režim je v roadmapě (issue #318). Do té doby:
+- **Workaround**: Export/Import mezi zařízeními (sekce Data Management)
+- **Alternativa**: Rozdělte universa (každý operátor vlastní universe / show stránku)
+- **Zapojení**: Napiš use-case do issue – řešíme oprávnění, konflikty a sdílený backend.
 
 ### Podporuje aplikace fixture library?
 
@@ -255,9 +115,10 @@ Zatím ne - musíte manuálně nastavit DMX adresy a kanály. Plánujeme:
 ### Můžu integrovat aplikaci s jiným software?
 
 Plánované integrace:
-- **OSC protocol** - Remote control
-- **Web API** - REST API pro externí kontrolu
-- **Webhooks** - Triggering z jiných systémů
+- **OSC protocol** (issue #422) – vzdálené ovládání / bridge na show control konzole
+- **Web API** (issue #350) – veřejné REST/WebSocket endpointy pro vlastní aplikace
+- **Webhooks** – triggery z jiných systémů (DMX playback, automation)
+- **Timecode** (issue #423) – SMPTE/MTC/LTC gateway
 
 ## 💡 Tipy a triky
 

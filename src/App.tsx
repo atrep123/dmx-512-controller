@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
 import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
@@ -6,9 +7,12 @@ import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { DesktopOnboarding, ONBOARDING_STORAGE_KEY } from '@/components/DesktopOnboarding'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { DesktopBackendIndicator } from '@/components/DesktopBackendIndicator'
 import { saveScenes } from '@/lib/scenesClient'
 import { downloadShow, uploadShow, type ShowSnapshot } from '@/lib/showClient'
 import { toast } from 'sonner'
+import { useI18n } from '@/lib/i18n'
+import type { MidiMapping } from '@/lib/midiMappings'
 
 const FixturesView = lazy(() => import('@/components/FixturesView'))
 const ScenesView = lazy(() => import('@/components/ScenesView'))
@@ -24,6 +28,7 @@ const DataManagementView = lazy(() => import('@/components/DataManagementView'))
 const SHOW_PERSIST_DEBOUNCE_MS = 400
 
 function App() {
+    const { t } = useI18n()
     const [universes, setUniversesState] = useState<Universe[]>([])
     const [fixtures, setFixturesState] = useState<Fixture[]>([])
     const [stepperMotors, setStepperMotorsState] = useState<StepperMotor[]>([])
@@ -39,9 +44,12 @@ function App() {
     const [showDirty, setShowDirty] = useState<boolean>(false)
     const [isDesktopShell, setIsDesktopShell] = useState<boolean>(false)
     const [needsDesktopOnboarding, setNeedsDesktopOnboarding] = useState<boolean>(false)
+    const [midiMappings, setMidiMappings] = useKV<MidiMapping[]>('midi-mappings', [])
     const isMountedRef = useRef(true)
     const showPersistTimerRef = useRef<number | null>(null)
     const pendingShowSnapshotRef = useRef<ShowSnapshot | null>(null)
+    const midiMappingsHashRef = useRef<string | null>(null)
+    const midiMappingsBootstrappedRef = useRef(false)
 
     const flushPendingShowSnapshot = useCallback(async () => {
         const snapshot = pendingShowSnapshotRef.current
@@ -55,7 +63,7 @@ function App() {
             setLastExportedAt(snapshot.exportedAt)
         } catch (error) {
             console.error('show_sync_failed', error)
-            toast.error('Nepodarilo se ulozit konfiguraci')
+            toast.error(t('toast.show.save_error'))
             pendingShowSnapshotRef.current = snapshot
             if (showPersistTimerRef.current !== null) {
                 window.clearTimeout(showPersistTimerRef.current)
@@ -65,7 +73,7 @@ function App() {
                 void flushPendingShowSnapshot()
             }, SHOW_PERSIST_DEBOUNCE_MS)
         }
-    }, [])
+    }, [t])
 
     useEffect(() => {
         return () => {
@@ -134,6 +142,33 @@ function App() {
         }
     }, [isDesktopShell, restartDesktopOnboarding])
 
+    useEffect(() => {
+        if (!isDesktopShell || typeof window === 'undefined') {
+            return
+        }
+        const handleWaiting = () => {
+            toast.message(t('desktop.backend.waiting'), { duration: 2000 })
+        }
+        const handleReady = () => {
+            toast.success(t('desktop.backend.ready'), { duration: 2000 })
+        }
+        const handleError = (event: Event) => {
+            const detail = (event as CustomEvent<string>).detail
+            toast.error(t('desktop.backend.error'), {
+                description: detail || undefined,
+                duration: 6000,
+            })
+        }
+        window.addEventListener('desktop://backend/waiting', handleWaiting)
+        window.addEventListener('desktop://backend/ready', handleReady)
+        window.addEventListener('desktop://backend/error', handleError)
+        return () => {
+            window.removeEventListener('desktop://backend/waiting', handleWaiting)
+            window.removeEventListener('desktop://backend/ready', handleReady)
+            window.removeEventListener('desktop://backend/error', handleError)
+        }
+    }, [isDesktopShell, t])
+
     const refreshShow = useCallback(async (): Promise<boolean> => {
         setShowLoading(true)
         setScenesLoading(true)
@@ -162,6 +197,11 @@ function App() {
             if (Array.isArray(snapshot.scenes)) {
                 setScenesState(snapshot.scenes)
             }
+            if (Array.isArray(snapshot.midiMappings)) {
+                const serialized = JSON.stringify(snapshot.midiMappings)
+                midiMappingsHashRef.current = serialized
+                setMidiMappings(() => snapshot.midiMappings as MidiMapping[])
+            }
             if (snapshot.exportedAt) {
                 setLastExportedAt(snapshot.exportedAt)
             }
@@ -175,8 +215,8 @@ function App() {
         } catch (error) {
             if (isMountedRef.current) {
                 console.error('show_fetch_failed', error)
-                setShowError('Nepodarilo se nacist konfiguraci')
-                setScenesError('Nepodarilo se nacist sceny')
+                setShowError(t('toast.show.load_error'))
+                setScenesError(t('toast.scenes.load_error'))
             }
             return false
         } finally {
@@ -185,7 +225,7 @@ function App() {
                 setScenesLoading(false)
             }
         }
-    }, [])
+    }, [setMidiMappings, t])
 
     useEffect(() => {
         void refreshShow()
@@ -216,12 +256,27 @@ function App() {
                 effects: overrides?.effects ?? effects,
                 stepperMotors: overrides?.stepperMotors ?? stepperMotors,
                 servos: overrides?.servos ?? servos,
+                midiMappings: overrides?.midiMappings ?? midiMappings ?? [],
             }
             setLastExportedAt(snapshot.exportedAt)
             scheduleShowSnapshotPersist(snapshot)
         },
-        [universes, fixtures, scenes, effects, stepperMotors, servos, scheduleShowSnapshotPersist]
+        [universes, fixtures, scenes, effects, stepperMotors, servos, midiMappings, scheduleShowSnapshotPersist]
     )
+
+    useEffect(() => {
+        const serialized = JSON.stringify(midiMappings ?? [])
+        if (!midiMappingsBootstrappedRef.current) {
+            midiMappingsBootstrappedRef.current = true
+            midiMappingsHashRef.current = serialized
+            return
+        }
+        if (serialized === midiMappingsHashRef.current) {
+            return
+        }
+        midiMappingsHashRef.current = serialized
+        persistShowSnapshot({ midiMappings: midiMappings ?? [] })
+    }, [midiMappings, persistShowSnapshot])
 
     const setUniverses = useCallback(
         (updater: (universes: Universe[]) => Universe[]) => {
@@ -284,11 +339,11 @@ function App() {
                 await saveScenes(next)
             } catch (error) {
                 console.error('scenes_save_failed', error)
-                toast.error('Nepodařilo se uložit scény')
+                toast.error(t('toast.scenes.save_error'))
                 void refreshShow()
             }
         },
-        [refreshShow]
+        [refreshShow, t]
     )
 
     const setScenes = useCallback(
@@ -323,10 +378,13 @@ function App() {
                 <header className="mb-6">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight">DMX 512 Kontrol�r</h1>
-                            <p className="text-sm text-muted-foreground mt-1">Profesion�ln� ��zen� osv�tlen� a motor�</p>
+                            <h1 className="text-2xl font-bold tracking-tight">{t('app.header.title')}</h1>
+                            <p className="text-sm text-muted-foreground mt-1">{t('app.header.subtitle')}</p>
                         </div>
-                        <ThemeToggle />
+                        <div className="flex flex-col gap-2 sm:items-end">
+                            {isDesktopShell ? <DesktopBackendIndicator /> : null}
+                            <ThemeToggle />
+                        </div>
                     </div>
                 </header>
 
@@ -334,44 +392,44 @@ function App() {
                     <TabsList className="grid w-full grid-cols-9 mb-6 h-auto gap-2 rounded-xl bg-muted/30 p-1">
                         <TabsTrigger value="custom" className={tabButtonClass}>
                             <SquaresFour weight="fill" />
-                            <span className="text-xs sm:text-sm">Moje stránka</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.custom')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="blocks" className={tabButtonClass}>
                             <Cube weight="fill" />
-                            <span className="text-xs sm:text-sm">UI Bloky</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.blocks')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="live" className={tabButtonClass}>
                             <Play weight="fill" />
-                            <span className="text-xs sm:text-sm">Kontrola</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.live')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="fixtures" className={tabButtonClass}>
                             <Lightbulb />
-                            <span className="text-xs sm:text-sm">Světla</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.fixtures')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="motors" className={tabButtonClass}>
                             <GearSix />
-                            <span className="text-xs sm:text-sm">Motory</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.motors')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="effects" className={tabButtonClass}>
                             <Lightning />
-                            <span className="text-xs sm:text-sm">Efekty</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.effects')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="scenes" className={tabButtonClass}>
                             <Palette />
-                            <span className="text-xs sm:text-sm">Scény</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.scenes')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="connection" className={tabButtonClass}>
                             <Plugs />
-                            <span className="text-xs sm:text-sm">Připojení</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.connection')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="setup" className={tabButtonClass}>
                             <Gear />
-                            <span className="text-xs sm:text-sm">Nastavení</span>
+                            <span className="text-xs sm:text-sm">{t('app.tabs.setup')}</span>
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="custom" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <CustomPageBuilder
                                 effects={effects || []}
                                 fixtures={fixtures || []}
@@ -386,19 +444,21 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="blocks" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <ControlBlocksDemo />
                         </Suspense>
                     </TabsContent>
 
                     <TabsContent value="live" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <LiveControlView
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
                                 effects={effects || []}
                                 setEffects={setEffects}
                                 universes={universes || []}
+                                scenes={scenes || []}
+                                setActiveScene={setActiveScene}
                                 stepperMotors={stepperMotors || []}
                                 setStepperMotors={setStepperMotors}
                                 servos={servos || []}
@@ -408,7 +468,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="fixtures" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <FixturesView
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
@@ -419,7 +479,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="motors" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <MotorsView
                                 stepperMotors={stepperMotors || []}
                                 setStepperMotors={setStepperMotors}
@@ -431,7 +491,7 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="effects" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <EffectsView
                                 effects={effects || []}
                                 setEffects={setEffects}
@@ -447,7 +507,7 @@ function App() {
                         ) : scenesError ? (
                             <div className="p-4 text-sm text-destructive">{scenesError}</div>
                         ) : (
-                            <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                            <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                                 <ScenesView
                                     scenes={scenes}
                                     setScenes={setScenes}
@@ -462,22 +522,24 @@ function App() {
                     </TabsContent>
 
                     <TabsContent value="connection" className="mt-0">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <ConnectionView />
                         </Suspense>
                     </TabsContent>
 
                                         <TabsContent value="setup" className="mt-0 space-y-4">
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <SetupView
                                 universes={universes || []}
                                 setUniverses={setUniverses}
                                 fixtures={fixtures || []}
                                 setFixtures={setFixtures}
+                                scenes={scenes || []}
+                                effects={effects || []}
                                 onRestartDesktopWizard={isDesktopShell ? restartDesktopOnboarding : undefined}
                             />
                         </Suspense>
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Načítám…</div>}>
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <DataManagementView
                                 universes={universes || []}
                                 fixtures={fixtures || []}

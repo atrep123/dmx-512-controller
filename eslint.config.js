@@ -19,7 +19,15 @@ const tsTypeChecked = tseslint.configs.recommendedTypeChecked.map((config) => ({
 
 export default [
   {
-    ignores: ['dist', 'coverage', 'node_modules', '.venv'],
+    ignores: [
+      'dist',
+      'coverage',
+      'node_modules',
+      '.venv',
+      'desktop/src-tauri/resources/app',
+      'server/dist',
+      'build',
+    ],
   },
   js.configs.recommended,
   ...tsTypeChecked,
@@ -68,6 +76,17 @@ export default [
       globals: {
         ...globals.node,
         console: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        console: 'readonly',
+        Buffer: 'readonly',
       },
     },
   },

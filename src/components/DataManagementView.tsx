@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback, type ChangeEvent } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -9,6 +10,7 @@ import { ArrowsClockwise, CircleNotch, WarningCircle } from '@phosphor-icons/rea
 import { toast } from 'sonner'
 import type { Effect, Fixture, Scene, Servo, StepperMotor, Universe, ProjectMeta, BackupVersion } from '@/lib/types'
 import type { ShowSnapshot } from '@/lib/showClient'
+import type { MidiMapping } from '@/lib/midiMappings'
 import { uploadShow, downloadShow } from '@/lib/showClient'
 import {
   fetchProjects,
@@ -79,6 +81,7 @@ export default function DataManagementView({
   const [backupsLoading, setBackupsLoading] = useState(false)
   const [backupError, setBackupError] = useState<string | null>(null)
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? null
+  const [midiMappings, setMidiMappings] = useKV<MidiMapping[]>('midi-mappings', [])
 
   const disableActions = showLoading || refreshing
   const formattedExportedAt = formatExportedAt(lastExportedAt)
@@ -289,6 +292,7 @@ export default function DataManagementView({
     effects,
     stepperMotors,
     servos,
+    midiMappings: midiMappings ?? [],
   })
 
   const handleExport = async () => {
@@ -347,6 +351,7 @@ export default function DataManagementView({
     const nextEffects = merge(effects, safeArray<Effect>(payload.effects))
     const nextStepper = merge(stepperMotors, safeArray<StepperMotor>(payload.stepperMotors))
     const nextServos = merge(servos, safeArray<Servo>(payload.servos))
+    const nextMidiMappings = merge(midiMappings ?? [], safeArray<MidiMapping>(payload.midiMappings))
 
     setUniverses(() => nextUniverses)
     setFixtures(() => nextFixtures)
@@ -354,6 +359,7 @@ export default function DataManagementView({
     setEffects(() => nextEffects)
     setStepperMotors(() => nextStepper)
     setServos(() => nextServos)
+    setMidiMappings(() => nextMidiMappings)
 
     return {
       version: typeof payload.version === 'string' ? payload.version : '1.1',
@@ -364,6 +370,7 @@ export default function DataManagementView({
       effects: nextEffects,
       stepperMotors: nextStepper,
       servos: nextServos,
+      midiMappings: nextMidiMappings,
     }
   }
 

@@ -433,10 +433,56 @@ Na desktopu můžete použít:
 
 ### Pro users
 
-- **MIDI mapping** - Připojte MIDI kontrolér (TODO: implement)
-- **OSC protocol** - Remote control přes OSC (TODO: implement)
-- **Timecode sync** - Sync s timecode (TODO: implement)
-- **Multi-user** - Více zařízení současně (vyžaduje server)
+- **MIDI mapping** - Připojte MIDI kontrolér *(ve vývoji – viz [Roadmap V1.3](ROADMAP.md#v13---midi-support))*
+- **OSC protocol** - Remote control přes OSC *(plánováno v sekci Pro Features)*
+- **Timecode sync** - Sync s timecode *(plánováno v Pro Features – show control integrace)*
+- **Multi-user** - Více zařízení současně *(potřebuje server mód, sledujte roadmapu)*
+
+## �? Pokročilé funkce (roadmapa)
+
+Následující funkce jsou připravované – některé mají již API stubs, jiné čekají na komunitní příspěvky. Přiložené odkazy vedou na GitHub issue nebo kapitolu v `ROADMAP.md`, kde můžeš sledovat stav nebo se zapojit.
+
+### Cloud backup & export
+
+- **Co je připraveno:** Export/import JSON snapshotů (`Data Management` panel).
+- **Roadmap:** Automatické cloud zálohy, verzování a diff náhledy – [Roadmap V1.2](ROADMAP.md#v12---data-management).
+- **Jak pomoci:** Otestuj export/import (issues label `data-management`) a přidej use-cases pro auto-backup.
+
+### MIDI ovládání (preview)
+
+Pilotní Web MIDI bridge je dostupný přímo v aplikaci:
+
+1. Otevři **Nastavení → MIDI (preview)**.
+2. Klikni na **„Zapnout MIDI bridge“** (Chrome 128+ a HTTPS/localhost jsou povinné).
+3. V systémovém dialogu povol přístup k MIDI zařízení.
+4. Panel zobrazí připojená zařízení a poslední přijatou zprávu (loguje do konzole a vystavuje event `dmx-midi`).
+5. Přepni se do sekce **MIDI mapování** (umístěná přímo pod panelem) a klikni na **„Zachytit MIDI zprávu“** – poté pohni faderem nebo stiskni tlačítko.
+6. Po doplnění příkazu a čísla ovladače zvol akci (DMX kanál, scéna, efekt toggle/intenzita nebo master dimmer) a stiskni **„Uložit mapování“**. Každé mapování lze smazat křížkem.
+7. `LiveControlView` reaguje okamžitě: CC fadery škálují DMX kanály na 0–255, note-on tlačítka vyvolávají scény a přepínají efekty, master dimmer funguje jako globální brzda před odesláním DMX patchů.
+8. Mapování se ukládají do IndexedDB i show snapshotu, takže export/import přenese MIDI vazby mezi zařízeními. Další rozšíření (MIDI feedback, clock sync) sleduj v [V1.3 – MIDI Support](ROADMAP.md#v13---midi-support).
+
+- Feedback & requesty: issue [`#421 MIDI Support`](https://github.com/atrep123/dmx-512-controller/issues/421).
+- Podporujeme libovolný class-compliant USB/MIDI kontrolér (Launchpad, APC, NanoKontrol…); připoj screenshot dat pro ladění.
+
+### OSC protokol
+
+- **Plán:** OSC server s mapovatelnými příkazy (`/dmx/scene`, `/dmx/channel`).
+- **Issue:** [`#422 OSC Bridge`](https://github.com/atrep123/dmx-512-controller/issues/422).
+- **Tip:** Pokud máš preferovaný OSC controller, zanech komentář s mapou příkazů.
+
+### Timecode synchronization
+
+- **Plán:** Podpora LTC/MTC a možnost spouštět scény podle timeline.
+- **Roadmap:** Sekce „Pro Features – Show Control“.
+- **Issue:** [`#423 Timecode`](https://github.com/atrep123/dmx-512-controller/issues/423).
+
+### Desktop multi-user
+
+- **Plán:** Serverový mód (FastAPI) + websocket hub sdílející stav mezi více klienty.
+- **Status:** FastAPI backend už existuje (Tauri desktop wrapper), ale PWA zatím startuje v single-user módu.
+- **Issue:** [`#318 Multi-user`](https://github.com/atrep123/dmx-512-controller/issues/318).
+
+> **Chceš přispět?** Přečti [CONTRIBUTING.md](../CONTRIBUTING.md), přidej komentář na issue a začni s menším PoC (např. MIDI CC → channel slider).
 
 ## 🆘 Často kladené otázky
 

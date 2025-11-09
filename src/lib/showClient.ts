@@ -6,6 +6,7 @@ import type {
   StepperMotor,
   Servo,
 } from "@/lib/types";
+import type { MidiMapping } from "@/lib/midiMappings";
 
 export type ShowSnapshot = {
   version: string;
@@ -16,6 +17,7 @@ export type ShowSnapshot = {
   effects: Effect[];
   stepperMotors: StepperMotor[];
   servos: Servo[];
+  midiMappings?: MidiMapping[];
 };
 
 const jsonHeaders = {
