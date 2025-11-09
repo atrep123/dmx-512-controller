@@ -1,23 +1,21 @@
-﻿# Contributing to DMX 512 Kontroler
+# Contributing to DMX 512 Kontrolér
 
-Děkujeme za váš zájem přispět do DMX 512 Kontroler projektu!
-Tento dokument poskytuje pokyny pro efektivní spolupráci.
+Děkujeme za váš zájem přispět do DMX 512 Kontrolér projektu! Tento dokument poskytuje pokyny pro efektivní spolupráci.
 
-## Table of Contents
+## 📋 Obsah
 
 - [Code of Conduct](#code-of-conduct)
-- [How to Contribute](#how-to-contribute)
-- [Development Environment](#development-environment)
-- [Project Structure](#project-structure)
+- [Jak přispět](#jak-přispět)
+- [Vývojové prostředí](#vývojové-prostředí)
+- [Struktura projektu](#struktura-projektu)
 - [Coding Standards](#coding-standards)
 - [Commit Guidelines](#commit-guidelines)
 - [Testing](#testing)
 - [Pull Request Process](#pull-request-process)
 
-## Code of Conduct
+## 🤝 Code of Conduct
 
-Tento projekt dodržuje [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/).
-Účastí v tomto projektu souhlasíte s dodržováním těchto pravidel.
+Tento projekt dodržuje [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/). Účastí v tomto projektu souhlasíte s dodržováním těchto pravidel.
 
 ### Základní pravidla
 
@@ -26,7 +24,7 @@ Tento projekt dodržuje [Contributor Covenant Code of Conduct](https://www.contr
 - Zaměřte se na to, co je nejlepší pro komunitu
 - Ukažte empatii vůči ostatním členům komunity
 
-## How to Contribute
+## 🚀 Jak přispět
 
 ### Typy příspěvků
 
@@ -45,7 +43,7 @@ Vítáme následující typy příspěvků:
 2. **Diskutujte velké změny** - Otevřete issue před začátkem práce na velkých funkcích
 3. **Jeden problém = jeden PR** - Usnadňuje to review a merge
 
-## Development Environment
+## 💻 Vývojové prostředí
 
 ### Požadavky
 
@@ -73,7 +71,7 @@ git checkout -b feature/moje-super-feature
 
 # 6. Spusťte vývojový server
 npm run dev
-```text
+```
 
 ### Dostupné scripty
 
@@ -95,7 +93,7 @@ npm run build
 
 # Preview produkční build
 npm run preview
-```text
+```
 
 ### VSCode Extensions
 
@@ -125,9 +123,9 @@ Vytvořte `.vscode/settings.json`:
 }
 ```
 
-## Project Structure
+## 🏗️ Struktura projektu
 
-```text
+```
 dmx-512-controller/
 ├── src/
 │   ├── components/          # React komponenty
@@ -159,7 +157,7 @@ dmx-512-controller/
 - **Typy**: PascalCase interface/type (např. `interface Fixture`)
 - **Konstanty**: UPPER_CASE (např. `const MAX_DMX_VALUE = 255`)
 
-## Coding Standards
+## 📝 Coding Standards
 
 ### TypeScript
 
@@ -170,9 +168,9 @@ dmx-512-controller/
 ```typescript
 // ✅ Dobře
 interface Fixture {
-  id: string
-  name: string
-  dmxAddress: number
+  id: string;
+  name: string;
+  dmxAddress: number;
 }
 
 function getFixture(id: string): Fixture | null {
@@ -194,17 +192,17 @@ function getFixture(id: any) {
 ```typescript
 // ✅ Dobře
 interface FixtureCardProps {
-  fixture: Fixture
-  onEdit: (id: string) => void
+  fixture: Fixture;
+  onEdit: (id: string) => void;
 }
 
 function FixtureCard({ fixture, onEdit }: FixtureCardProps) {
-  return <div>...</div>
+  return <div>...</div>;
 }
 
 // ❌ Špatně
 function FixtureCard(props) {
-  return <div>{props.fixture.name}</div>
+  return <div>{props.fixture.name}</div>;
 }
 ```
 
@@ -230,16 +228,16 @@ function FixtureCard(props) {
 - **Components**: PascalCase
 - **Functions**: camelCase
 - **Constants**: UPPER_CASE
-- **Private functions**: _prefixedCamelCase
+- **Private functions**: \_prefixedCamelCase
 - **Boolean props/state**: is/has prefix (např. `isActive`, `hasError`)
 
-## Commit Guidelines
+## 📤 Commit Guidelines
 
 Používáme [Conventional Commits](https://www.conventionalcommits.org/) formát.
 
 ### Commit message struktura
 
-```text
+```
 <type>(<scope>): <subject>
 
 <body>
@@ -281,7 +279,7 @@ refactor(components): extract common slider logic to hook
 - Přidejte tělo commitu pro komplexní změny
 - Referencujte issues (`Fixes #123`, `Closes #456`)
 
-## Testing
+## 🧪 Testing
 
 ### Running Tests
 
@@ -292,20 +290,14 @@ npm run test        # Vitest run (headless)
 npm run test:watch  # Vitest watch mode pro lokální vývoj
 ```
 
-Používáme **Vitest + React Testing Library** pro komponenty a hooks.
-Každá nová feature nebo bugfix by měla mít odpovídající testy (unit/komponentové)
-a případně aktualizovaný mock pro `msw`/REST klienty.
+Používáme **Vitest + React Testing Library** pro komponenty a hooks. Každá nová feature nebo bugfix by měla mít odpovídající testy (unit/komponentové) a případně aktualizovaný mock pro `msw`/REST klienty.
 
 ### Co testovat
 
-1. **Unit testy**
-   Utility funkce, hooks
-2. **Component testy**
-   UI komponenty v izolaci
-3. **Integration testy**
-   Interakce mezi komponenty
-4. **E2E testy**
-   Celé user flows
+1. **Unit testy** - Utility funkce, hooks
+2. **Component testy** - UI komponenty v izolaci
+3. **Integration testy** - Interakce mezi komponenty
+4. **E2E testy** - Celé user flows
 
 ### Testing best practices
 
@@ -314,11 +306,12 @@ a případně aktualizovaný mock pro `msw`/REST klienty.
 - Popisné názvy testů
 - Arrange-Act-Assert pattern
 
-## Pull Request Process
+## 🔄 Pull Request Process
 
 ### Před odesláním PR
 
 1. **✅ Zkontrolujte checklist**
+
    - [ ] `npm run lint`
    - [ ] `npm run typecheck`
    - [ ] `npm run test`
@@ -327,39 +320,44 @@ a případně aktualizovaný mock pro `msw`/REST klienty.
    - [ ] Branch je up-to-date s main
    - [ ] Přidána dokumentace (pokud potřeba)
 
-1. **Sync s upstream**
+2. **🔄 Sync s upstream**
 
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
+```bash
+git fetch upstream
+git rebase upstream/main
+```
 
-1. **Cleanup**
+3. **🧹 Cleanup**
 
-   ```bash
-   # Squash commits pokud je to vhodné
-   git rebase -i upstream/main
-   ```
+```bash
+# Squash commits pokud je to vhodné
+git rebase -i upstream/main
+```
 
 ### PR Template
 
 ```markdown
 ## Popis změn
+
 Krátký popis toho, co tento PR dělá.
 
 ## Type změny
+
 - [ ] Bug fix (non-breaking change)
 - [ ] New feature (non-breaking change)
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testování
+
 Jak jste testovali tyto změny?
 
 ## Screenshots (pokud relevantní)
+
 Přidejte screenshots pro UI změny.
 
 ## Checklist
+
 - [ ] Kód je naformátovaný
 - [ ] TypeScript kompiluje
 - [ ] Dokumentace aktualizována
@@ -380,7 +378,7 @@ Přidejte screenshots pro UI změny.
 - **Diskutujte** - Vysvětlete vaše rozhodnutí
 - **Iterujte** - Opravte požadované změny
 
-## Feature Development Guidelines
+## 🎯 Feature Development Guidelines
 
 ### Před začátkem nové feature
 
@@ -402,7 +400,7 @@ Přidejte screenshots pro UI změny.
 3. **Accessibility audit** - Keyboard navigation, screen readers
 4. **Documentation** - Aktualizujte README/docs
 
-## Bug Fix Guidelines
+## 🐛 Bug Fix Guidelines
 
 ### Reprodukce
 
@@ -423,7 +421,7 @@ Přidejte screenshots pro UI změny.
 2. Dokumentujte v changelog
 3. Zvažte preventivní refactoring
 
-## Documentation Guidelines
+## 📖 Documentation Guidelines
 
 ### Co dokumentovat
 
@@ -440,15 +438,15 @@ Přidejte screenshots pro UI změny.
 
 ### JSDoc příklad
 
-```typescript
+````typescript
 /**
  * Calculates DMX channel value for RGB color.
- * 
+ *
  * @param red - Red component (0-255)
  * @param green - Green component (0-255)
  * @param blue - Blue component (0-255)
  * @returns Array of DMX values [red, green, blue]
- * 
+ *
  * @example
  * ```ts
  * const dmxValues = rgbToDMX(255, 0, 128);
@@ -458,29 +456,29 @@ Přidejte screenshots pro UI změny.
 function rgbToDMX(red: number, green: number, blue: number): number[] {
   return [red, green, blue];
 }
-```
+````
 
-## Internationalization (i18n)
+## 🌍 Internationalization (i18n)
 
 Pokud přidáváte texty do UI:
 
-1. **Používejte hook `useI18n`** –
-   `const { t } = useI18n()` a texty renderujte přes `t('translation.key')`.
-2. **Udržujte `src/lib/i18n.ts`** –
-   každý nový klíč musí mít český i anglický překlad.
-3. **Placeholdery jsou podporované** –
-   `t('desktop.onboarding.test.success', { target })` nahradí `{target}` hodnotou.
+1. **Používejte hook `useI18n`** - `const { t } = useI18n()` a texty renderujte přes `t('translation.key')`.
+
+2. **Udržujte `src/lib/i18n.ts`** - každý nový klíč musí mít český i anglický překlad.
+
+3. **Placeholdery jsou podporované** - `t('desktop.onboarding.test.success', { target })` nahradí `{target}` hodnotou.
 
 ```tsx
-import { useI18n } from '@/lib/i18n'
+import { useI18n } from "@/lib/i18n";
 
 function Example() {
-  const { t } = useI18n()
-  return t('app.tabs.custom')
+  const { t } = useI18n();
+
+  return <span>{t("app.tabs.custom")}</span>;
 }
 ```
 
-## Release Process
+## 🚀 Release Process
 
 (Pro maintainers)
 
@@ -490,17 +488,16 @@ function Example() {
 4. Deploy to production
 5. Announce release
 
-## Questions
+## ❓ Máte otázky?
 
 - 💬 [Otevřete Discussion](https://github.com/atrep123/dmx-512-controller/discussions)
 - 🐛 [Report Issue](https://github.com/atrep123/dmx-512-controller/issues)
 - 📧 Contact maintainers
 
-## Thank You
+## 🙏 Děkujeme
 
-Děkujeme za váš čas a příspěvek do projektu!
-Každý příspěvek, ať už velký nebo malý, je velmi ceněn. 💚
+Děkujeme za váš čas a příspěvek do projektu! Každý příspěvek, ať už velký nebo malý, je velmi ceněn. 💚
 
 ---
 
-Happy coding! 🎭✨
+**Happy coding! 🎭✨**
