@@ -27,6 +27,7 @@ import { UsbDmxBridge, isWebSerialSupported, type UsbPortInfo } from '@/lib/usbD
 import { DesktopIndicator } from '@/components/DesktopIndicator'
 import { registerPatchObserver } from '@/lib/dmxQueue'
 import { buildBackendUrl } from '@/lib/env'
+import { parseDmxMetrics, type DmxMetrics } from '@/lib/metrics'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
@@ -45,16 +46,7 @@ interface ConnectionProfile {
   settings: ConnectionSettings
 }
 
-type Metrics = Partial<{
-  dmx_core_cmds_total: number
-  dmx_core_queue_depth: number
-  dmx_core_ws_clients: number
-  dmx_core_apply_latency_ms_last: number
-  dmx_engine_processed_total: number
-  dmx_engine_queue_depth: number
-  dmx_ws_clients: number
-  dmx_engine_last_latency_ms: number
-}>
+type Metrics = DmxMetrics
 
 type UsbStatus = {
   supported: boolean
@@ -86,27 +78,6 @@ const STATUS_COLORS: Record<ConnectionStatus, string> = {
   connecting: 'bg-primary',
   disconnected: 'bg-muted',
   error: 'bg-destructive',
-}
-
-function parsePrometheus(text: string): Metrics {
-  const out: Metrics = {}
-  const lines = text.split('\n')
-  for (const line of lines) {
-    if (!line || line.startsWith('#')) continue
-    const [name, value] = line.split(/\s+/)
-    if (!name || !value) continue
-    const numeric = Number(value)
-    if (Number.isNaN(numeric)) continue
-    if (name.includes('dmx_core_cmds_total')) out.dmx_core_cmds_total = numeric
-    else if (name.includes('dmx_core_queue_depth')) out.dmx_core_queue_depth = numeric
-    else if (name.includes('dmx_core_ws_clients')) out.dmx_core_ws_clients = numeric
-    else if (name.includes('dmx_core_apply_latency_ms_last')) out.dmx_core_apply_latency_ms_last = numeric
-    else if (name.includes('dmx_engine_processed_total')) out.dmx_engine_processed_total = numeric
-    else if (name.includes('dmx_engine_queue_depth')) out.dmx_engine_queue_depth = numeric
-    else if (name.includes('dmx_ws_clients')) out.dmx_ws_clients = numeric
-    else if (name.includes('dmx_engine_last_latency_ms')) out.dmx_engine_last_latency_ms = numeric
-  }
-  return out
 }
 
 function getStatusIcon(status: ConnectionStatus) {
@@ -278,7 +249,7 @@ export default function ConnectionView() {
       const response = await fetch(buildBackendUrl('/metrics'), { cache: 'no-store' })
       if (!response.ok) throw new Error(`status ${response.status}`)
       const text = await response.text()
-      setMetrics(parsePrometheus(text))
+      setMetrics(parseDmxMetrics(text))
     } catch (error) {
       toast.error('Nepodařilo se načíst metriky')
       console.error('metrics_error', error)

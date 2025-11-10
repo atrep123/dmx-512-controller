@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
+﻿import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -137,44 +137,44 @@ export default function CustomPageBuilder({
     {
       kind: 'master-dimmer',
       title: 'Master dimmer',
-      description: 'Jednoduchý slidery nebo kolečko pro ovládání celkové intenzity se zobrazením procent.',
-      configHint: 'Napojíš na useKV("master-dimmer") a helper setMasterDimmerScale – viz LiveControlView.',
+      description: 'Jednoduch├Ż slidery nebo kole─Źko pro ovl├íd├ín├ş celkov├ę intenzity se zobrazen├şm procent.',
+      configHint: 'Napoj├ş┼í na useKV("master-dimmer") a helper setMasterDimmerScale ÔÇô viz LiveControlView.',
     },
     {
       kind: 'scene-button',
-      title: 'Scénické tlačítko',
-      description: 'Spustí/preview konkrétní scénu jedním klikem, ideální pro dotykové ovládání.',
-      configHint: 'Vyber ID scény ze seznamu ScenesView (fixtures: ' + fixtures.length + ').',
+      title: 'Sc├ęnick├ę tla─Ź├ştko',
+      description: 'Spust├ş/preview konkr├ętn├ş sc├ęnu jedn├şm klikem, ide├íln├ş pro dotykov├ę ovl├íd├ín├ş.',
+      configHint: 'Vyber ID sc├ęny ze seznamu ScenesView (fixtures: ' + fixtures.length + ').',
     },
     {
       kind: 'effect-toggle',
-      title: 'Přepínač efektu',
+      title: 'P┼Öep├şna─Ź efektu',
       description: 'Toggle/on/off pro chase, rainbow nebo custom effect.',
-      configHint: 'Napojuj na effectId z aktuálních efektů (' + effects.length + ' položek).',
+      configHint: 'Napojuj na effectId z aktu├íln├şch efekt┼» (' + effects.length + ' polo┼żek).',
     },
     {
       kind: 'fixture-slider',
-      title: 'Slider kanálu',
-      description: 'Přímé řízení konkrétního DMX kanálu (např. dimmer, barva, iris).',
-      configHint: 'Vyber fixture + channelId, hodnoty se zapisují přes setFixtures ⇒ persistShowSnapshot.',
+      title: 'Slider kan├ílu',
+      description: 'P┼Ö├şm├ę ┼Ö├şzen├ş konkr├ętn├şho DMX kan├ílu (nap┼Ö. dimmer, barva, iris).',
+      configHint: 'Vyber fixture + channelId, hodnoty se zapisuj├ş p┼Öes setFixtures Ôçĺ persistShowSnapshot.',
     },
     {
       kind: 'motor-pad',
-      title: 'Motorický pad',
-      description: '2D pad/joystick pro směrování stepper motoru nebo pan/tilt pohybu.',
-      configHint: 'Využij stepperMotors (' + stepperMotors.length + ') a metody v MotorsView.',
+      title: 'Motorick├Ż pad',
+      description: '2D pad/joystick pro sm─Ťrov├ín├ş stepper motoru nebo pan/tilt pohybu.',
+      configHint: 'Vyu┼żij stepperMotors (' + stepperMotors.length + ') a metody v MotorsView.',
     },
     {
       kind: 'servo-knob',
       title: 'Servo knob',
-      description: 'Malý kruhový ovladač pro servo úhel, s možností ukázat cílovou hodnotu.',
-      configHint: 'Serva k dispozici: ' + servos.length + '. Hodnoty zapisuj přes setServos.',
+      description: 'Mal├Ż kruhov├Ż ovlada─Ź pro servo ├║hel, s mo┼żnost├ş uk├ízat c├şlovou hodnotu.',
+      configHint: 'Serva k dispozici: ' + servos.length + '. Hodnoty zapisuj p┼Öes setServos.',
     },
     {
       kind: 'markdown-note',
-      title: 'Poznámka/Markdown',
-      description: 'Statický blok s instrukcemi, QR kódem nebo rozcestníkem.',
-      configHint: 'Uložený text se bude renderovat přes markdown renderer – vhodné pro ops handover.',
+      title: 'Pozn├ímka/Markdown',
+      description: 'Statick├Ż blok s instrukcemi, QR k├│dem nebo rozcestn├şkem.',
+      configHint: 'Ulo┼żen├Ż text se bude renderovat p┼Öes markdown renderer ÔÇô vhodn├ę pro ops handover.',
     },
   ]
 
@@ -219,7 +219,7 @@ export default function CustomPageBuilder({
     }
     return {
       id: 'custom-layout',
-      name: 'Vlastní ovládání',
+      name: 'Vlastn├ş ovl├íd├ín├ş',
       grid: { columns: 12, rowHeight: 1, gap: 1 },
       blocks: [],
       updatedAt: Date.now(),
@@ -267,7 +267,7 @@ export default function CustomPageBuilder({
         return {
           id: uuid,
           kind,
-          title: 'Oblíbená scéna',
+          title: 'Obl├şben├í sc├ęna',
           size: 'sm',
           position: basePosition,
           sceneId: scenes[0]?.id ?? null,
@@ -289,7 +289,7 @@ export default function CustomPageBuilder({
         return {
           id: uuid,
           kind,
-          title: firstFixture ? `${firstFixture.name} ${firstChannel?.name ?? ''}`.trim() : 'Kanál',
+          title: firstFixture ? `${firstFixture.name} ${firstChannel?.name ?? ''}`.trim() : 'Kan├íl',
           size: 'md',
           position: basePosition,
           fixtureId: firstFixture?.id ?? null,
@@ -303,7 +303,7 @@ export default function CustomPageBuilder({
         return {
           id: uuid,
           kind,
-          title: 'Motorický pad',
+          title: 'Motorick├Ż pad',
           size: 'md',
           position: basePosition,
           motorId: stepperMotors[0]?.id ?? null,
@@ -325,10 +325,10 @@ export default function CustomPageBuilder({
         return {
           id: uuid,
           kind: 'markdown-note',
-          title: 'Poznámka',
+          title: 'Pozn├ímka',
           size: 'lg',
           position: basePosition,
-          content: '### Instrukce\n- Přidej vlastní text\n- Nebo vlož QR/URL',
+          content: '### Instrukce\n- P┼Öidej vlastn├ş text\n- Nebo vlo┼ż QR/URL',
         }
     }
   }
@@ -571,17 +571,17 @@ export default function CustomPageBuilder({
   return (
     <div className="flex flex-col gap-4">
       <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-2">Vlastní stránka</h2>
+        <h2 className="text-lg font-semibold mb-2">Vlastn├ş str├ínka</h2>
         <p className="text-sm text-muted-foreground">
-          Definovali jsme základní typy bloků a layout se brzy bude ukládat spolu s show snapshotem. Každý blok může mít vlastní
-          konfiguraci (fixture, scéna, efekt) a renderer si zvolí výslednou podobu.
+          Definovali jsme z├íkladn├ş typy blok┼» a layout se brzy bude ukl├ídat spolu s show snapshotem. Ka┼żd├Ż blok m┼»┼że m├şt vlastn├ş
+          konfiguraci (fixture, sc├ęna, efekt) a renderer si zvol├ş v├Żslednou podobu.
         </p>
       </Card>
       <Card className="p-6">
-        <h3 className="text-base font-semibold mb-4">Nastavení mřížky</h3>
+        <h3 className="text-base font-semibold mb-4">Nastaven├ş m┼Ö├ş┼żky</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-1">
-            <Label>Počet sloupců</Label>
+            <Label>Po─Źet sloupc┼»</Label>
             <Input
               type="number"
               min={4}
@@ -591,7 +591,7 @@ export default function CustomPageBuilder({
             />
           </div>
           <div className="space-y-1">
-            <Label>Výška řádku</Label>
+            <Label>V├Ż┼íka ┼Ö├ídku</Label>
             <Input
               type="number"
               min={1}
@@ -613,21 +613,21 @@ export default function CustomPageBuilder({
             />
           </div>
         <p className="text-xs text-muted-foreground mt-3">
-          Úprava parametrů mřížky se projeví jak v plátně, tak v runtime rendereru. Hodnoty se ukládají do `customLayout.grid`.
-          Tip: drž <kbd>Shift</kbd> a táhni bloky pro přesnější zarovnání (připravuje se snap‑to‑grid).
+          ├Üprava parametr┼» m┼Ö├ş┼żky se projev├ş jak v pl├ítn─Ť, tak v runtime rendereru. Hodnoty se ukl├ídaj├ş do `customLayout.grid`.
+          Tip: dr┼ż <kbd>Shift</kbd> a t├íhni bloky pro p┼Öesn─Ťj┼í├ş zarovn├ín├ş (p┼Öipravuje se snapÔÇĹtoÔÇĹgrid).
         </p>
       </Card>
       <Card className="p-6 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold">Plátno</h3>
+            <h3 className="text-base font-semibold">Pl├ítno</h3>
             <p className="text-xs text-muted-foreground">
-              {layoutPreview.grid?.columns ?? 12} sloupců · mezera {layoutPreview.grid?.gap ?? 1}
+              {layoutPreview.grid?.columns ?? 12} sloupc┼» ┬Ě mezera {layoutPreview.grid?.gap ?? 1}
             </p>
           </div>
           <div className="flex flex-col gap-2 text-xs text-muted-foreground">
             <div className="flex flex-wrap items-center gap-2">
-              <span>Modifikátory:</span>
+              <span>Modifik├ítory:</span>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -639,7 +639,7 @@ export default function CustomPageBuilder({
                       Duplicita
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Zapni pro rychlé klonování bloků kliknutím</TooltipContent>
+                  <TooltipContent>Zapni pro rychl├ę klonov├ín├ş blok┼» kliknut├şm</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -648,10 +648,10 @@ export default function CustomPageBuilder({
                       variant={modifier === 'delete' ? 'destructive' : 'outline'}
                       onClick={() => setModifier(modifier === 'delete' ? 'none' : 'delete')}
                     >
-                      Mazání
+                      Maz├ín├ş
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Zapni pro rychlé mazání bloků kliknutím</TooltipContent>
+                  <TooltipContent>Zapni pro rychl├ę maz├ín├ş blok┼» kliknut├şm</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -660,20 +660,20 @@ export default function CustomPageBuilder({
                       variant={modifier === 'multi' ? 'default' : 'outline'}
                       onClick={() => setModifier(modifier === 'multi' ? 'none' : 'multi')}
                     >
-                      Multi výběr
+                      Multi v├Żb─Ťr
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Přidávej/odebírej bloky do výběru kliknutím</TooltipContent>
+                  <TooltipContent>P┼Öid├ívej/odeb├şrej bloky do v├Żb─Ťru kliknut├şm</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline">Vybráno: {selectionCount}</Badge>
+              <Badge variant="outline">Vybr├íno: {selectionCount}</Badge>
               <Button size="sm" variant="outline" onClick={duplicateSelection} disabled={!selectionCount}>
-                Duplikovat výběr
+                Duplikovat v├Żb─Ťr
               </Button>
               <Button size="sm" variant="outline" onClick={deleteSelection} disabled={!selectionCount}>
-                Smazat výběr
+                Smazat v├Żb─Ťr
               </Button>
               <TooltipProvider>
                 <Tooltip>
@@ -746,11 +746,11 @@ export default function CustomPageBuilder({
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          Tip: Ctrl/Cmd + D klonuje vybraný blok, Delete jej odebere. Alt + šipky mění velikost, samotné šipky posouvají výběr (Shift = větší krok).
+          Tip: Ctrl/Cmd + D klonuje vybran├Ż blok, Delete jej odebere. Alt + ┼íipky m─Ťn├ş velikost, samotn├ę ┼íipky posouvaj├ş v├Żb─Ťr (Shift = v─Ťt┼í├ş krok).
         </p>
       </Card>
       <Card className="p-6">
-        <h3 className="text-base font-semibold mb-4">Dostupné bloky</h3>
+        <h3 className="text-base font-semibold mb-4">Dostupn├ę bloky</h3>
         <div className="grid gap-4 md:grid-cols-2">
           {availableBlocks.map((block) => (
             <div key={block.kind} className="rounded-lg border p-4 flex flex-col gap-2">
@@ -761,30 +761,30 @@ export default function CustomPageBuilder({
                 <span className="font-medium">Workflow:</span> {block.configHint}
               </p>
               <div className="flex items-center justify-between pt-2">
-                <Badge variant="outline">Bloků: {blockStats[block.kind]}</Badge>
+                <Badge variant="outline">Blok┼»: {blockStats[block.kind]}</Badge>
                 <Button size="sm" variant="outline" onClick={() => handleAddBlock(block.kind)} className="gap-2">
                   <PlusCircle size={16} />
-                  Přidat
+                  P┼Öidat
                 </Button>
               </div>
             </div>
           ))}
         </div>
         <p className="text-sm text-muted-foreground mt-6">
-          Bloky přidáš jedním klikem a poté je můžeš přetahovat níže – konfigurace se ukládá do{' '}
+          Bloky p┼Öid├í┼í jedn├şm klikem a pot├ę je m┼»┼że┼í p┼Öetahovat n├ş┼że ÔÇô konfigurace se ukl├íd├í do{' '}
           <code className="mx-1 text-xs">customLayout</code> v show snapshotu.
         </p>
       </Card>
       <Card className="p-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-base font-semibold">Aktuální layout</h3>
+          <h3 className="text-base font-semibold">Aktu├íln├ş layout</h3>
           <p className="text-xs text-muted-foreground">
-            {blocks.length ? `${blocks.length} bloků · aktualizováno ${customLayout?.updatedAt ? new Date(customLayout.updatedAt).toLocaleString() : 'nikdy'}` : 'Zatím žádné bloky'}
+            {blocks.length ? `${blocks.length} blok┼» ┬Ě aktualizov├íno ${customLayout?.updatedAt ? new Date(customLayout.updatedAt).toLocaleString() : 'nikdy'}` : 'Zat├şm ┼ż├ídn├ę bloky'}
           </p>
         </div>
         <Separator className="my-3" />
         {blocks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Přidej první blok výše a layout se uloží do show snapshotu.</p>
+          <p className="text-sm text-muted-foreground">P┼Öidej prvn├ş blok v├Ż┼íe a layout se ulo┼ż├ş do show snapshotu.</p>
         ) : (
           <DndContext
             sensors={sensors}
@@ -813,13 +813,13 @@ export default function CustomPageBuilder({
         )}
       </Card>
       <Card className="p-6">
-        <h3 className="text-base font-semibold mb-4">Nastavení bloku</h3>
+        <h3 className="text-base font-semibold mb-4">Nastaven├ş bloku</h3>
         {selectionCount > 1 ? (
           <p className="text-sm text-muted-foreground">
-            Vybráno {selectionCount} bloků. Použij bulk akce výše nebo zmenši výběr, pokud chceš upravovat konkrétní blok.
+            Vybr├íno {selectionCount} blok┼». Pou┼żij bulk akce v├Ż┼íe nebo zmen┼íi v├Żb─Ťr, pokud chce┼í upravovat konkr├ętn├ş blok.
           </p>
         ) : !selectedBlock ? (
-          <p className="text-sm text-muted-foreground">Vyber blok v seznamu nebo na plátně pro úpravu.</p>
+          <p className="text-sm text-muted-foreground">Vyber blok v seznamu nebo na pl├ítn─Ť pro ├║pravu.</p>
         ) : (
           <BlockEditor
             block={selectedBlock}
@@ -879,7 +879,7 @@ function SortableBlockRow({
         className="cursor-grab rounded-md border bg-background px-2 py-1 text-muted-foreground hover:text-foreground"
         {...attributes}
         {...listeners}
-        aria-label="Přesunout blok"
+        aria-label="P┼Öesunout blok"
       >
         <DotsSixVertical size={16} weight="bold" />
       </button>
@@ -905,7 +905,7 @@ function SortableBlockRow({
               onDuplicate(block.id)
             }}
           >
-            Kopírovat
+            Kop├şrovat
           </Button>
           <Button
             size="icon"
@@ -985,16 +985,16 @@ function BlockEditor({
         return (
           <>
             <div className="space-y-1">
-              <Label>Scéna</Label>
+              <Label>Sc├ęna</Label>
               <Select
                 value={block.sceneId ?? 'none'}
                 onValueChange={(value) => updateCurrent({ sceneId: value === 'none' ? null : value } as SceneButtonBlock)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Vyber scénu" />
+                  <SelectValue placeholder="Vyber sc├ęnu" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádná</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├í</SelectItem>
                   {scenes.map((scene) => (
                     <SelectItem key={scene.id} value={scene.id}>
                       {scene.name}
@@ -1004,7 +1004,7 @@ function BlockEditor({
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Chování</Label>
+              <Label>Chov├ín├ş</Label>
               <Select value={block.behavior} onValueChange={(value: SceneButtonBlock['behavior']) => updateCurrent({ behavior: value } as SceneButtonBlock)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1031,7 +1031,7 @@ function BlockEditor({
                   <SelectValue placeholder="Vyber efekt" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádný</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├Ż</SelectItem>
                   {effects.map((effect) => (
                     <SelectItem key={effect.id} value={effect.id}>
                       {effect.name}
@@ -1041,7 +1041,7 @@ function BlockEditor({
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Chování</Label>
+              <Label>Chov├ín├ş</Label>
               <Select value={block.behavior} onValueChange={(value: EffectToggleBlock['behavior']) => updateCurrent({ behavior: value } as EffectToggleBlock)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -1061,7 +1061,7 @@ function BlockEditor({
         return (
           <>
             <div className="space-y-1">
-              <Label>Svítidlo</Label>
+              <Label>Sv├ştidlo</Label>
               <Select
                 value={block.fixtureId ?? selectedFixture?.id ?? 'none'}
                 onValueChange={(value) => {
@@ -1080,7 +1080,7 @@ function BlockEditor({
                   <SelectValue placeholder="Vyber fixture" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádné</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├ę</SelectItem>
                   {fixtures.map((fixture) => (
                     <SelectItem key={fixture.id} value={fixture.id}>
                       {fixture.name}
@@ -1090,16 +1090,16 @@ function BlockEditor({
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Kanál</Label>
+              <Label>Kan├íl</Label>
               <Select
                 value={block.channelId ?? 'none'}
                 onValueChange={(value) => updateCurrent({ channelId: value === 'none' ? null : value } as FixtureSliderBlock)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Vyber kanál" />
+                  <SelectValue placeholder="Vyber kan├íl" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádný</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├Ż</SelectItem>
                   {channels.map((channel) => (
                     <SelectItem key={channel.id} value={channel.id}>
                       {channel.name} (#{channel.number})
@@ -1154,7 +1154,7 @@ function BlockEditor({
                   <SelectValue placeholder="Vyber motor" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádný</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├Ż</SelectItem>
                   {stepperMotors.map((motor) => (
                     <SelectItem key={motor.id} value={motor.id}>
                       {motor.name}
@@ -1172,7 +1172,7 @@ function BlockEditor({
                 <SelectContent>
                   <SelectItem value="pan">Pan</SelectItem>
                   <SelectItem value="tilt">Tilt</SelectItem>
-                  <SelectItem value="linear">Lineární</SelectItem>
+                  <SelectItem value="linear">Line├írn├ş</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1202,7 +1202,7 @@ function BlockEditor({
                   <SelectValue placeholder="Vyber servo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Žádné</SelectItem>
+                  <SelectItem value="none">┼Ż├ídn├ę</SelectItem>
                   {servos.map((servo) => (
                     <SelectItem key={servo.id} value={servo.id}>
                       {servo.name}
@@ -1212,7 +1212,7 @@ function BlockEditor({
               </Select>
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="servo-show-target">Zobrazit cílovou hodnotu</Label>
+              <Label htmlFor="servo-show-target">Zobrazit c├şlovou hodnotu</Label>
               <Switch
                 id="servo-show-target"
                 checked={block.showTarget ?? true}
@@ -1224,7 +1224,7 @@ function BlockEditor({
       case 'markdown-note':
         return (
           <div className="space-y-1">
-            <Label>Obsah poznámky (Markdown)</Label>
+            <Label>Obsah pozn├ímky (Markdown)</Label>
             <Textarea
               rows={6}
               value={block.content}
@@ -1251,7 +1251,7 @@ function BlockEditor({
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
         <div className="space-y-1">
-          <Label>Název</Label>
+          <Label>N├ízev</Label>
           <Input value={block.title ?? ''} onChange={(event) => updateCurrent({ title: event.target.value })} />
         </div>
         <div className="space-y-1">

@@ -1,6 +1,16 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -21,8 +31,18 @@ import type {
   CustomBlockPosition,
   Universe,
 } from '@/lib/types'
-import { CustomLayoutRenderer, type BlockRendererMap } from '@/components/CustomLayoutRenderer'
+import {
+  CustomLayoutRenderer,
+  type BlockRendererMap,
+  type BlockPalette,
+  type AppearancePreset,
+  BLOCK_KIND_LABELS,
+} from '@/components/CustomLayoutRenderer'
 import { cn } from '@/lib/utils'
+import ConnectionMonitorCard from '@/components/ConnectionMonitorCard'
+import { useCanvasPreferences } from '@/hooks/useCanvasPreferences'
+import { useCustomBlockPalette } from '@/hooks/useCustomBlockPalette'
+import { CUSTOM_BLOCK_KIND_ORDER } from '@/config/customBlocks'
 
 interface CustomDashboardProps {
   layout: CustomLayout | null
@@ -39,8 +59,29 @@ interface CustomDashboardProps {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
+const DASHBOARD_BLOCK_PALETTE: BlockPalette = {
+  'master-dimmer': 'from-slate-900/40 via-slate-900/0 to-slate-900/60',
+  'scene-button': 'from-rose-500/30 via-transparent to-rose-900/40',
+  'effect-toggle': 'from-amber-400/30 via-transparent to-amber-900/40',
+  'fixture-slider': 'from-blue-400/30 via-transparent to-blue-900/40',
+  'motor-pad': 'from-emerald-400/30 via-transparent to-emerald-900/40',
+  'servo-knob': 'from-purple-400/30 via-transparent to-purple-900/40',
+  'markdown-note': 'from-muted/40 via-transparent to-muted-foreground/40',
+}
+
+const APPEARANCE_OPTIONS: AppearancePreset[] = ['soft', 'flat', 'glass', 'custom']
+const DASHBOARD_CANVAS_PREFS_KEY = 'custom-dashboard-canvas-prefs'
+const DASHBOARD_BLOCK_PALETTE_KEY = 'custom-dashboard-block-palette'
+
+type DashboardCanvasPrefs = {
+  appearance: AppearancePreset
+  showGuides: boolean
+  showSummary: boolean
+}
+
 const formatMarkdown = (content: string | undefined) =>
-  content?.trim() ? marked.parse(content) : '<p class="text-muted-foreground">Žádný obsah</p>'
+  content?.trim() ? marked.parse(content) : '<p class="text-muted-foreground">??dn? obsah</p>'
+
 
 export default function CustomDashboard({
   layout,
@@ -54,6 +95,25 @@ export default function CustomDashboard({
   setEffects,
   setActiveScene,
 }: CustomDashboardProps) {
+  const {
+    appearance: canvasAppearance,
+    setAppearance: setCanvasAppearance,
+    showGuides: showDashboardGridGuides,
+    setShowGuides: setShowDashboardGridGuides,
+    showSummary: showDashboardSummary,
+    setShowSummary: setShowDashboardSummary,
+    resetPreferences: resetDashboardCanvasPrefs,
+  } = useCanvasPreferences(
+    DASHBOARD_CANVAS_PREFS_KEY,
+    { appearance: 'flat', showGuides: false, showSummary: false },
+    { allowedAppearances: APPEARANCE_OPTIONS }
+  )
+  const {
+    palette: dashboardCustomPalette,
+    overrides: dashboardCustomPaletteOverrides,
+    setPaletteEntry: setDashboardPaletteEntry,
+    resetPalette: resetDashboardPalette,
+  } = useCustomBlockPalette(DASHBOARD_BLOCK_PALETTE_KEY, DASHBOARD_BLOCK_PALETTE)
   const [masterDimmer, setMasterDimmer] = useKV<number>('master-dimmer', 255)
   const masterDimmerValue = typeof masterDimmer === 'number' ? clamp(masterDimmer, 0, 255) : 255
 
@@ -280,23 +340,103 @@ export default function CustomDashboard({
     return renderMap
   }, [applyScene, effects, fixtures, handleMasterChange, masterDimmerValue, scenes, setEffects, setFixtures, toggleEffect, universes])
 
-  if (!layout || !layout.blocks?.length) {
-    return (
-      <Card className="border-dashed p-6 text-sm text-muted-foreground">
-        Vlastní dashboard není zatím nakonfigurován. Otevři záložku „Custom“ a přidej bloky do layoutu.
-      </Card>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-4">
-      <Card className="p-4">
-        <p className="text-sm text-muted-foreground">
-          Dashboard používá layout uložený v show snapshotu. Přidávej nebo upravuj bloky v sekci „Custom“ a změny se zde projeví
-          po synchronizaci.
-        </p>
-      </Card>
-      <CustomLayoutRenderer layout={layout} renderers={renderers} showEmptyState />
+      <div className="grid gap-4 md:grid-cols-2">
+        <ConnectionMonitorCard />
+        <Card className="p-4">
+          <p className="text-sm text-muted-foreground">
+            Dashboard pou??v? layout ulo?en? v show snapshotu. P?id?vej nebo upravuj bloky v sekci ?Custom? a zm?ny se zde projev?
+            po synchronizaci. Pokud nejsou bloky definovan?, pou?ij builder nebo importuj layout p?es `/import`.
+          </p>
+        </Card>
+
+        <Card className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Zobrazení plátna</p>
+              <p className="text-xs text-muted-foreground">Runtime sdílí stejné téma jako builder.</p>
+            </div>
+            <Select value={canvasAppearance} onValueChange={(value: AppearancePreset) => setCanvasAppearance(value)}>
+              <SelectTrigger className="w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {APPEARANCE_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option === 'soft' ? 'Soft' : option === 'flat' ? 'Flat' : option === 'glass' ? 'Glass' : 'Custom'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center justify-between rounded-md border px-3 py-2">
+            <div>
+              <p className="text-xs font-medium">Grid guides</p>
+              <p className="text-xs text-muted-foreground">Zvýrazní skrytou mřížkovou síť.</p>
+            </div>
+            <Switch checked={showDashboardGridGuides} onCheckedChange={setShowDashboardGridGuides} />
+          </div>
+          <div className="flex items-center justify-between rounded-md border px-3 py-2">
+            <div>
+              <p className="text-xs font-medium">Souhrn mřížky</p>
+              <p className="text-xs text-muted-foreground">Karta nad plátnem s parametry.</p>
+            </div>
+            <Switch checked={showDashboardSummary} onCheckedChange={setShowDashboardSummary} />
+          </div>
+          {canvasAppearance === 'custom' ? (
+            <div className="space-y-3 rounded-lg border bg-muted/10 p-3">
+              <p className="text-xs text-muted-foreground">Tailwind gradienty se aplikují na runtime bloky. Změny se ukládají jen lokálně.</p>
+              {CUSTOM_BLOCK_KIND_ORDER.map((kind) => (
+                <div key={kind} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">{BLOCK_KIND_LABELS[kind]}</Label>
+                    {dashboardCustomPaletteOverrides[kind] ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => setDashboardPaletteEntry(kind, DASHBOARD_BLOCK_PALETTE[kind] ?? '')}
+                      >
+                        Reset
+                      </Button>
+                    ) : null}
+                  </div>
+                  <Input
+                    value={dashboardCustomPaletteOverrides[kind] ?? DASHBOARD_BLOCK_PALETTE[kind] ?? ''}
+                    onChange={(event) => setDashboardPaletteEntry(kind, event.target.value)}
+                  />
+                </div>
+              ))}
+              <Button size="sm" variant="outline" onClick={resetDashboardPalette}>
+                Obnovit paletu
+              </Button>
+            </div>
+          ) : null}
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                resetDashboardCanvasPrefs()
+                resetDashboardPalette()
+              }}
+            >
+              Obnovit výchozí vzhled
+            </Button>
+          </div>
+        </Card>
+      </div>
+      <CustomLayoutRenderer
+        layout={layout}
+        renderers={renderers}
+        showEmptyState
+        appearance={canvasAppearance}
+        blockPalette={canvasAppearance === 'custom' ? dashboardCustomPalette : DASHBOARD_BLOCK_PALETTE}
+        showGridGuides={showDashboardGridGuides}
+        showGridSummary={showDashboardSummary}
+      />
     </div>
   )
 }

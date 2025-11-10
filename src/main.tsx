@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from "react-error-boundary";
+import "./lib/setupSparkKvMock"
 import "@github/spark/spark"
 
 import App from './App.tsx'
