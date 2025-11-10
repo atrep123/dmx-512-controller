@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ServerClientOptions, ServerClient } from '@/lib/serverClient'
 import ConnectionView from '../ConnectionView'
+import { buildBackendUrl } from '@/lib/env'
 
 vi.mock('@github/spark/hooks', () => ({
   useKV: <T,>(key: string, initial: T) => useState(initial),
@@ -44,12 +45,7 @@ describe('ConnectionView REST fallback', () => {
       const testButton = screen.getByRole('button', { name: /testovací příkaz/i })
       await user.click(testButton)
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        '/rgb',
-        expect.objectContaining({
-          method: 'POST',
-        })
-      )
+      expect(fetchMock).toHaveBeenCalledWith(buildBackendUrl('/rgb'), expect.objectContaining({ method: 'POST' }))
     } finally {
       globalThis.fetch = originalFetch
     }

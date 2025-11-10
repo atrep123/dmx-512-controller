@@ -2,6 +2,7 @@ import type { Command, DmxPatchEntry } from '@/shared/types'
 import { getServerClient } from '@/lib/transport'
 import { isTestEnv } from '@/lib/isTestEnv'
 import { getMasterDimmerScale } from '@/lib/masterDimmer'
+import { buildBackendUrl } from '@/lib/env'
 
 type UniverseKey = number
 type PatchObserver = (universe: number, patch: DmxPatchEntry[]) => void
@@ -60,7 +61,7 @@ async function send(cmd: Command) {
     return
   }
   // Fallback to REST
-  await fetch('/command', {
+  await fetch(buildBackendUrl('/command'), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(cmd),

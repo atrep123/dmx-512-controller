@@ -26,6 +26,7 @@ import { registerServerClient } from '@/lib/transport'
 import { UsbDmxBridge, isWebSerialSupported, type UsbPortInfo } from '@/lib/usbDmx'
 import { DesktopIndicator } from '@/components/DesktopIndicator'
 import { registerPatchObserver } from '@/lib/dmxQueue'
+import { buildBackendUrl } from '@/lib/env'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
@@ -274,7 +275,7 @@ export default function ConnectionView() {
 
   const refreshMetrics = useCallback(async () => {
     try {
-      const response = await fetch('/metrics', { cache: 'no-store' })
+      const response = await fetch(buildBackendUrl('/metrics'), { cache: 'no-store' })
       if (!response.ok) throw new Error(`status ${response.status}`)
       const text = await response.text()
       setMetrics(parsePrometheus(text))
@@ -287,7 +288,7 @@ export default function ConnectionView() {
   const handleRefreshState = useCallback(async () => {
     try {
       setIsRefreshingState(true)
-      const response = await fetch('/rgb', { cache: 'no-store' })
+      const response = await fetch(buildBackendUrl('/rgb'), { cache: 'no-store' })
       if (!response.ok) throw new Error(`status ${response.status}`)
       const payload = (await response.json()) as Record<string, unknown>
       if (typeof payload.r === 'number' && typeof payload.g === 'number' && typeof payload.b === 'number') {
@@ -588,7 +589,7 @@ export default function ConnectionView() {
         // Prefer legacy REST endpoint for compatibility; fallback to unified /command
         let ok = false
         try {
-          const resRgb = await fetch('/rgb', {
+          const resRgb = await fetch(buildBackendUrl('/rgb'), {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ cmdId: crypto.randomUUID(), src: 'ui', r, g, b }),
@@ -598,7 +599,11 @@ export default function ConnectionView() {
           ok = false
         }
         if (!ok) {
-          await fetch('/command', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
+          await fetch(buildBackendUrl('/command'), {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body,
+          })
         }
       }
       setPacketsSent((prev) => prev + 1)

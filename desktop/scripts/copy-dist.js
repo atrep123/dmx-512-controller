@@ -34,3 +34,10 @@ function copyRecursive(source, target) {
 
 copyRecursive(src, dest);
 console.log(`[copy-dist] Copied ${src} -> ${dest}`);
+
+const backendExe = path.join(process.cwd(), 'src-tauri', 'resources', 'bin', 'dmx-backend.exe');
+if (!fs.existsSync(backendExe)) {
+  console.warn(
+    `[copy-dist] WARN: Missing ${backendExe}. Run "node scripts/build-server-exe.mjs" (or scripts\\build-server-exe.bat on Windows) before building the desktop shell.`,
+  );
+}

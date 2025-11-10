@@ -17,6 +17,7 @@ import httpx
 
 from fastapi import APIRouter, Depends, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, PlainTextResponse, Response, StreamingResponse
+from pydantic import ValidationError
 
 from .context import AppContext
 from .engine import Engine
@@ -37,6 +38,7 @@ from .models import (
     BackupRestoreModel,
     DMXTestRequest,
     DesktopPreferences,
+    CustomLayoutModel,
 )
 from .util.schema import load_schemas
 from .fixtures.mapper import resolve_attrs
@@ -725,6 +727,7 @@ def _current_show_payload(context: AppContext) -> dict[str, Any]:
         "stepperMotors": snapshot.get("stepperMotors") or [],
         "servos": snapshot.get("servos") or [],
         "midiMappings": snapshot.get("midiMappings") or [],
+        "customLayout": snapshot.get("customLayout") or None,
     }
     return payload
 
@@ -756,6 +759,19 @@ async def import_show(payload: dict[str, Any], context: AppContext = Depends(get
     context.scenes = validated_scenes
     if context.scenes_store is not None:
         await context.scenes_store.save(validated_scenes)
+
+    layout_payload = payload.get("customLayout")
+    if layout_payload is None:
+        validated_layout: dict[str, Any] | None = None
+    elif isinstance(layout_payload, dict):
+        try:
+            validated_layout = CustomLayoutModel.model_validate(layout_payload).model_dump()
+        except ValidationError as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid customLayout payload: {exc.errors()}") from exc
+    else:
+        raise HTTPException(status_code=400, detail="customLayout must be an object or null")
+    payload["customLayout"] = validated_layout
+
     context.show_snapshot = payload
     if context.show_store is not None:
         await context.show_store.save(payload)

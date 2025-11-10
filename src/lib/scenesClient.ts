@@ -1,28 +1,29 @@
-import type { Scene } from "@/lib/types";
+import type { Scene } from '@/lib/types'
+import { buildBackendUrl } from '@/lib/env'
 
 const headers = {
-  "content-type": "application/json",
-};
+  'content-type': 'application/json',
+}
 
 export async function fetchScenes(): Promise<Scene[]> {
-  const res = await fetch("/scenes", {
+  const res = await fetch(buildBackendUrl('/scenes'), {
     headers,
-    method: "GET",
-  });
+    method: 'GET',
+  })
   if (!res.ok) {
-    throw new Error("Failed to load scenes");
+    throw new Error('Failed to load scenes')
   }
-  return (await res.json()) as Scene[];
+  return (await res.json()) as Scene[]
 }
 
 export async function saveScenes(scenes: Scene[]): Promise<Scene[]> {
-  const res = await fetch("/scenes", {
+  const res = await fetch(buildBackendUrl('/scenes'), {
     headers,
-    method: "PUT",
+    method: 'PUT',
     body: JSON.stringify(scenes),
-  });
+  })
   if (!res.ok) {
-    throw new Error("Failed to save scenes");
+    throw new Error('Failed to save scenes')
   }
-  return (await res.json()) as Scene[];
+  return (await res.json()) as Scene[]
 }

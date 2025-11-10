@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..models import SceneModel
+from pydantic import ValidationError
+
+from ..models import CustomLayoutModel, SceneModel
 from ..persistence.scenes import ScenesStore
 from ..persistence.show import ShowStore
 
@@ -52,4 +54,12 @@ async def load_show_snapshot(store: ShowStore | None) -> dict[str, Any]:
         "midiMappings": raw.get("midiMappings") if isinstance(raw.get("midiMappings"), list) else [],
         "scenes": sanitize_scene_list(raw.get("scenes")),
     }
+    layout_raw = raw.get("customLayout")
+    if isinstance(layout_raw, dict):
+        try:
+            snapshot["customLayout"] = CustomLayoutModel.model_validate(layout_raw).model_dump()
+        except ValidationError:
+            snapshot["customLayout"] = None
+    else:
+        snapshot["customLayout"] = None
     return snapshot

@@ -103,6 +103,104 @@ export interface AppState {
   effects: Effect[]
 }
 
+export type CustomBlockKind =
+  | 'master-dimmer'
+  | 'scene-button'
+  | 'effect-toggle'
+  | 'fixture-slider'
+  | 'motor-pad'
+  | 'servo-knob'
+  | 'markdown-note'
+
+export type CustomBlockSize = 'xs' | 'sm' | 'md' | 'lg'
+
+export interface CustomBlockPosition {
+  col: number
+  row: number
+  width: number
+  height: number
+}
+
+interface CustomBlockBase {
+  id: string
+  kind: CustomBlockKind
+  title?: string
+  description?: string
+  /**
+   * Visual hint for default width/height presets. Concrete renderer should map it to grid spans.
+   */
+  size?: CustomBlockSize
+  position?: CustomBlockPosition
+}
+
+export interface MasterDimmerBlock extends CustomBlockBase {
+  kind: 'master-dimmer'
+  showPercent?: boolean
+}
+
+export interface SceneButtonBlock extends CustomBlockBase {
+  kind: 'scene-button'
+  sceneId: string | null
+  behavior: 'recall' | 'toggle' | 'preview'
+}
+
+export interface EffectToggleBlock extends CustomBlockBase {
+  kind: 'effect-toggle'
+  effectId: string | null
+  behavior: 'toggle' | 'on' | 'off'
+}
+
+export interface FixtureSliderBlock extends CustomBlockBase {
+  kind: 'fixture-slider'
+  fixtureId: string | null
+  channelId: string | null
+  min?: number
+  max?: number
+  showValue?: boolean
+}
+
+export interface MotorPadBlock extends CustomBlockBase {
+  kind: 'motor-pad'
+  motorId: string | null
+  axis: 'pan' | 'tilt' | 'linear'
+  speedScale?: number
+}
+
+export interface ServoKnobBlock extends CustomBlockBase {
+  kind: 'servo-knob'
+  servoId: string | null
+  showTarget?: boolean
+}
+
+export interface MarkdownNoteBlock extends CustomBlockBase {
+  kind: 'markdown-note'
+  content: string
+}
+
+export type CustomBlock =
+  | MasterDimmerBlock
+  | SceneButtonBlock
+  | EffectToggleBlock
+  | FixtureSliderBlock
+  | MotorPadBlock
+  | ServoKnobBlock
+  | MarkdownNoteBlock
+
+export interface CustomLayout {
+  id: string
+  name: string
+  /**
+   * Optional grid definition; renderer can ignore or override.
+   */
+  grid?: {
+    columns: number
+    rowHeight: number
+    gap: number
+  }
+  blocks: CustomBlock[]
+  updatedAt: number
+}
+
 export interface ProjectMeta {
   id: string
   name: string

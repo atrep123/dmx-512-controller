@@ -13,6 +13,7 @@ import { fixtureTemplates, findFixtureTemplate } from '@/lib/fixtureTemplates'
 import MidiPanel from '@/components/MidiPanel'
 import MidiMappingsPanel from '@/components/MidiMappingsPanel'
 import { DesktopBackendConsole } from '@/components/DesktopBackendConsole'
+import { buildBackendUrl } from '@/lib/env'
 
 interface SetupViewProps {
     universes: Universe[]
@@ -57,7 +58,7 @@ export default function SetupView({
             setDesktopPrefsLoading(true)
             setDesktopPrefsError(null)
             try {
-                const response = await fetch('/desktop/preferences')
+                const response = await fetch(buildBackendUrl('/desktop/preferences'))
                 if (!response.ok) throw new Error(`HTTP ${response.status}`)
                 const body = await response.json()
                 if (!cancelled) {

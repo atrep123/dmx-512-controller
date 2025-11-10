@@ -1,6 +1,7 @@
 import type { Command, Ack } from '@/shared/types';
 import { notifyAck } from '@/lib/transport';
 import { isTestEnv } from '@/lib/isTestEnv';
+import { buildWebSocketUrl } from '@/lib/env';
 
 export type RgbStateMsg = { type: 'state'; r: number; g: number; b: number; seq: number };
 type PongMsg = { type: 'pong'; ts?: number };
@@ -27,7 +28,7 @@ export type ServerClient = {
 };
 
 export function createServerClient(opts: ServerClientOptions): ServerClient {
-  const url = opts.url ?? (import.meta.env.VITE_WS_URL ?? 'ws://localhost:5173/ws');
+  const url = opts.url ?? buildWebSocketUrl();
   const token = opts.token ?? (import.meta.env.VITE_API_KEY ?? 'demo-key');
   const maxBackoff = Math.max(1000, opts.maxBackoffMs ?? 10_000);
   const pingSec = Math.max(5, opts.pingSec ?? 15);

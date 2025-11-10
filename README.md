@@ -16,6 +16,7 @@ Profesionální DMX 512 řízení osvětlení a motion prvků, které běží ja
 - **Projekty & zálohy** – více show v jednom repu, cloud-ready zálohy s volitelným šifrováním a diff-friendly JSON snapshoty.
 - **Automatizace** – AI/Codex workflowy (viz `docs/AI_AUTOMATION.md`) připravené pro cron, CI i VS Code agent režim.
 - **Desktop distribuce** – PyInstaller backend (`scripts/build-server-exe.bat`) + Tauri wrapper s onboarding wizardem, updaterem a MSI/NSIS instalátory.
+- **Custom dashboard** – drag & drop builder uložený v show snapshotu (`docs/CUSTOM_LAYOUT.md`), vlastní bloky a runtime renderer.
 
 Detailní přehled funkcí: [`docs/FEATURES.md`](docs/FEATURES.md).
 
@@ -58,6 +59,12 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
    python -m pytest server/tests
    ```
 
+### Seed show pro lok?ln? v?voj
+
+- Repo obsahuje realistick? snapshot rig? v `data/show.json` + `data/scenes.json`. Backend je na?te automaticky p?i startu a UI tak ihned zobrazuje fixtures, sc?ny, efekty i MIDI mapy.
+- Pokud chce? seed upravit (p?idat dal?? universa, sv?tidla, sc?ny nebo efekty), sta?? tyto JSONy editovat a restartovat backend nebo v UI kliknout na ?Synchronizovat?. Backend zm?ny ulo?? zp?t.
+- Detailn? popis form?tu i doporu?en?ho workflow je v [`docs/SEED_DATA.md`](docs/SEED_DATA.md).
+
 ---
 
 ## DMX integrace
@@ -81,26 +88,36 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 
 ## Desktop distribuce
 
-1. Backend sidecar (PyInstaller) – zkopíruje `dmx-backend.exe` do Tauri bundle:
-   ```powershell
-   scripts\build-server-exe.bat
-   ```
-2. Slož `desktop` shell:
-   ```powershell
-   cd desktop
-   npm install
-   npm run build
-   ```
-   Výstup: `desktop/src-tauri/target/release/bundle/{msi,nsis}`.
-3. První spuštění řeší wizard (`src/components/DesktopOnboarding.tsx`) – licence, DMX detekce/test, kanál updatů, telemetrie.
-   - Wizard lze kdykoli restartovat z Nastavení (karta „Desktop onboarding“) nebo přes Tauri tray menu (*Run Onboarding*).
-4. Updater je nastavený v `desktop/src-tauri/tauri.conf.json` (`https://updates.atmosfil.cz/desktop/release.json`). V CI nahraj skutečný public key a publikuj podepsané `release.json`.
-5. Publikace release: spusť workflow **Desktop Release** (Actions → _Desktop Release_ → Run workflow), zadej `channel` (`stable`/`beta`) a verzi. Workflow:
-   - postaví PyInstaller + Tauri (`scripts/build-server-exe.bat`, `desktop/npm run build`)
-   - podepíše (pokud jsou secrets)
-   - vygeneruje `release.json` (stable/beta)
-   - vytvoří GitHub release s MSI, NSIS a manifestem
-   - pokud nastavíš `UPDATES_BUCKET` + AWS klíče, pushne `<channel>-release.json` i na `https://updates.atmosfil.cz/desktop/<channel>/release.json` pro backend proxy
+Podrobnosti jsou v [`docs/DESKTOP_APP.md`](docs/DESKTOP_APP.md) a `desktop/README.md`. Shrnut? workflow je dostupn? i p?es npm skripty:
+
+- **Instalace z?vislost?**
+  ```bash
+  npm install
+  cd desktop && npm install
+  ```
+- **PyInstaller backend (dmx-backend.exe)**
+  ```bash
+  npm run desktop:backend   # = node scripts/build-server-exe.mjs
+  ```
+  Artefakt: `server/dist/dmx-backend.exe` + kopie v `desktop/src-tauri/resources/bin/`.
+- **Dev shell**
+  ```bash
+  npm run desktop:dev
+  ```
+  Spust? `npm run build`, zkop?ruje `dist/` do `desktop/src-tauri/resources/app`, nastartuje `tauri dev` a sidecar (SPA p?ij?m? `desktop://backend/{waiting,ready,error}`).
+- **Production build**
+  ```bash
+  npm run desktop:build
+  ```
+  V?stup: MSI + NSIS (`desktop/src-tauri/target/release/bundle`).
+- **Release manifest + podpis**
+  ```bash
+  npm run desktop:release
+  ```
+  Vy?aduje `TAURI_SIGNING_PRIVATE_KEY(_PATH)` (+ voliteln? heslo). `desktop/scripts/create-release-json.mjs` podep??e NSIS a ulo?? `dist/desktop/<channel>-release.json`, kter? pou??v? updater v `tauri.conf.json`.
+
+GitHub workflow **Desktop Release** d?l? tot?? (PyInstaller, Tauri build, podpis, release manifest, upload). Sta?? zvolit `channel`, verzi a dodat secrets (signing + voliteln? upload na S3/CDN).
+
 
 ---
 
@@ -123,6 +140,7 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 
 - docs/FEATURES.md – kompletní seznam funkcí (osvětlení, motion, automaty, limity).
 - docs/AI_AUTOMATION.md – autonomní Codex / GPT workflowy, CI/cron příklady.
+- docs/DESKTOP_APP.md – end-to-end průvodce desktop buildem a releasy.
 - docs/DESKTOP_INSTALL.md – PyInstaller + Tauri build guide a poznámky k updateru.
 - docs/DESKTOP_WRAPPER_PLAN.md – roadmapa desktop verze (signing, CI, QA).
 - docs/DEPLOYMENT_GUIDE.md – deployment backendu (Docker, infra/Caddy).

@@ -2,9 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    NonNegativeInt,
+    PositiveFloat,
+    PositiveInt,
+    field_validator,
+)
 
 from .util.ulid import is_valid_ulid
 
@@ -190,6 +198,117 @@ class DesktopPreferences(BaseModel):
     completedAt: PositiveInt | None = None
 
 
+CustomBlockKind = Literal[
+    "master-dimmer",
+    "scene-button",
+    "effect-toggle",
+    "fixture-slider",
+    "motor-pad",
+    "servo-knob",
+    "markdown-note",
+]
+CustomBlockSize = Literal["xs", "sm", "md", "lg"]
+
+
+class CustomBlockPosition(BaseModel):
+    col: NonNegativeInt = 0
+    row: NonNegativeInt = 0
+    width: PositiveInt = Field(3, le=24)
+    height: PositiveInt = Field(1, le=24)
+
+
+class CustomBlockBase(BaseModel):
+    id: str
+    title: str | None = None
+    description: str | None = None
+    size: CustomBlockSize | None = None
+    position: CustomBlockPosition | None = None
+
+
+class MasterDimmerBlock(CustomBlockBase):
+    kind: Literal["master-dimmer"]
+    showPercent: bool | None = True
+
+
+class SceneButtonBlock(CustomBlockBase):
+    kind: Literal["scene-button"]
+    sceneId: str | None = None
+    behavior: Literal["recall", "toggle", "preview"] = "recall"
+
+
+class EffectToggleBlock(CustomBlockBase):
+    kind: Literal["effect-toggle"]
+    effectId: str | None = None
+    behavior: Literal["toggle", "on", "off"] = "toggle"
+
+
+class FixtureSliderBlock(CustomBlockBase):
+    kind: Literal["fixture-slider"]
+    fixtureId: str | None = None
+    channelId: str | None = None
+    min: NonNegativeInt | None = Field(0, le=255)
+    max: NonNegativeInt | None = Field(255, le=255)
+    showValue: bool | None = True
+
+    @field_validator("max")
+    @classmethod
+    def _validate_max(cls, value: int | None) -> int | None:
+        if value is None:
+            return value
+        return min(255, max(0, value))
+
+    @field_validator("min")
+    @classmethod
+    def _validate_min(cls, value: int | None) -> int | None:
+        if value is None:
+            return value
+        return min(255, max(0, value))
+
+
+class MotorPadBlock(CustomBlockBase):
+    kind: Literal["motor-pad"]
+    motorId: str | None = None
+    axis: Literal["pan", "tilt", "linear"] = "pan"
+    speedScale: PositiveFloat | None = None
+
+
+class ServoKnobBlock(CustomBlockBase):
+    kind: Literal["servo-knob"]
+    servoId: str | None = None
+    showTarget: bool | None = True
+
+
+class MarkdownNoteBlock(CustomBlockBase):
+    kind: Literal["markdown-note"]
+    content: str = ""
+
+
+CustomBlockModel = Annotated[
+    MasterDimmerBlock
+    | SceneButtonBlock
+    | EffectToggleBlock
+    | FixtureSliderBlock
+    | MotorPadBlock
+    | ServoKnobBlock
+    | MarkdownNoteBlock,
+    Field(discriminator="kind"),
+]
+
+
+class CustomLayoutGrid(BaseModel):
+    columns: PositiveInt = Field(12, le=24)
+    rowHeight: PositiveFloat = 1.0
+    gap: PositiveFloat = 1.0
+
+
+class CustomLayoutModel(BaseModel):
+    id: str
+    name: str = "Dashboard"
+    grid: CustomLayoutGrid | None = None
+    blocks: list[CustomBlockModel] = Field(default_factory=list)
+    updatedAt: PositiveInt | None = None
+
+
 __all__ = [
     "RGBCommand",
     "RGBState",
@@ -207,6 +326,8 @@ __all__ = [
     "BackupRestoreModel",
     "DMXTestRequest",
     "DesktopPreferences",
+    "CustomLayoutModel",
+    "CustomBlockModel",
     "CMD_SCHEMA",
     "STATE_SCHEMA",
 ]

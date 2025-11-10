@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Lightbulb, Palette, Gear, GearSix, Lightning, Plugs, Play, Cube, SquaresFour } from '@phosphor-icons/react'
-import { Universe, Fixture, Scene, StepperMotor, Servo, Effect } from '@/lib/types'
+import { Universe, Fixture, Scene, StepperMotor, Servo, Effect, CustomLayout } from '@/lib/types'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { DesktopOnboarding, ONBOARDING_STORAGE_KEY } from '@/components/DesktopOnboarding'
 import { Toaster } from '@/components/ui/sonner'
@@ -13,6 +13,7 @@ import { downloadShow, uploadShow, type ShowSnapshot } from '@/lib/showClient'
 import { toast } from 'sonner'
 import { useI18n } from '@/lib/i18n'
 import type { MidiMapping } from '@/lib/midiMappings'
+import CustomDashboard from '@/components/CustomDashboard'
 
 const FixturesView = lazy(() => import('@/components/FixturesView'))
 const ScenesView = lazy(() => import('@/components/ScenesView'))
@@ -34,6 +35,7 @@ function App() {
     const [stepperMotors, setStepperMotorsState] = useState<StepperMotor[]>([])
     const [servos, setServosState] = useState<Servo[]>([])
     const [effects, setEffectsState] = useState<Effect[]>([])
+    const [customLayout, setCustomLayoutState] = useState<CustomLayout | null>(null)
     const [activeScene, setActiveScene] = useState<string | null>(null)
     const [scenes, setScenesState] = useState<Scene[]>([])
     const [scenesLoading, setScenesLoading] = useState<boolean>(true)
@@ -197,6 +199,11 @@ function App() {
             if (Array.isArray(snapshot.scenes)) {
                 setScenesState(snapshot.scenes)
             }
+            if (snapshot.customLayout && typeof snapshot.customLayout === 'object') {
+                setCustomLayoutState(snapshot.customLayout as CustomLayout)
+            } else {
+                setCustomLayoutState(null)
+            }
             if (Array.isArray(snapshot.midiMappings)) {
                 const serialized = JSON.stringify(snapshot.midiMappings)
                 midiMappingsHashRef.current = serialized
@@ -257,11 +264,12 @@ function App() {
                 stepperMotors: overrides?.stepperMotors ?? stepperMotors,
                 servos: overrides?.servos ?? servos,
                 midiMappings: overrides?.midiMappings ?? midiMappings ?? [],
+                customLayout: overrides?.customLayout ?? customLayout ?? undefined,
             }
             setLastExportedAt(snapshot.exportedAt)
             scheduleShowSnapshotPersist(snapshot)
         },
-        [universes, fixtures, scenes, effects, stepperMotors, servos, midiMappings, scheduleShowSnapshotPersist]
+        [universes, fixtures, scenes, effects, stepperMotors, servos, midiMappings, customLayout, scheduleShowSnapshotPersist]
     )
 
     useEffect(() => {
@@ -333,6 +341,17 @@ function App() {
         [persistShowSnapshot]
     )
 
+    const setCustomLayout = useCallback(
+        (updater: (layout: CustomLayout | null) => CustomLayout | null) => {
+            setCustomLayoutState((current) => {
+                const next = updater(current)
+                persistShowSnapshot({ customLayout: next ?? undefined })
+                return next
+            })
+        },
+        [persistShowSnapshot]
+    )
+
     const persistScenes = useCallback(
         async (next: Scene[]) => {
             try {
@@ -388,10 +407,14 @@ function App() {
                     </div>
                 </header>
 
-                <Tabs defaultValue="custom" className="w-full">
-                    <TabsList className="grid w-full grid-cols-9 mb-6 h-auto gap-2 rounded-xl bg-muted/30 p-1">
-                        <TabsTrigger value="custom" className={tabButtonClass}>
+                <Tabs defaultValue="dashboard" className="w-full">
+                    <TabsList className="grid w-full grid-cols-10 mb-6 h-auto gap-2 rounded-xl bg-muted/30 p-1">
+                        <TabsTrigger value="dashboard" className={tabButtonClass}>
                             <SquaresFour weight="fill" />
+                            <span className="text-xs sm:text-sm">Dashboard</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="custom" className={tabButtonClass}>
+                            <Cube weight="fill" />
                             <span className="text-xs sm:text-sm">{t('app.tabs.custom')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="blocks" className={tabButtonClass}>
@@ -428,9 +451,27 @@ function App() {
                         </TabsTrigger>
                     </TabsList>
 
+                    <TabsContent value="dashboard" className="mt-0">
+                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
+                            <CustomDashboard
+                                layout={customLayout}
+                                fixtures={fixtures}
+                                scenes={scenes}
+                                effects={effects}
+                                stepperMotors={stepperMotors}
+                                servos={servos}
+                                universes={universes}
+                                setFixtures={setFixtures}
+                                setEffects={setEffects}
+                                setActiveScene={setActiveScene}
+                            />
+                        </Suspense>
+                    </TabsContent>
+
                     <TabsContent value="custom" className="mt-0">
                         <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">{t('app.loading')}</div>}>
                             <CustomPageBuilder
+                                scenes={scenes || []}
                                 effects={effects || []}
                                 fixtures={fixtures || []}
                                 stepperMotors={stepperMotors || []}
@@ -439,6 +480,8 @@ function App() {
                                 setFixtures={setFixtures}
                                 setStepperMotors={setStepperMotors}
                                 setServos={setServos}
+                                customLayout={customLayout}
+                                setCustomLayout={setCustomLayout}
                             />
                         </Suspense>
                     </TabsContent>

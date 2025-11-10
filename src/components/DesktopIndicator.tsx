@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { buildBackendUrl } from '@/lib/env'
 
 type Preferences = {
   channel?: string
@@ -15,7 +16,7 @@ export function DesktopIndicator() {
     let cancelled = false
     const loadPrefs = async () => {
       try {
-        const response = await fetch('/desktop/preferences')
+        const response = await fetch(buildBackendUrl('/desktop/preferences'))
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const data = await response.json()
         if (!cancelled) {
@@ -23,7 +24,7 @@ export function DesktopIndicator() {
         }
       } catch (error) {
         if (!cancelled) {
-          toast.error('Nepodařilo se načíst desktopové nastavení')
+          toast.error('Nepodarilo se nacist desktopova nastaveni')
         }
       } finally {
         if (!cancelled) {
@@ -31,7 +32,7 @@ export function DesktopIndicator() {
         }
       }
     }
-    loadPrefs()
+    void loadPrefs()
     return () => {
       cancelled = true
     }
@@ -43,7 +44,7 @@ export function DesktopIndicator() {
 
   return (
     <div className="text-xs text-muted-foreground">
-      Kanál: <strong>{prefs?.channel === 'beta' ? 'Beta' : 'Stable'}</strong> • Telemetrie:{' '}
+      Kanal: <strong>{prefs?.channel === 'beta' ? 'Beta' : 'Stable'}</strong> • Telemetrie:{' '}
       {prefs?.telemetryOptIn ? 'zapnuta' : 'vypnuta'}
     </div>
   )

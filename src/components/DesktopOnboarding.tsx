@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useI18n } from '@/lib/i18n'
+import { BACKEND_BASE_URL } from '@/lib/env'
 import {
   Broadcast,
   CheckCircle,
@@ -168,8 +169,10 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
   const [prefsError, setPrefsError] = useState<string | null>(null)
 
   const apiBase = useMemo(() => {
-    if (typeof window === 'undefined') return ''
-    return '__TAURI_INTERNALS__' in window ? 'http://127.0.0.1:8080' : ''
+    if (typeof window === 'undefined') {
+      return BACKEND_BASE_URL
+    }
+    return '__TAURI_INTERNALS__' in window ? 'http://127.0.0.1:8080' : BACKEND_BASE_URL
   }, [])
 
   const steps = useMemo(
@@ -189,8 +192,15 @@ export function DesktopOnboarding({ onComplete }: DesktopOnboardingProps) {
 
   const buildUrl = useCallback(
     (path: string) => {
-      if (apiBase && path.startsWith('http')) return path
-      return apiBase ? `${apiBase}${path}` : path
+      if (/^https?:\/\//i.test(path)) {
+        return path
+      }
+      const base = apiBase || BACKEND_BASE_URL
+      if (!base) {
+        return path
+      }
+      const prefix = path.startsWith('/') ? '' : '/'
+      return `${base}${prefix}${path}`
     },
     [apiBase]
   )

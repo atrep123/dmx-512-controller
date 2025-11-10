@@ -1,4 +1,5 @@
 import type { ProjectMeta, BackupVersion } from '@/lib/types'
+import { buildBackendUrl } from '@/lib/env'
 
 type ProjectsResponse = {
   activeId: string
@@ -15,7 +16,8 @@ const jsonHeaders = {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, init)
+  const target = buildBackendUrl(path)
+  const response = await fetch(target, init)
   if (!response.ok) {
     const message = await response.text().catch(() => 'Request failed')
     throw new Error(message || `Request failed for ${path}`)

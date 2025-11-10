@@ -7,7 +7,9 @@ import createIconImportProxy from "@github/spark/vitePhosphorIconProxyPlugin";
 import { resolve } from "path";
 import { realpathSync } from "node:fs";
 
-const projectRoot = realpathSync(process.env.PROJECT_ROOT || import.meta.dirname);
+const projectRoot = realpathSync(
+  process.env.PROJECT_ROOT || import.meta.dirname
+);
 const baseHref = process.env.PUBLIC_URL || "/";
 const serverPort = Number(process.env.PORT || 5173);
 
@@ -28,22 +30,24 @@ export default defineConfig({
   ],
   server: {
     port: serverPort,
-    strictPort: true,
-    host: "localhost",
-    proxy: {
-      "^/(ws|rgb|command|state|healthz|readyz|metrics|version|debug)": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-        ws: true,
-      },
+    strictPort: false,
+    host: true,
+    open: true,
+    hmr: {
+      overlay: true,
     },
+    // No proxy configuration to avoid errors
+  },
+  preview: {
+    port: 4173,
+    strictPort: false,
   },
   build: {
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor'
+          if (id.includes("node_modules")) {
+            return "vendor";
           }
         },
       },
@@ -53,5 +57,9 @@ export default defineConfig({
     alias: {
       "@": resolve(projectRoot, "src"),
     },
+  },
+  optimizeDeps: {
+    entries: ["./src/main.tsx"],
+    exclude: ["@tauri-apps/api"],
   },
 });

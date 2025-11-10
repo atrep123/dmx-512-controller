@@ -22,7 +22,8 @@ const getArg = (flag, fallback) => {
 }
 
 const channel = getArg('--channel', process.env.RELEASE_CHANNEL || 'stable')
-const version = getArg('--version', process.env.RELEASE_VERSION || '0.0.0')
+const version =
+  getArg('--version', process.env.RELEASE_VERSION || process.env.npm_package_version) || '0.0.0'
 const tag =
   getArg('--tag', process.env.GITHUB_REF_NAME) ||
   (version.startsWith('desktop-v') ? version : `desktop-v${version}`)
