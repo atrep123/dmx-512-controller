@@ -124,6 +124,19 @@ export default function CustomPageBuilder({
     []
   )
   const clampValue = useCallback((value: number, min: number, max: number) => Math.max(min, Math.min(max, value)), [])
+  const applyLayoutUpdate = useCallback(
+    (updater: (layout: CustomLayout | null) => CustomLayout | null) => {
+      setCustomLayoutProp((current) => {
+        const next = updater(current)
+        if (!isLayoutEqual(current ?? null, next ?? null)) {
+          pushHistorySnapshot(current ?? null)
+          return next
+        }
+        return current
+      })
+    },
+    [setCustomLayoutProp, pushHistorySnapshot]
+  )
   const getSelectionIds = useCallback(() => (selectedIds.length ? selectedIds : selectedBlockId ? [selectedBlockId] : []), [selectedIds, selectedBlockId])
   useEffect(() => {
     syncHistoryLengths()
@@ -178,7 +191,7 @@ export default function CustomPageBuilder({
     },
   ]
 
-  const blocks = customLayout?.blocks ?? []
+  const blocks = useMemo(() => customLayout?.blocks ?? [], [customLayout])
   useEffect(() => {
     if (!customLayout) {
       setSelectedIds(selectedBlockId ? [selectedBlockId] : [])
@@ -346,15 +359,14 @@ export default function CustomPageBuilder({
     })
   }
 
-  const handleRemoveBlock = (blockId: string) => {
+  const handleRemoveBlock = useCallback((blockId: string) => {
     applyLayoutUpdate((current) => {
       if (!current) {
         return current
       }
       const nextBlocks = current.blocks.filter((block) => block.id !== blockId)
-      if (selectedBlockId === blockId) {
-        setSelectedBlockId(nextBlocks[0]?.id ?? null)
-      }
+      const nextSelectionTarget = nextBlocks[0]?.id ?? null
+      setSelectedBlockId((currentSelected) => (currentSelected === blockId ? nextSelectionTarget : currentSelected))
       setSelectedIds((ids) => ids.filter((id) => id !== blockId))
       return {
         ...current,
@@ -362,7 +374,7 @@ export default function CustomPageBuilder({
         blocks: nextBlocks,
       }
     })
-  }
+  }, [applyLayoutUpdate])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -446,7 +458,7 @@ export default function CustomPageBuilder({
     })
   }
 
-  const handleDuplicateBlock = (blockId: string) => {
+  const handleDuplicateBlock = useCallback((blockId: string) => {
     applyLayoutUpdate((current) => {
       if (!current) {
         return current
@@ -475,7 +487,7 @@ export default function CustomPageBuilder({
         blocks: nextBlocks,
       }
     })
-  }
+  }, [applyLayoutUpdate])
 
   const nudgeSelection = useCallback(
     (ids: string[], key: string, delta: number, resize: boolean) => {
@@ -612,6 +624,7 @@ export default function CustomPageBuilder({
               onChange={(event) => updateLayoutGrid({ gap: Math.max(0, Number(event.target.value) || 1) })}
             />
           </div>
+        </div>
         <p className="text-xs text-muted-foreground mt-3">
           ├Üprava parametr┼» m┼Ö├ş┼żky se projev├ş jak v pl├ítn─Ť, tak v runtime rendereru. Hodnoty se ukl├ídaj├ş do `customLayout.grid`.
           Tip: dr┼ż <kbd>Shift</kbd> a t├íhni bloky pro p┼Öesn─Ťj┼í├ş zarovn├ín├ş (p┼Öipravuje se snapÔÇĹtoÔÇĹgrid).
@@ -1292,16 +1305,3 @@ function BlockEditor({
     </div>
   )
 }
-  const applyLayoutUpdate = useCallback(
-    (updater: (layout: CustomLayout | null) => CustomLayout | null) => {
-      setCustomLayoutProp((current) => {
-        const next = updater(current)
-        if (!isLayoutEqual(current ?? null, next ?? null)) {
-          pushHistorySnapshot(current ?? null)
-          return next
-        }
-        return current
-      })
-    },
-    [setCustomLayoutProp, pushHistorySnapshot]
-  )

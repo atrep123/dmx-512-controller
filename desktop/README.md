@@ -4,7 +4,7 @@ This folder hosts the experiments for the native desktop wrapper. The shell
 embeds the existing PWA build and manages the packaged backend sidecar
 (`dmx-backend.exe`).
 
-> âš ď¸Ź Early prototype â€“ you need a working Rust + Node toolchain and the backend
+> ⚠️ Early prototype – you need a working Rust + Node toolchain and the backend
 > executable generated via `scripts\build-server-exe.bat`.
 
 ## Prerequisites
@@ -38,9 +38,9 @@ npm run dev
 - Attempts to launch the backend sidecar (`dmx-backend.exe`). Logs appear in the
   terminal and in the DevTools console (`dmx-backend://log` events).
 - Keeps a splash window visible until the packaged backend responds on `http://127.0.0.1:8080/healthz`. During startup the shell emits:
-  - `desktop://backend/waiting` &rarr; still polling (payload = attempt count)
-  - `desktop://backend/ready` &rarr; backend is up, splash closes and the main window is shown
-  - `desktop://backend/error` &rarr; backend failed to boot (a native dialog is also shown)
+  - `desktop://backend/waiting` → still polling (payload = attempt count)
+  - `desktop://backend/ready` → backend is up, splash closes and the main window is shown
+  - `desktop://backend/error` → backend failed to boot (a native dialog is also shown)
 
 ## Production build
 

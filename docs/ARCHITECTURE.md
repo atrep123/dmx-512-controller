@@ -95,7 +95,7 @@ Reliability:
 - Metriky:
   - `dmx_core_sacn_packets_total{universe}` – počet paketů
   - `dmx_core_sacn_sources{universe}` – aktivní zdroje
-  - `dmx_core_sacn_ooo_total{universe}` – out‑of‑order zahozené
+  - `dmx_core_sacn_ooo_total{universe}` – out‑of‑order zahozené
   - `dmx_core_sacn_priority_current{universe}` – aktuální vybraná priorita
 ### DMX Engine
 

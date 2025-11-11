@@ -11,7 +11,7 @@ import { DesktopBackendIndicator } from '@/components/DesktopBackendIndicator'
 import { saveScenes } from '@/lib/scenesClient'
 import { downloadShow, uploadShow, type ShowSnapshot } from '@/lib/showClient'
 import { toast } from 'sonner'
-import { useI18n } from '@/lib/i18n'
+import { useI18n } from '@/lib/useI18n'
 import type { MidiMapping } from '@/lib/midiMappings'
 import CustomDashboard from '@/components/CustomDashboard'
 

@@ -1,6 +1,6 @@
 # AI workflow automation
 
-This guide captures how to run fully automated “generate → test → review” loops with large
+This guide captures how to run fully automated "generate → test → review" loops with large
 language models (LLM) inside this repository. It is tailored for OpenAI Codex/GPT models, but the
 same structure works for other providers.
 
@@ -9,7 +9,7 @@ same structure works for other providers.
 - **API access** – set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, `AI_AUTOMATION_*`
   overrides) in your shell, Task Scheduler or CI secrets store.
 - **Codex CLI / VS Code extension** – install `codex` (`npm i -g @openai/codex-cli`) and/or the
-  “OpenAI Codex” VS Code extension and enable *Agent (full access)* if you want an autonomous agent
+  "OpenAI Codex" VS Code extension and enable *Agent (full access)* if you want an autonomous agent
   that edits files and runs commands.
 - **Optional agents** – Auto-GPT, BabyAGI, LangChain or GPT-Engineer can be plugged in by pointing
   them at this repo; see section 5 for orchestration tips.
@@ -110,7 +110,7 @@ untrusted code before it touches your workstation.
 - **LangChain / Autogen** – define a sequence: prompt → generate files → run tests → retry on failure.
 - **GPT-Engineer** – drop a spec into `prompt` and let it scaffold a project snapshot inside a
   separate folder, then selectively copy artifacts here.
-- **CI pipelines** – split jobs into “Generate”, “Validate”, “Publish” for traceable logs.
+- **CI pipelines** – split jobs into "Generate", "Validate", "Publish" for traceable logs.
 - **VS Code Tasks** – chain tasks via `dependsOn` if you want to run generation + tests with one
   command (e.g., `AI: Generate via OpenAI API` followed by `Run Tests`).
 

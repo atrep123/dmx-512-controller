@@ -1,6 +1,6 @@
 # Custom UI Blocks
 
-Tento soubor popisuje koncept bloků, které půjdou skládat v editoru „Custom Page Builder“. Typy už existují v `src/lib/types.ts`, takže UI i backend mohou layout bezpečně validovat.
+Tento soubor popisuje koncept bloků, které půjdou skládat v editoru "Custom Page Builder". Typy už existují v `src/lib/types.ts`, takže UI i backend mohou layout bezpečně validovat.
 
 ## Struktura layoutu
 
@@ -14,7 +14,7 @@ export interface CustomLayout {
 }
 ```
 
-- `id`, `name` – identifikace layoutu (např. „mobilní ovládání“).
+- `id`, `name` – identifikace layoutu (např. "mobilní ovládání").
 - `grid` – volitelná metadata pro renderer (může je ignorovat).
 - `blocks` – seznam bloků (viz níže). Každý blok nese i `position` (`col`, `row`, `width`, `height`) pro grid snap.
 - `updatedAt` – timestamp pro undo/redo nebo synchronizaci.
@@ -68,11 +68,11 @@ interface CustomBlockBase {
 3. V rendereru přidej komponentu, která zpracuje nový typ.
 4. (volitelné) Přidej seed do `data/show.json`, aby tester viděl nový blok hned po startu.
 
-Layout můžeš editovat přímo v `CustomPageBuilder` – bloky přidáš tlačítkem a následně je přetáhneš (DnD kit) v sekci „Aktuální layout“. Každý drag/drop nebo odebrání okamžitě persistuje `customLayout` do show snapshotu (a seed souborů). Builder navíc podporuje:
+Layout můžeš editovat přímo v `CustomPageBuilder` – bloky přidáš tlačítkem a následně je přetáhneš (DnD kit) v sekci "Aktuální layout". Každý drag/drop nebo odebrání okamžitě persistuje `customLayout` do show snapshotu (a seed souborů). Builder navíc podporuje:
 
-- Multi výběr (tlačítko „Multi výběr“ nebo Ctrl/Cmd + klik), bulk duplikaci/smazání a zobrazení počtu vybraných bloků.
+- Multi výběr (tlačítko "Multi výběr" nebo Ctrl/Cmd + klik), bulk duplikaci/smazání a zobrazení počtu vybraných bloků.
 - Historii (Undo/Redo + zkratky Ctrl/Cmd + Z / Shift + Z).
 - Klávesové zkratky: Delete (smazání), Ctrl/Cmd + D (klon), šipky pro posun, Alt + šipky pro změnu šířky/výšky, Shift pro větší krok.
-- Modifikátory „Duplicita“ / „Mazání“ pro rychlé klikací operace na plátně.
+- Modifikátory "Duplicita" / "Mazání" pro rychlé klikací operace na plátně.
 
 Pokud potřebuješ hromadné úpravy, lze layout pořád editovat i ručně v JSONu – struktura zůstává validovaná TypeScriptem i backendem.

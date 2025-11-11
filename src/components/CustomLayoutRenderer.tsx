@@ -16,6 +16,8 @@ import {
   type CSSProperties,
 } from 'react'
 import { SquaresFour, CopySimple, TrashSimple } from '@phosphor-icons/react'
+import { appearancePresets, defaultBlockPalette, BLOCK_KIND_LABELS } from '@/components/customLayoutShared'
+import type { AppearancePreset, AppearanceStyles, BlockPalette } from '@/components/customLayoutShared'
 
 export type BlockRendererContext = {
   block: CustomBlock
@@ -29,88 +31,6 @@ export type BlockRendererMap = Partial<Record<CustomBlockKind, BlockRenderer>>
 export type BlockActions = {
   onDuplicate?: (block: CustomBlock) => void
   onRemove?: (block: CustomBlock) => void
-}
-
-export type BlockPalette = Partial<Record<CustomBlockKind, string>>
-
-export type AppearancePreset = 'soft' | 'flat' | 'glass' | 'custom'
-
-type AppearanceStyles = {
-  wrapper: string
-  button: string
-  overlay: string
-  cardBase: string
-  metaText: string
-  badgeClass: string
-}
-
-export type RenderBlockWrapperProps = {
-  block: CustomBlock
-  index: number
-  isSelected: boolean
-  className: string
-  style: CSSProperties
-  children: ReactNode
-  onSelect?: (event: ReactMouseEvent<HTMLButtonElement>) => void
-  onHoverChange?: (isHovering: boolean) => void
-}
-
-type BindingInfo = {
-  warning: string | null
-  preview: string | null
-}
-
-const baseSoftAppearance: AppearanceStyles = {
-  wrapper: 'gap-3',
-  cardBase: 'rounded-2xl border border-border/30 bg-background/90 p-4 shadow-sm',
-  button:
-    'rounded-2xl border border-border/40 bg-background/70 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg',
-  overlay: 'bg-background/90',
-  metaText: 'text-foreground/70',
-  badgeClass: 'border-foreground/30 text-foreground',
-}
-
-const appearancePresets: Record<AppearancePreset, AppearanceStyles> = {
-  soft: baseSoftAppearance,
-  flat: {
-    wrapper: 'gap-3 rounded-3xl bg-muted/30 p-3',
-    cardBase: 'rounded-2xl border border-border/40 bg-background/95 p-4',
-    button:
-      'rounded-xl border border-border/40 bg-background transition hover:-translate-y-0.5 hover:border-primary/60',
-    overlay: 'bg-background/95 border border-border/40',
-    metaText: 'text-muted-foreground',
-    badgeClass: 'border-border text-foreground',
-  },
-  glass: {
-    wrapper: 'gap-3 rounded-3xl bg-white/5 p-3 backdrop-blur',
-    cardBase: 'rounded-2xl border border-white/20 bg-white/10 p-4 text-white shadow-lg backdrop-blur',
-    button:
-      'rounded-2xl border border-white/20 bg-white/10 backdrop-blur transition hover:bg-white/20 data-[selected=true]:border-primary/70',
-    overlay: 'bg-white/80 backdrop-blur shadow',
-    metaText: 'text-white/80 drop-shadow',
-    badgeClass: 'border-white/50 text-white',
-  },
-  custom: baseSoftAppearance,
-}
-
-const defaultBlockPalette: BlockPalette = {
-  'master-dimmer': 'from-primary/30 via-primary/10 to-background',
-  'scene-button': 'from-rose-400/30 via-background to-background',
-  'effect-toggle': 'from-amber-400/30 via-background to-background',
-  'fixture-slider': 'from-blue-400/30 via-background to-background',
-  'motor-pad': 'from-emerald-400/30 via-background to-background',
-  'servo-knob': 'from-purple-400/30 via-background to-background',
-  'markdown-note': 'from-muted/50 via-background to-background',
-}
-
-export const BLOCK_KIND_LABELS: Record<CustomBlockKind, string> = {
-  'master-dimmer': 'Master',
-  'scene-button': 'Scéna',
-  'effect-toggle': 'Efekt',
-  'fixture-slider': 'Slider',
-  'motor-pad': 'Motor',
-  'servo-knob': 'Servo',
-  'markdown-note': 'Poznámka',
 }
 
 const getBlockSummary = (block: CustomBlock) => {
@@ -266,7 +186,7 @@ const createDefaultBlockRenderers = (
           <p className="text-xs uppercase tracking-wide text-white/70">Scéna</p>
           <p className="text-lg font-semibold leading-tight">{block.title || 'Scéna'}</p>
         </div>
-        <p className="text-xs text-white/70">Tap & hold pro dal?? volby</p>
+        <p className="text-xs text-white/70">Tap & hold pro další volby</p>
       </div>,
       ctx.bindingInfo ?? getBindingInfo(block),
       appearanceStyles,
@@ -280,7 +200,7 @@ const createDefaultBlockRenderers = (
         <p className="text-xs uppercase tracking-wide text-white/70">Efekt</p>
         <div>
           <p className="text-lg font-semibold">{toggleBlock.title || 'Effect'}</p>
-          <p className="text-xs text-white/70">Re?im: {toggleBlock.behavior ?? 'toggle'}</p>
+          <p className="text-xs text-white/70">Režim: {toggleBlock.behavior ?? 'toggle'}</p>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <span className="inline-flex rounded-full bg-white/10 px-3 py-1">ON</span>
@@ -299,7 +219,7 @@ const createDefaultBlockRenderers = (
       <div className="flex h-full flex-col justify-between">
         <div>
           <p className="text-xs uppercase tracking-wide text-white/70">Fixture slider</p>
-          <p className="text-lg font-semibold">{block.title || 'Kan?l'}</p>
+          <p className="text-lg font-semibold">{block.title || 'Kanál'}</p>
         </div>
         <div className="space-y-2">
           <div className="h-32 rounded-full bg-white/10 p-1">
@@ -316,7 +236,7 @@ const createDefaultBlockRenderers = (
     withMeta(
       block,
       <div className="flex h-full flex-col justify-between">
-        <p className="text-xs uppercase tracking-wide text-white/70">Motorick? pad</p>
+        <p className="text-xs uppercase tracking-wide text-white/70">Motorický pad</p>
         <div className="flex items-center justify-center">
           <div className="grid h-16 w-16 grid-cols-3 grid-rows-3 gap-0.5">
             {Array.from({ length: 9 }).map((_, index) => (
@@ -345,7 +265,7 @@ const createDefaultBlockRenderers = (
             </div>
           </div>
         </div>
-        <p className="text-xs text-white/70">C?l 37?</p>
+        <p className="text-xs text-white/70">Cíl 37°</p>
       </div>,
       ctx.bindingInfo ?? getBindingInfo(block),
       appearanceStyles,
@@ -360,7 +280,7 @@ const createDefaultBlockRenderers = (
           <p className="text-xs uppercase tracking-wide text-white/70">Poznámka</p>
           <p className="text-lg font-semibold">{noteBlock.title || 'Instrukce'}</p>
         </div>
-        <p className="line-clamp-4 text-sm text-white/80">{noteBlock.content || 'P?idej instrukce nebo QR.'}</p>
+        <p className="line-clamp-4 text-sm text-white/80">{noteBlock.content || 'Přidej instrukce nebo QR.'}</p>
       </div>,
       ctx.bindingInfo ?? getBindingInfo(block),
       appearanceStyles,
@@ -375,7 +295,7 @@ const createFallbackRenderer = (appearanceStyles: AppearanceStyles): BlockRender
     <div className="flex h-full flex-col justify-between rounded-2xl border border-dashed border-muted-foreground/40 p-4 text-sm">
       <div>
         <p className="text-xs uppercase tracking-wide text-muted-foreground">{block.kind}</p>
-        <p className="text-sm font-semibold">{block.title || 'Nezn?m? blok'}</p>
+        <p className="text-sm font-semibold">{block.title || 'Neznámý blok'}</p>
       </div>
       <p className="text-xs text-muted-foreground">{getBlockSummary(block)}</p>
     </div>,
@@ -384,34 +304,34 @@ const createFallbackRenderer = (appearanceStyles: AppearanceStyles): BlockRender
     'from-muted/30 via-transparent to-muted/50'
   )
 
-export const getBindingInfo = (block: CustomBlock): BindingInfo => {
+const getBindingInfo = (block: CustomBlock): BindingInfo => {
   switch (block.kind) {
     case 'scene-button':
       return {
-        warning: block.sceneId ? null : 'Vyber sc?nu v konfiguraci.',
+        warning: block.sceneId ? null : 'Vyber scénu v konfiguraci.',
         preview: block.sceneId ? `Scéna: ${block.sceneId}` : null,
       }
     case 'effect-toggle':
       return {
-        warning: block.effectId ? null : 'P?i?a? efekt tomuto p?ep?na?i.',
+        warning: block.effectId ? null : 'Přiřaď efekt tomuto přepínači.',
         preview: block.effectId ? `Efekt: ${block.effectId}` : null,
       }
     case 'fixture-slider':
       if (!block.fixtureId) {
-        return { warning: 'Zvol sv?tidlo pro slider.', preview: null }
+        return { warning: 'Zvol svítidlo pro slider.', preview: null }
       }
       if (!block.channelId) {
-        return { warning: 'Vyber DMX kan?l.', preview: null }
+        return { warning: 'Vyber DMX kanál.', preview: null }
       }
-      return { warning: null, preview: `Fixture ${block.fixtureId} | kan?l ${block.channelId}` }
+      return { warning: null, preview: `Fixture ${block.fixtureId} | kanál ${block.channelId}` }
     case 'motor-pad':
       return {
-        warning: block.motorId ? null : 'P?i?a? motor k tomuto ovlada?i.',
+        warning: block.motorId ? null : 'Přiřaď motor k tomuto ovladači.',
         preview: block.motorId ? `Motor: ${block.motorId}` : null,
       }
     case 'servo-knob':
       return {
-        warning: block.servoId ? null : 'Vyber servo, kter? m? knob ovl?dat.',
+        warning: block.servoId ? null : 'Vyber servo, které má knob ovládat.',
         preview: block.servoId ? `Servo: ${block.servoId}` : null,
       }
     default:
@@ -491,8 +411,8 @@ export function CustomLayoutRenderer({
       renderEmptyState?.() ?? (
         <div className="rounded-2xl border border-dashed border-muted-foreground/40 bg-muted/10 p-6 text-center text-sm text-muted-foreground">
           <SquaresFour className="mx-auto mb-2 h-8 w-8 text-muted-foreground/70" weight="duotone" />
-          <p className="font-semibold">??dn? bloky zat?m nejsou p?id?ny.</p>
-          <p className="text-xs mt-1">Pou?ij katalog blok? nebo import show snapshotu.</p>
+          <p className="font-semibold">Žádné bloky zatím nejsou přidány.</p>
+          <p className="text-xs mt-1">Použij katalog bloků nebo import show snapshotu.</p>
         </div>
       )
     return <div className={className}>{fallbackEmpty}</div>
@@ -573,8 +493,8 @@ export function CustomLayoutRenderer({
               className={cn(
                 'group relative w-full text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
                 appearanceStyles.button,
-                highlightedBlockId === block.id && 'border-primary/50 bg-primary/5',
-                isSelected && 'ring-2 ring-primary'
+                highlightedBlockId === block.id && 'ring-primary/40 bg-primary/5',
+                isSelected && 'ring-2 ring-primary/70 ring-offset-2 ring-offset-background shadow-lg'
               )}
               style={blockStyle}
               title={getBlockSummary(block)}
@@ -598,7 +518,7 @@ export function CustomLayoutRenderer({
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-xs text-muted-foreground">
         <span className="font-semibold text-foreground">Blok?: {blocks.length}</span>
         <span>Sloupce: {grid.columns}</span>
-        <span>??dkov? v??ka: {grid.rowHeight} rem</span>
+        <span>Řádková výška: {grid.rowHeight} rem</span>
         <span>Mezera: {grid.gap} rem</span>
       </div>
       {gridElement}

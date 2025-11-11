@@ -133,4 +133,4 @@ desktop/
 | `tauri build` fails with signing errors | Provide `TAURI_SIGNING_PRIVATE_KEY_PATH` or `TAURI_SIGNING_PRIVATE_KEY` environment variables (see README). |
 | Splash never closes | Backend health check failed – check logs from the `dmx-backend` sidecar; ensure FastAPI can bind to `127.0.0.1:8080`. |
 
-For more context, see `desktop/README.md` and the main project README (section “Desktop distribuce”).
+For more context, see `desktop/README.md` and the main project README (section "Desktop distribuce").

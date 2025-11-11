@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Trash, ArrowUp, ArrowDown, Play, Palette, Clock, Lightning, ArrowsClockwise, Sparkle, Shuffle, CrosshairSimple, Code, ListNumbers } from '@phosphor-icons/react'
 import { useState, useEffect } from 'react'
 import { compileBlocks, getEffectSummary, type CompiledEffect } from '@/lib/blockCompiler'
+import { cn } from '@/lib/utils'
 
 interface BlockProgrammingProps {
     blocks: EffectBlock[]
@@ -21,77 +22,77 @@ const BLOCK_TYPES = [
         type: 'set-color' as const, 
         name: 'Nastavit barvu', 
         icon: Palette, 
-        color: 'bg-blue-500/20 border-blue-500',
+        color: 'bg-gradient-to-r from-sky-500/15 via-sky-500/5 to-transparent text-sky-950 dark:text-sky-50 ring-1 ring-inset ring-sky-500/35',
         description: 'Nastavit RGB/RGBW barvu'
     },
     { 
         type: 'set-intensity' as const, 
         name: 'Nastavit intenzitu', 
         icon: Lightning, 
-        color: 'bg-yellow-500/20 border-yellow-500',
+        color: 'bg-gradient-to-r from-amber-400/15 via-amber-400/5 to-transparent text-amber-950 dark:text-amber-50 ring-1 ring-inset ring-amber-400/40',
         description: 'Nastavit jas'
     },
     { 
         type: 'fade' as const, 
         name: 'Přechod', 
         icon: Sparkle, 
-        color: 'bg-purple-500/20 border-purple-500',
+        color: 'bg-gradient-to-r from-violet-500/15 via-violet-500/5 to-transparent text-violet-950 dark:text-violet-50 ring-1 ring-inset ring-violet-500/35',
         description: 'Plynulý přechod'
     },
     { 
         type: 'wait' as const, 
         name: 'Čekat', 
         icon: Clock, 
-        color: 'bg-gray-500/20 border-gray-500',
+        color: 'bg-gradient-to-r from-slate-500/15 via-slate-500/5 to-transparent text-slate-900 dark:text-slate-100 ring-1 ring-inset ring-slate-500/30',
         description: 'Pozastavit provádění'
     },
     { 
         type: 'chase-step' as const, 
         name: 'Krok Chase', 
         icon: ArrowsClockwise, 
-        color: 'bg-green-500/20 border-green-500',
+        color: 'bg-gradient-to-r from-emerald-500/15 via-emerald-500/5 to-transparent text-emerald-950 dark:text-emerald-50 ring-1 ring-inset ring-emerald-500/35',
         description: 'Aktivovat jedno světlo'
     },
     { 
         type: 'strobe-pulse' as const, 
         name: 'Stroboskop', 
         icon: Lightning, 
-        color: 'bg-red-500/20 border-red-500',
+        color: 'bg-gradient-to-r from-rose-500/15 via-rose-500/5 to-transparent text-rose-950 dark:text-rose-50 ring-1 ring-inset ring-rose-500/35',
         description: 'Rychlý záblesk'
     },
     { 
         type: 'rainbow-shift' as const, 
         name: 'Duha', 
         icon: Palette, 
-        color: 'bg-pink-500/20 border-pink-500',
+        color: 'bg-gradient-to-r from-pink-500/15 via-pink-500/5 to-transparent text-pink-950 dark:text-pink-50 ring-1 ring-inset ring-pink-500/35',
         description: 'Posunutí odstínu'
     },
     { 
         type: 'random-color' as const, 
         name: 'Náhodná barva', 
         icon: Shuffle, 
-        color: 'bg-orange-500/20 border-orange-500',
+        color: 'bg-gradient-to-r from-orange-500/15 via-orange-500/5 to-transparent text-orange-950 dark:text-orange-50 ring-1 ring-inset ring-orange-500/35',
         description: 'Náhodná RGB'
     },
     { 
         type: 'pan-tilt' as const, 
         name: 'Pan/Tilt', 
         icon: CrosshairSimple, 
-        color: 'bg-cyan-500/20 border-cyan-500',
+        color: 'bg-gradient-to-r from-cyan-500/15 via-cyan-500/5 to-transparent text-cyan-900 dark:text-cyan-100 ring-1 ring-inset ring-cyan-500/35',
         description: 'Pozice moving head'
     },
     { 
         type: 'loop-start' as const, 
         name: 'Začátek smyčky', 
         icon: ArrowsClockwise, 
-        color: 'bg-indigo-500/20 border-indigo-500',
+        color: 'bg-gradient-to-r from-indigo-500/15 via-indigo-500/5 to-transparent text-indigo-900 dark:text-indigo-100 ring-1 ring-inset ring-indigo-500/35',
         description: 'Začít smyčku'
     },
     { 
         type: 'loop-end' as const, 
         name: 'Konec smyčky', 
         icon: ArrowsClockwise, 
-        color: 'bg-indigo-500/20 border-indigo-500',
+        color: 'bg-gradient-to-r from-indigo-500/15 via-indigo-500/5 to-transparent text-indigo-900 dark:text-indigo-100 ring-1 ring-inset ring-indigo-500/35',
         description: 'Ukončit smyčku'
     },
 ]
@@ -418,17 +419,27 @@ export default function BlockProgramming({ blocks, onBlocksChange }: BlockProgra
                         <div className="space-y-2">
                             {BLOCK_TYPES.map((blockType) => {
                                 const Icon = blockType.icon
+                                const accentClass =
+                                    blockType.color || 'bg-card/70 text-foreground ring-1 ring-inset ring-border/30'
                                 return (
                                     <button
                                         key={blockType.type}
                                         onClick={() => addBlock(blockType.type)}
-                                        className={`w-full p-2.5 rounded border-2 text-left transition-all hover:scale-[1.02] active:scale-95 ${blockType.color}`}
+                                        data-testid={`block-library-${blockType.type}`}
+                                        className={cn(
+                                            'group w-full rounded-xl border border-transparent bg-card/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                                            accentClass
+                                        )}
                                     >
                                         <div className="flex items-start gap-2">
-                                            <Icon size={18} className="mt-0.5 flex-shrink-0" />
+                                            <div className="rounded-lg bg-white/20 p-1.5 text-white dark:text-white/90 shadow-inner">
+                                                <Icon size={16} className="shrink-0" />
+                                            </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="font-semibold text-xs truncate">{blockType.name}</div>
-                                                <div className="text-[10px] text-muted-foreground leading-tight">{blockType.description}</div>
+                                                <div className="text-[10px] text-muted-foreground/90 leading-tight">
+                                                    {blockType.description}
+                                                </div>
                                             </div>
                                         </div>
                                     </button>
@@ -470,20 +481,29 @@ export default function BlockProgramming({ blocks, onBlocksChange }: BlockProgra
                                                 const blockInfo = getBlockInfo(block.type)
                                                 const Icon = blockInfo?.icon || Play
                                                 const isSelected = selectedBlockId === block.id
+                                                const accentClass =
+                                                    blockInfo?.color ||
+                                                    'bg-card/70 text-foreground ring-1 ring-inset ring-border/30'
 
                                                 return (
                                                     <div
                                                         key={block.id}
                                                         onClick={() => selectBlock(block)}
-                                                        className={`p-2.5 rounded border-2 cursor-pointer transition-all ${
-                                                            isSelected 
-                                                                ? 'ring-2 ring-primary border-primary shadow-md' 
-                                                                : 'hover:border-accent hover:shadow-sm'
-                                                        } ${blockInfo?.color || 'bg-card'}`}
+                                                        data-testid={`block-sequence-${block.id}`}
+                                                        className={cn(
+                                                            'group rounded-xl border border-transparent p-3 cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                                                            accentClass,
+                                                            isSelected
+                                                                ? 'ring-2 ring-primary/60 ring-offset-2 ring-offset-background shadow-lg'
+                                                                : 'hover:-translate-y-0.5 hover:shadow-md'
+                                                        )}
                                                     >
                                                         <div className="flex items-center justify-between gap-2">
                                                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                                <Badge variant="outline" className="font-mono text-[10px] px-1.5 py-0 h-5 flex-shrink-0">
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    className="font-mono text-[10px] px-1.5 py-0 h-5 flex-shrink-0 border border-white/30 dark:border-white/20 bg-white/10 text-black/70 dark:text-white/80"
+                                                                >
                                                                     {index + 1}
                                                                 </Badge>
                                                                 <Icon size={16} className="flex-shrink-0" />

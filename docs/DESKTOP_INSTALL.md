@@ -45,7 +45,7 @@ app, so the UI (Tauri/Electron) can talk to `http://127.0.0.1:8080`.
 
 ## 4. Troubleshooting
 
-- **Missing DLLs / VC runtime** – install the “Microsoft Visual C++ Redistributable”
+- **Missing DLLs / VC runtime** – install the "Microsoft Visual C++ Redistributable"
   or Visual Studio Build Tools.
 - **Config/data files** – `config/patch.yaml` and JSON schemas are bundled automatically,
   but if you add new data files remember to update `server/desktop.spec`.

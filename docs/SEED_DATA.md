@@ -9,15 +9,15 @@ The repository ships with a ready‑made DMX show so you can develop the UI agai
 | `data/show.json` | Canonical snapshot used by the FastAPI `/export` & `/import` endpoints. Contains universes, fixtures, effects, motors, servos, scenes and MIDI map definitions. |
 | `data/scenes.json` | Materialised list consumed by `ScenesStore`. It mirrors the scenes from `show.json` so REST updates remain consistent even if the show snapshot fails to load. |
 
-Both files are UTF‑8 JSON and can be edited manually. The backend rewrites them whenever the UI performs “Synchronizovat” or any change that calls `uploadShow`.
+Both files are UTF‑8 JSON and can be edited manually. The backend rewrites them whenever the UI performs "Synchronizovat" or any change that calls `uploadShow`.
 
-### What’s inside
+### What's inside
 
 The default dataset represents a small two‑universe rig:
 
-- `Main Stage` (universe `0`) – two RGBW front washes, one moving head spot, one servo (“Laser Iris”).
-- `Rig Truss` (universe `1`) – pixel strip (3× RGB segments) and a two‑channel stepper motor (“Pan Rail”).
-- Two sample scenes (“Warm Wash”, “Solo Spot”), including motor/servo positions.
+- `Main Stage` (universe `0`) – two RGBW front washes, one moving head spot, one servo ("Laser Iris").
+- `Rig Truss` (universe `1`) – pixel strip (3× RGB segments) and a two‑channel stepper motor ("Pan Rail").
+- Two sample scenes ("Warm Wash", "Solo Spot"), including motor/servo positions.
 - Example effects (`Warm Chase`, `Rainbow Pixels`) and MIDI mappings that hook master dimmer / scenes / effects.
 - `customLayout` s několika bloky (master dimmer, tlačítka scén, efekt toggle, slider kanálu, poznámka), aby Custom Page Builder hned ukazoval reálné UI.
 
@@ -42,7 +42,7 @@ Feel free to rename fixtures, add more channels, or extend the snapshot with you
 
 3. **Iterate on the dataset**  
    - Change fixture definitions or add universes directly in `data/show.json`.
-   - Reload the backend (or hit “Synchronizovat” in the UI) to pull new values.
+   - Reload the backend (or hit "Synchronizovat" in the UI) to pull new values.
    - Commit the JSON files if the seed should be shared with teammates/CI.
 
 4. **Reset to a clean state**  

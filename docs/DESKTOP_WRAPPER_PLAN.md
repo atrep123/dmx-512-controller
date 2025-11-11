@@ -1,4 +1,4 @@
-# Desktop Wrapper â€“ Implementation Plan
+# Desktop Wrapper – Implementation Plan
 
 ## 1. Goal
 
@@ -16,53 +16,54 @@ Provide a turnkey `.exe` distribution that bundles the DMX controller PWA + back
 ## 3. Architecture overview
 
 ```
-â”Śâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ Tauri Shell (Rust)             â”‚
-â”‚  - window displaying PWA       â”‚
-â”‚  - sidecar process manager     â”‚
-â”‚  - tray / status icon          â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-             â”‚ launches / monitors
-â”Śâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–Ľâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ FastAPI backend (PyInstaller) â”‚
-â”‚  - listens on 127.0.0.1:8080  â”‚
-â”‚  - DMX drivers, MQTT, etc.    â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
++------------------------------+
+| Tauri Shell (Rust)           |
+| - window displaying the PWA  |
+| - sidecar process manager    |
+| - tray / status icon         |
++------------------------------+
+             |
+   launches & monitors
+             v
++------------------------------+
+| FastAPI backend (PyInstaller)|
+| - listens on 127.0.0.1:8080  |
+| - DMX drivers, MQTT, etc.    |
++------------------------------+
 ```
 
 ## 4. Work packages
 
 ### A. PyInstaller packaging
-1. âś… `server/desktop.spec` (PyInstaller onefile) with entry script `server/run_desktop.py` and bundled schemas/config.
-2. âś… Build helper `scripts/build-server-exe.bat` â†’ `server/dist/dmx-backend.exe`.
-3. âś… `docs/DESKTOP_INSTALL.md` documents the build/run process.
+1. Define `server/desktop.spec` (PyInstaller onefile) with entry script `server/run_desktop.py` and bundled schemas/config.
+2. Build helper `scripts/build-server-exe.bat` that produces `server/dist/dmx-backend.exe`.
+3. Document the build/run process in `docs/DESKTOP_INSTALL.md`.
 4. Tests: _TODO_ (CI job to exercise the executable).
 
 ### B. Tauri shell
-1. âś… `desktop/` workspace scaffolded with Tauri (Rust) + npm scripts.
-2. âś… Build pipeline links Vite `dist/` â†’ Tauri resources via `npm run prepare:resources`.
-3. âś… Sidecar management: Tauri spawns `dmx-backend.exe`, streams logs to window events.
-4. âś… System tray (open/restart/quit) + splash window styling.
+1. Scaffold the `desktop/` workspace with Tauri (Rust) + npm scripts.
+2. Link the Vite `dist/` output into Tauri resources via `npm run prepare:resources`.
+3. Implement sidecar management so Tauri spawns `dmx-backend.exe` and streams logs to window events.
+4. Add a system tray (open/restart/quit) and splash window styling.
 
 ### C. Installer + first-run wizard
-1. Use 	auri.conf.json > bundle to generate .msi/.exe.
-2. First launch wizard (React component inside PWA):
+1. Use the `tauri.conf.json` bundle section to generate `.msi/.exe` installers.
+2. First launch wizard (React component inside the PWA):
    - check DMX hardware (USB, IP)
-   - select quick-start profile (e.g., �Club RGB Rig�, �Stage DMX�)
-   - store config in %APPDATA%\DMXController.
+   - select a quick-start profile (e.g., "Club RGB Rig", "Stage DMX")
+   - store config in `%APPDATA%/DMXController`.
 3. Auto-update feed & signing:
-   - Generate Tauri signing keys (
-px tauri signer generate) and place the public key in 	auri.conf.json.
-   - After each desktop build run 
-ode desktop/scripts/create-release-json.mjs --channel <name> --version <semver> with TAURI_SIGNING_PRIVATE_KEY(_PATH) so the script can invoke 	auri signer sign internally.
-   - Publish installers and the matching dist/desktop/<channel>-release.json; backend endpoint /desktop/update-feed proxies to the chosen channel.
+   - Generate Tauri signing keys (`npx tauri signer generate`) and place the public key in `tauri.conf.json`.
+   - After each desktop build run `node desktop/scripts/create-release-json.mjs --channel <name> --version <semver>` with `TAURI_SIGNING_PRIVATE_KEY(_PATH)` so the script can invoke `tauri signer sign` internally.
+   - Publish installers and the matching `dist/desktop/<channel>-release.json`; the backend endpoint `/desktop/update-feed` proxies to the chosen channel.
+
 ### D. Quality gates
 1. End-to-end QA checklist (installation, DMX USB detection, firewall prompts).
 2. CI job for Windows runner:
-   - build PyInstaller exe
-   - build Tauri bundle
-   - attach artifacts to GitHub Release.
-   - ✅ Added `Desktop QA` workflow (`.github/workflows/desktop-qa.yml`) that runs on PRs/pushes touching desktop/back-end code. It compiles the frontend, PyInstaller backend, and Tauri shell on `windows-latest`, then uploads MSI/NSIS artifacts for manual testing.
+   - build the PyInstaller executable
+   - build the Tauri bundle
+   - attach artifacts to the GitHub Release
+   - ✅ `Desktop QA` workflow (`.github/workflows/desktop-qa.yml`) runs on PRs/pushes touching desktop/back-end code, compiles the frontend + backend + Tauri shell on `windows-latest`, and uploads MSI/NSIS artifacts for manual testing.
 3. Documentation: `docs/DESKTOP_INSTALL.md` covering requirements, troubleshooting, signed binary info.
 
 ## 5. Open questions
@@ -72,7 +73,7 @@ ode desktop/scripts/create-release-json.mjs --channel <name> --version <semver> 
 - macOS notarization & Apple Developer ID (future step).
 
 ## 6. Next steps
-1. Create GitHub issue â€śDesktop Wrapper (.exe) â€“ Windows MVPâ€ť referencing this plan.
+1. Create GitHub issue "Desktop Wrapper (.exe) – Windows MVP" referencing this plan.
 2. Break into subtasks:
    - `#1 PyInstaller backend`
    - `#2 Tauri shell scaffold`

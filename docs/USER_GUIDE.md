@@ -438,7 +438,7 @@ Na desktopu můžete použít:
 - **Timecode sync** - Sync s timecode *(plánováno v Pro Features – show control integrace)*
 - **Multi-user** - Více zařízení současně *(potřebuje server mód, sledujte roadmapu)*
 
-## �? Pokročilé funkce (roadmapa)
+## 🚀 Pokročilé funkce (roadmapa)
 
 Následující funkce jsou připravované – některé mají již API stubs, jiné čekají na komunitní příspěvky. Přiložené odkazy vedou na GitHub issue nebo kapitolu v `ROADMAP.md`, kde můžeš sledovat stav nebo se zapojit.
 
@@ -453,11 +453,11 @@ Následující funkce jsou připravované – některé mají již API stubs, ji
 Pilotní Web MIDI bridge je dostupný přímo v aplikaci:
 
 1. Otevři **Nastavení → MIDI (preview)**.
-2. Klikni na **„Zapnout MIDI bridge“** (Chrome 128+ a HTTPS/localhost jsou povinné).
+2. Klikni na **"Zapnout MIDI bridge"** (Chrome 128+ a HTTPS/localhost jsou povinné).
 3. V systémovém dialogu povol přístup k MIDI zařízení.
 4. Panel zobrazí připojená zařízení a poslední přijatou zprávu (loguje do konzole a vystavuje event `dmx-midi`).
-5. Přepni se do sekce **MIDI mapování** (umístěná přímo pod panelem) a klikni na **„Zachytit MIDI zprávu“** – poté pohni faderem nebo stiskni tlačítko.
-6. Po doplnění příkazu a čísla ovladače zvol akci (DMX kanál, scéna, efekt toggle/intenzita nebo master dimmer) a stiskni **„Uložit mapování“**. Každé mapování lze smazat křížkem.
+5. Přepni se do sekce **MIDI mapování** (umístěná přímo pod panelem) a klikni na **"Zachytit MIDI zprávu"** – poté pohni faderem nebo stiskni tlačítko.
+6. Po doplnění příkazu a čísla ovladače zvol akci (DMX kanál, scéna, efekt toggle/intenzita nebo master dimmer) a stiskni **"Uložit mapování"**. Každé mapování lze smazat křížkem.
 7. `LiveControlView` reaguje okamžitě: CC fadery škálují DMX kanály na 0–255, note-on tlačítka vyvolávají scény a přepínají efekty, master dimmer funguje jako globální brzda před odesláním DMX patchů.
 8. Mapování se ukládají do IndexedDB i show snapshotu, takže export/import přenese MIDI vazby mezi zařízeními. Další rozšíření (MIDI feedback, clock sync) sleduj v [V1.3 – MIDI Support](ROADMAP.md#v13---midi-support).
 
@@ -473,7 +473,7 @@ Pilotní Web MIDI bridge je dostupný přímo v aplikaci:
 ### Timecode synchronization
 
 - **Plán:** Podpora LTC/MTC a možnost spouštět scény podle timeline.
-- **Roadmap:** Sekce „Pro Features – Show Control“.
+- **Roadmap:** Sekce "Pro Features – Show Control".
 - **Issue:** [`#423 Timecode`](https://github.com/atrep123/dmx-512-controller/issues/423).
 
 ### Desktop multi-user

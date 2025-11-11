@@ -1,64 +1,64 @@
-﻿# Roadmap - PlĂˇnovanĂ© funkce
+# Roadmap - Plánované funkce
 
-PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ©r aplikaci.
+Přehled plánovaných funkcí a vylepšení pro DMX 512 Kontrolér aplikaci.
 
-## đź“‹ Obsah
+## đź"‹ Obsah
 
-- [AktuĂˇlnĂ­ verze](#aktuĂˇlnĂ­-verze)
-- [V1.1 - NejbliĹľĹˇĂ­ update](#v11---nejbliĹľĹˇĂ­-update)
+- [Aktuální verze](#aktuální-verze)
+- [V1.1 - Nejbližší update](#v11---nejbližší-update)
 - [V1.2 - Data Management](#v12---data-management)
 - [V1.3 - MIDI Support](#v13---midi-support)
 - [V2.0 - Pro Features](#v20---pro-features)
-- [DlouhodobĂ© plĂˇny](#dlouhodobĂ©-plĂˇny)
-- [KomunitnĂ­ poĹľadavky](#komunitnĂ­-poĹľadavky)
+- [Dlouhodobé plány](#dlouhodobé-plány)
+- [Komunitní pořadavky](#komunitní-pořadavky)
 
-## đźŽŻ AktuĂˇlnĂ­ verze
+## 🎯 Aktuální verze
 
 ### V1.0 (Current) âś…
 
-**Stav**: SpuĹˇtÄ›no 2024-11-01
+**Stav**: Spuštěno 2024-11-01
 
-**KlĂ­ÄŤovĂ© funkce:**
-- âś… DMX kontrola (512 kanĂˇlĹŻ per universe)
+**Klíčové funkce:**
+- ✅ DMX kontrola (512 kanálů per universe)
 - âś… RGB/RGBW color picker
 - âś… Scene management
 - âś… 14 preset effects
 - âś… Block programming
 - âś… Stepper motor control (16-bit)
-- âś… Servo control (0-180Â°)
+- ✅ Servo control (0-180°)
 - âś… Joystick Pan/Tilt control
 - âś… Art-Net support
 - âś… PWA support (offline mode)
 - âś… Custom page builder
 - âś… 6 control blocks
 
-## đźš€ V1.1 - NejbliĹľĹˇĂ­ update
+## 🚀 V1.1 - Nejbližší update
 
-**PlĂˇnovanĂ© vydĂˇnĂ­**: Q1 2025  
-**ZamÄ›Ĺ™enĂ­**: UĹľivatelskĂ© vylepĹˇenĂ­ a polish
+**Plánované vydání**: Q1 2025  
+**Zaměření**: Uživatelské vylepšení a polish
 
-### NovĂ© funkce
+### Nové funkce
 
-#### 1. Testing Framework âšˇ VysokĂˇ priorita
+#### 1. Testing Framework ⚡ Vysoká priorita
 - [x] Vitest setup
 - [x] React Testing Library
 - [x] Component tests
 - [x] Integration tests
 - [ ] E2E tests (Playwright)
 
-**ProÄŤ**: Zajistit kvalitu kĂłdu a prevenci regresĂ­
+**ProÄŤ**: Zajistit kvalitu kódu a prevenci regresí
 
-#### 2. USB DMX Support đź”Ś VysokĂˇ priorita
+#### 2. USB DMX Support 🔌 Vysoká priorita
 - [x] Web Serial API integration
-- [x] Support pro bÄ›ĹľnĂ© USB DMX interfaces
+- [x] Support pro běžné USB DMX interfaces
 - [x] Enttec DMX USB PRO support
 - [x] Auto-detection devices
 
-**Use case**: PĹ™Ă­mĂ© pĹ™ipojenĂ­ k DMX bez Art-Net node
+**Use case**: Přímé připojení k DMX bez Art-Net node
 
-#### 3. Fixture Templates đź“š StĹ™ednĂ­ priorita
-- [x] Library bÄ›ĹľnĂ˝ch fixtures
-- [x] Template picker pĹ™i pĹ™idĂˇvĂˇnĂ­ fixture
+#### 3. Fixture Templates 📚 Střední priorita
+- [x] Library běžných fixtures
+- [x] Template picker při přidávání fixture
 - [ ] Community fixture contributions
 - [ ] Import custom fixture profiles
 
@@ -67,116 +67,116 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 - Generic Moving Head (16ch, 20ch, 24ch)
 - Popular brands (Chauvet, ADJ, Martin)
 
-#### 4. UI/UX Improvements đźŽ¨ StĹ™ednĂ­ priorita
+#### 4. UI/UX Improvements 🎨 Střední priorita
 - [x] Dark/Light theme toggle
 - [ ] Customizable color scheme
 - [x] Larger touch targets na mobilech
 - [ ] Better gesture support
 - [ ] Haptic feedback (vibrace)
 
-#### 5. Performance Optimizations âšˇ NĂ­zkĂˇ priorita
-- [ ] Virtual scrolling pro velkĂ© seznamy
+#### 5. Performance Optimizations ⚡ Nízká priorita
+- [ ] Virtual scrolling pro velké seznamy
 - [ ] React.memo optimizations
 - [ ] Lazy loading improvements
 - [ ] Reduced bundle size
 - [ ] Better caching strategy
 
-## đź’ľ V1.2 - Data Management
+## đź'ľ V1.2 - Data Management
 
-**PlĂˇnovanĂ© vydĂˇnĂ­**: Q2 2025  
-**ZamÄ›Ĺ™enĂ­**: Import/Export a zĂˇlohy
+**Plánované vydání**: Q2 2025  
+**Zaměření**: Import/Export a zálohy
 
-### NovĂ© funkce
+### Nové funkce
 
-#### 1. Export/Import đź’Ľ VysokĂˇ priorita
-- [x] Export celĂ© konfigurace (JSON)
-- [x] Export jednotlivĂ˝ch scĂ©n
+#### 1. Export/Import 💼 Vysoká priorita
+- [x] Export celé konfigurace (JSON)
+- [x] Export jednotlivých scén
 - [x] Export effects
 - [x] Import konfigurace
-- [x] Merge import (slouÄŤenĂ­ s existujĂ­cĂ­mi daty)
+- [x] Merge import (slouÄŤení s existujícími daty)
 
-**FormĂˇt**: JSON s verzovĂˇnĂ­m
+**Formát**: JSON s verzováním
 
 **Use cases:**
-- Backup pĹ™ed showem
-- SdĂ­lenĂ­ konfigurace mezi zaĹ™Ă­zenĂ­mi
+- Backup před showem
+- Sdílení konfigurace mezi zařízeními
 - Template sharing v komunitÄ›
 
-#### 2. Cloud Backup âď¸Ź StĹ™ednĂ­ priorita
+#### 2. Cloud Backup ☁️ Střední priorita
 - [x] Optional cloud storage
-- [x] Auto-backup mo��nost
+- [x] Auto-backup možnost
 - [x] Restore z cloud
 - [x] Version history
 
-**Privacy**: Opt-in, ĹˇifrovanĂ©, ĹľĂˇdnĂ© tracky
+**Privacy**: Opt-in, šifrované, žádné tracky
 
-#### 3. Project Management đź“ StĹ™ednĂ­ priorita
+#### 3. Project Management 📁 Střední priorita
 - [x] Multiple projects
 - [x] Project switching
 - [x] Project templates
 - [x] Project metadata (venue, date, notes)
 
-**Use case**: RĹŻznĂ© projekty pro rĹŻznĂˇ venue
+**Use case**: Různé projekty pro různá venue
 
-#### 4. Scene Organization đź—‚ď¸Ź NĂ­zkĂˇ priorita
+#### 4. Scene Organization 🗂️ Nízká priorita
 - [ ] Scene folders
 - [ ] Scene tagging
 - [ ] Scene filtering
 - [ ] Scene duplication
 - [ ] Batch operations
 
-## đźŽą V1.3 - MIDI Support
+## 🎹 V1.3 - MIDI Support
 
-**PlĂˇnovanĂ© vydĂˇnĂ­**: Q3 2025  
-**ZamÄ›Ĺ™enĂ­**: HardwarovĂ© ovlĂˇdĂˇnĂ­
+**Plánované vydání**: Q3 2025  
+**Zaměření**: Hardwarové ovládání
 
-### NovĂ© funkce
+### Nové funkce
 
-#### 1. MIDI Input đźŽ›ď¸Ź VysokĂˇ priorita
+#### 1. MIDI Input 🎛️ Vysoká priorita
 - [x] Web MIDI API integration
 - [x] MIDI device detection
 - [ ] MIDI learn funkce
-- [x] Fader mapping (CC → DMX kanĂˇly)
-- [x] Button mapping (note-on → scĂ©ny/efekty)
+- [x] Fader mapping (CC → DMX kanály)
+- [x] Button mapping (note-on → scény/efekty)
 - [ ] Encoder support
 
-> ✅ **Preview dostupné**: Web MIDI bridge (Nastavení → karta „MIDI (preview)“) už umí číst vstupní zprávy v Chromu/HTTPS. Sbíráme feedback v issue [#421](https://github.com/atrep123/dmx-512-controller/issues/421).
+> ✅ **Preview dostupné**: Web MIDI bridge (Nastavení → karta "MIDI (preview)") už umí číst vstupní zprávy v Chromu/HTTPS. Sbíráme feedback v issue [#421](https://github.com/atrep123/dmx-512-controller/issues/421).
 
-**PodporovanĂ© kontrolĂ©ry:**
+**Podporované kontroléry:**
 - AKAI APC mini/40
 - Novation Launchpad
 - Behringer X-Touch
 - Generic MIDI controllers
 
-#### 2. MIDI Mapping đź”— VysokĂˇ priorita
+#### 2. MIDI Mapping 🔗 Vysoká priorita
 - [x] Visual mapping interface
 - [x] Save/load mappings (IndexedDB + show snapshot)
 - [ ] Multiple mapping profiles
 - [ ] MIDI feedback (LED sync)
 
-**MapovatelnĂ© funkce (preview):**
-- Channel faders â†’ MIDI CC
-- Scene triggers â†’ MIDI notes
-- Effect toggle/intensity â†’ MIDI notes & CC
-- Master dimmer â†’ MIDI CC
-- Color picker â†’ MIDI encoder
+**Mapovatelné funkce (preview):**
+- Channel faders → MIDI CC
+- Scene triggers → MIDI notes
+- Effect toggle/intensity → MIDI notes & CC
+- Master dimmer → MIDI CC
+- Color picker → MIDI encoder
 
-#### 3. MIDI Clock Sync âŹ±ď¸Ź StĹ™ednĂ­ priorita
+#### 3. MIDI Clock Sync ⏱️ Střední priorita
 - [ ] MIDI clock input
 - [ ] Tempo-synced effects
 - [ ] Beat-triggered scenes
 - [ ] BPM detection
 
-**Use case**: Sync svÄ›tel s hudbou pĹ™es MIDI
+**Use case**: Sync světel s hudbou přes MIDI
 
-## đźŽ¬ V2.0 - Pro Features
+## 🎬 V2.0 - Pro Features
 
-**PlĂˇnovanĂ© vydĂˇnĂ­**: Q4 2025  
-**ZamÄ›Ĺ™enĂ­**: ProfesionĂˇlnĂ­ features
+**Plánované vydání**: Q4 2025  
+**Zaměření**: Profesionální features
 
-### NovĂ© funkce
+### Nové funkce
 
-#### 1. Cue List đź“‹ VysokĂˇ priorita
+#### 1. Cue List 📋 Vysoká priorita
 - [ ] Cue creation
 - [ ] Fade times per cue
 - [ ] Cue editing
@@ -189,16 +189,16 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 - Cue spreadsheet
 - Real-time playback
 
-#### 2. Timecode Support âŹ° VysokĂˇ priorita
+#### 2. Timecode Support ⏰ Vysoká priorita
 - [ ] SMPTE timecode input
 - [ ] Art-Net timecode
 - [ ] OSC timecode
 - [ ] Timecode-triggered cues
 - [ ] Timecode display
 
-**Use case:** ProgramovĂˇnĂ­ show s audio/video sync
+**Use case:** Programování show s audio/video sync
 
-#### 3. Multi-User Support đź‘Ą StĹ™ednĂ­ priorita
+#### 3. Multi-User Support 👥 Střední priorita
 - [ ] WebSocket server
 - [ ] Real-time sync mezi devices
 - [ ] Role-based access (admin/operator/view)
@@ -207,30 +207,30 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 
 **Architektura:** Optional server mode
 
-#### 4. Advanced Effects đźŚź StĹ™ednĂ­ priorita
+#### 4. Advanced Effects 🌟 Střední priorita
 - [ ] Effect generator
 - [ ] Pixel mapping
 - [ ] Matrix effects (2D grid)
 - [ ] Video-to-DMX
 - [ ] Audio-reactive effects
 
-#### 5. Fixture Library Import đź“¦ StĹ™ednĂ­ priorita
+#### 5. Fixture Library Import 📦 Střední priorita
 - [ ] GDTF import
 - [ ] MVR import
 - [ ] Fixture Builder Pro profiles
 - [ ] Custom fixture editor
 
-#### 6. Show Recording đź“ą NĂ­zkĂˇ priorita
+#### 6. Show Recording 📹 Nízká priorita
 - [ ] Record live show
 - [ ] Playback recorded show
 - [ ] Edit recording
 - [ ] Export show file
 
-## đź”® DlouhodobĂ© plĂˇny
+## 🔮 Dlouhodobé plány
 
 ### V3.0+ - Enterprise Features
 
-**PotenciĂˇlnĂ­ timeline**: 2026+
+**Potenciální timeline**: 2026+
 
 #### Network Features
 - [ ] sACN full implementation
@@ -264,74 +264,74 @@ PĹ™ehled plĂˇnovanĂ˝ch funkcĂ­ a vylepĹˇenĂ­ pro DMX 512 KontrolĂ�
 - [ ] Magic sheets
 - [ ] Reports and analytics
 
-## đź—łď¸Ź KomunitnĂ­ poĹľadavky
+## 🗳️ Komunitní požadavky
 
-Hlasujte pro features kterĂ© chcete vidÄ›t jako prvnĂ­!
+Hlasujte pro features které chcete vidět jako první!
 
 ### Top requested features
 
-1. **Fixture Library** (45 hlasĹŻ) đź”Ą
-2. **Export/Import** (38 hlasĹŻ) đź”Ą
-3. **MIDI Support** (32 hlasĹŻ)
-4. **Cue List** (28 hlasĹŻ)
-5. **USB DMX** (24 hlasĹŻ)
-6. **Dark Theme** (22 hlasĹŻ)
-7. **Multi-User** (18 hlasĹŻ)
-8. **Timecode** (15 hlasĹŻ)
+1. **Fixture Library** (45 hlasů) 🔥
+2. **Export/Import** (38 hlasů) 🔥
+3. **MIDI Support** (32 hlasů)
+4. **Cue List** (28 hlasů)
+5. **USB DMX** (24 hlasů)
+6. **Dark Theme** (22 hlasů)
+7. **Multi-User** (18 hlasů)
+8. **Timecode** (15 hlasů)
 
 **Jak hlasovat:**
 - [Feature Requests](https://github.com/atrep123/dmx-512-controller/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
-- Dejte đź‘Ť na issue kterĂ© chcete
-- Nebo vytvoĹ™te novĂ˝ feature request
+- Dejte 👍 na issue které chcete
+- Nebo vytvořte nový feature request
 
-## đź“Š Prioritizace
+## 📊 Prioritizace
 
-### KritĂ©ria pro prioritizaci
+### Kritéria pro prioritizaci
 
-1. **User demand** - Kolik uĹľivatelĹŻ o to stojĂ­
-2. **Impact** - Jak moc to pomĹŻĹľe uĹľivatelĹŻm
-3. **Effort** - Jak nĂˇroÄŤnĂˇ je implementace
-4. **Dependencies** - Co musĂ­ bĂ˝t hotovĂ© pĹ™ed tĂ­m
-5. **Strategic fit** - ZapadĂˇ do dlouhodobĂ© vize
+1. **User demand** - Kolik uřivatelů o to stojí
+2. **Impact** - Jak moc to pomůře uřivatelům
+3. **Effort** - Jak náročná je implementace
+4. **Dependencies** - Co musí být hotové před tím
+5. **Strategic fit** - Zapadá do dlouhodobé vize
 
-### PrioritnĂ­ matice
+### Prioritní matice
 
 | Priorita | Definice | Timeline |
 |----------|----------|----------|
-| đź”Ą VysokĂˇ | NutnĂ© pro vÄ›tĹˇinu uĹľivatelĹŻ | PĹ™Ă­ĹˇtĂ­ verze |
-| âšˇ StĹ™ednĂ­ | UĹľiteÄŤnĂ©, vylepĹˇuje UX | 2-3 verze |
-| đź’ˇ NĂ­zkĂˇ | Nice to have | KdyĹľ je ÄŤas |
-| đź”® Budoucnost | DlouhodobĂˇ vize | MoĹľnĂˇ nÄ›kdy |
+| 🔥 Vysoká | Nutné pro většinu uživatelů | Příští verze |
+| ⚡ Střední | Užitečné, vylepšuje UX | 2-3 verze |
+| 💡 Nízká | Nice to have | Když je čas |
+| 🔮 Budoucnost | Dlouhodobá vize | Možná někdy |
 
-## đź¤ť Jak pĹ™ispÄ›t k roadmapÄ›
+## 🤝 Jak přispět k roadmapě
 
 ### Navrhnout novou funkci
 
 1. Zkontrolujte [existing feature requests](https://github.com/atrep123/dmx-512-controller/issues?q=is%3Aissue+label%3Aenhancement)
-2. Pokud neexistuje, [vytvoĹ™te novĂ˝](https://github.com/atrep123/dmx-512-controller/issues/new?template=feature_request.yml)
-3. PopiĹˇte:
-   - JakĂ˝ problĂ©m Ĺ™eĹˇĂ­
+2. Pokud neexistuje, [vytvořte nový](https://github.com/atrep123/dmx-512-controller/issues/new?template=feature_request.yml)
+3. Popište:
+   - Jaký problém řeší
    - Jak by to fungovalo
    - Use cases
-   - Mockupy (pokud moĹľnĂ©)
+   - Mockupy (pokud možné)
 
 ### Implementovat funkci
 
-1. NajdÄ›te feature na roadmapÄ›
-2. Komentujte na issue Ĺľe na tom pracujete
-3. PĹ™eÄŤtÄ›te si [Contributing Guide](../CONTRIBUTING.md)
-4. VytvoĹ™te PR s implementacĂ­
+1. Najděte feature na roadmapě
+2. Komentujte na issue ře na tom pracujete
+3. Přečtěte si [Contributing Guide](../CONTRIBUTING.md)
+4. Vytvořte PR s implementací
 
 ### Hlasovat pro funkce
 
-- Dejte đź‘Ť emoji reaction na issues
-- Komentujte s vaĹˇimi use cases
-- SdĂ­lejte proÄŤ je to pro vĂˇs dĹŻleĹľitĂ©
+- Dejte 👍 emoji reaction na issues
+- Komentujte s vašimi use cases
+- Sdílejte proč je to pro vás důležité
 
-## đź“ť Release Notes
+## 📝 Release Notes
 
-KaĹľdĂˇ verze bude mĂ­t detailnĂ­ release notes s:
-- NovĂ˝mi funkcemi
+Každá verze bude mít detailní release notes s:
+- Novými funkcemi
 - Bug fixes
 - Breaking changes
 - Migration guide
@@ -339,29 +339,29 @@ KaĹľdĂˇ verze bude mĂ­t detailnĂ­ release notes s:
 
 Release notes najdete v [CHANGELOG.md](../CHANGELOG.md)
 
-## đź’¬ Diskuse
+## đź'¬ Diskuse
 
-MĂˇte nĂˇpad? Chcete diskutovat o roadmapÄ›?
+Máte nápad? Chcete diskutovat o roadmapě?
 
-- đź’¬ [GitHub Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
-- đź› [Feature Requests](https://github.com/atrep123/dmx-512-controller/issues/new?template=feature_request.yml)
-- đź“§ Nebo napiĹˇte maintainerĹŻm
+- đź'¬ [GitHub Discussions](https://github.com/atrep123/dmx-512-controller/discussions)
+- 🐛 [Feature Requests](https://github.com/atrep123/dmx-512-controller/issues/new?template=feature_request.yml)
+- 📧 Nebo napište maintainerům
 
-## âš ď¸Ź UpozornÄ›nĂ­
+## ⚠️ Upozornění
 
-**Roadmap je living document** a mĹŻĹľe se zmÄ›nit na zĂˇkladÄ›:
+**Roadmap je living document** a může se změnit na základě:
 - User feedback
-- TechnickĂ˝ch omezenĂ­
-- ZmÄ›ny priorit
-- DostupnĂ˝ch zdrojĹŻ
-- NovĂ˝ch technologiĂ­
+- Technických omezení
+- Změny priorit
+- Dostupných zdrojů
+- Nových technologií
 
-Timeline je **orientaÄŤnĂ­** a mĹŻĹľe se posunout.
+Timeline je **orientaÄŤní** a můře se posunout.
 
 ---
 
-**Roadmap pro DMX 512 KontrolĂ©r**  
-PoslednĂ­ aktualizace: 2024-11-01  
-DalĹˇĂ­ review: Q1 2025
+**Roadmap pro DMX 512 Kontrolér**  
+Poslední aktualizace: 2024-11-01  
+Další review: Q1 2025
 
-đźŚź **PodpoĹ™te vĂ˝voj**: Star na [GitHub](https://github.com/atrep123/dmx-512-controller)!
+🌟 **Podpořte vývoj**: Star na [GitHub](https://github.com/atrep123/dmx-512-controller)!

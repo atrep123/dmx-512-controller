@@ -59,11 +59,11 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
    python -m pytest server/tests
    ```
 
-### Seed show pro lok?ln? v?voj
+### Seed show pro lokální vývoj
 
-- Repo obsahuje realistick? snapshot rig? v `data/show.json` + `data/scenes.json`. Backend je na?te automaticky p?i startu a UI tak ihned zobrazuje fixtures, sc?ny, efekty i MIDI mapy.
-- Pokud chce? seed upravit (p?idat dal?? universa, sv?tidla, sc?ny nebo efekty), sta?? tyto JSONy editovat a restartovat backend nebo v UI kliknout na ?Synchronizovat?. Backend zm?ny ulo?? zp?t.
-- Detailn? popis form?tu i doporu?en?ho workflow je v [`docs/SEED_DATA.md`](docs/SEED_DATA.md).
+- Repo obsahuje realistický snapshot rigů v `data/show.json` + `data/scenes.json`. Backend je načte automaticky při startu a UI tak ihned zobrazuje fixtures, scény, efekty i MIDI mapy.
+- Pokud chceš seed upravit (přidat další universa, svítidla, scény nebo efekty), stačí tyto JSONy editovat a restartovat backend nebo v UI kliknout na "Synchronizovat". Backend změny uloží zpět.
+- Detailní popis formátu i doporučeného workflow je v [`docs/SEED_DATA.md`](docs/SEED_DATA.md).
 
 ---
 
@@ -88,9 +88,9 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
 
 ## Desktop distribuce
 
-Podrobnosti jsou v [`docs/DESKTOP_APP.md`](docs/DESKTOP_APP.md) a `desktop/README.md`. Shrnut? workflow je dostupn? i p?es npm skripty:
+Podrobnosti jsou v [`docs/DESKTOP_APP.md`](docs/DESKTOP_APP.md) a `desktop/README.md`. Shrnutí workflow je dostupné i přes npm skripty:
 
-- **Instalace z?vislost?**
+- **Instalace závislostí**
   ```bash
   npm install
   cd desktop && npm install
@@ -104,19 +104,19 @@ Podrobnosti jsou v [`docs/DESKTOP_APP.md`](docs/DESKTOP_APP.md) a `desktop/READM
   ```bash
   npm run desktop:dev
   ```
-  Spust? `npm run build`, zkop?ruje `dist/` do `desktop/src-tauri/resources/app`, nastartuje `tauri dev` a sidecar (SPA p?ij?m? `desktop://backend/{waiting,ready,error}`).
+  Spustí `npm run build`, zkopíruje `dist/` do `desktop/src-tauri/resources/app`, nastartuje `tauri dev` a sidecar (SPA přijímá `desktop://backend/{waiting,ready,error}`).
 - **Production build**
   ```bash
   npm run desktop:build
   ```
-  V?stup: MSI + NSIS (`desktop/src-tauri/target/release/bundle`).
+  Výstup: MSI + NSIS (`desktop/src-tauri/target/release/bundle`).
 - **Release manifest + podpis**
   ```bash
   npm run desktop:release
   ```
-  Vy?aduje `TAURI_SIGNING_PRIVATE_KEY(_PATH)` (+ voliteln? heslo). `desktop/scripts/create-release-json.mjs` podep??e NSIS a ulo?? `dist/desktop/<channel>-release.json`, kter? pou??v? updater v `tauri.conf.json`.
+  Vyžaduje `TAURI_SIGNING_PRIVATE_KEY(_PATH)` (+ volitelné heslo). `desktop/scripts/create-release-json.mjs` podepíše NSIS a uloží `dist/desktop/<channel>-release.json`, který používá updater v `tauri.conf.json`.
 
-GitHub workflow **Desktop Release** d?l? tot?? (PyInstaller, Tauri build, podpis, release manifest, upload). Sta?? zvolit `channel`, verzi a dodat secrets (signing + voliteln? upload na S3/CDN).
+GitHub workflow **Desktop Release** dělá totéž (PyInstaller, Tauri build, podpis, release manifest, upload). Stačí zvolit `channel`, verzi a dodat secrets (signing + volitelně upload na S3/CDN).
 
 
 ---
@@ -159,27 +159,6 @@ Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme 
 - Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
 
 
-
-## Roadmap & advanced funkce
-
-Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme veřejně:
-
-- docs/ROADMAP.md (sekce V1.2–V2.0) + issues [#421](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [#422](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [#423](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [#318](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user).
-- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa a docs/FAQ.md – shrnutí pro koncové uživatele.
-- Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
-
-
-
-## Roadmap & advanced funkce
-
-Pokročilé integrace (MIDI, OSC, timecode, multi-user, cloud backup) sledujeme veřejně:
-
-- docs/ROADMAP.md (sekce V1.2–V2.0) + issues [#421](https://github.com/atrep123/dmx-512-controller/issues/421) (MIDI), [#422](https://github.com/atrep123/dmx-512-controller/issues/422) (OSC), [#423](https://github.com/atrep123/dmx-512-controller/issues/423) (Timecode), [#318](https://github.com/atrep123/dmx-512-controller/issues/318) (Multi-user).
-- docs/USER_GUIDE.md#pokročilé-funkce-roadmapa a docs/FAQ.md – shrnutí pro koncové uživatele.
-- Chceš se zapojit? Dej 👍 na issue, přidej use-case nebo pošli PR – roadmapu řídí komunitní feedback.
-
-
----
 
 ## Přispívání
 

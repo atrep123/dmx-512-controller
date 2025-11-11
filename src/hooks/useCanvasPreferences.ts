@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { AppearancePreset } from '@/components/CustomLayoutRenderer'
+import type { AppearancePreset } from '@/components/customLayoutShared'
 
 const DEFAULT_APPEARANCES: AppearancePreset[] = ['soft', 'flat', 'glass']
 

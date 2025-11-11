@@ -18,7 +18,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { useI18n } from '@/lib/i18n'
+import { useI18n } from '@/lib/useI18n'
 import { BACKEND_BASE_URL } from '@/lib/env'
 import {
   Broadcast,

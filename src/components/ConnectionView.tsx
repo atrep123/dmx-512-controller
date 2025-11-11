@@ -345,7 +345,7 @@ export default function ConnectionView() {
           console.error('usb_dmx_patch_error', error)
           setUsbStatus((prev) => ({
             ...prev,
-            error: 'Chyba p�i odesl��n�� DMX dat do USB rozhran��',
+            error: 'Chyba při odesílání DMX dat do USB rozhraní',
           }))
         })
     })

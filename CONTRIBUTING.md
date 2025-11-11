@@ -469,7 +469,7 @@ Pokud přidáváte texty do UI:
 3. **Placeholdery jsou podporované** - `t('desktop.onboarding.test.success', { target })` nahradí `{target}` hodnotou.
 
 ```tsx
-import { useI18n } from "@/lib/i18n";
+import { useI18n } from "@/lib/useI18n";
 
 function Example() {
   const { t } = useI18n();

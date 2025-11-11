@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { CustomBlockKind } from '@/lib/types'
-import type { BlockPalette } from '@/components/CustomLayoutRenderer'
+import type { BlockPalette } from '@/components/customLayoutShared'
 
 type PaletteOverrides = Partial<BlockPalette>
 

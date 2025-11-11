@@ -31,13 +31,8 @@ import type {
   CustomBlockPosition,
   Universe,
 } from '@/lib/types'
-import {
-  CustomLayoutRenderer,
-  type BlockRendererMap,
-  type BlockPalette,
-  type AppearancePreset,
-  BLOCK_KIND_LABELS,
-} from '@/components/CustomLayoutRenderer'
+import { CustomLayoutRenderer, type BlockRendererMap } from '@/components/CustomLayoutRenderer'
+import { BLOCK_KIND_LABELS, type BlockPalette, type AppearancePreset } from '@/components/customLayoutShared'
 import { cn } from '@/lib/utils'
 import ConnectionMonitorCard from '@/components/ConnectionMonitorCard'
 import { useCanvasPreferences } from '@/hooks/useCanvasPreferences'
@@ -338,7 +333,7 @@ export default function CustomDashboard({
     }
 
     return renderMap
-  }, [applyScene, effects, fixtures, handleMasterChange, masterDimmerValue, scenes, setEffects, setFixtures, toggleEffect, universes])
+  }, [applyScene, effects, fixtures, handleMasterChange, masterDimmerValue, scenes, setFixtures, toggleEffect, universes])
 
   return (
     <div className="flex flex-col gap-4">

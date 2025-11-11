@@ -100,5 +100,5 @@ curl -s :8080/metrics | grep -E 'dmx_core_fade_(active|jobs_active|fades_(starte
 - Bump verze (např. 1.3.0) v changelogu a relasu.
 - CI zelené (FE/BE/WS/OLA/fades testy).
 - Tag + GitHub Release; do README uveď `OUTPUT_MODE=null|ola`, `FADES_ENABLED=true|false`.
-- Do „Deployment Guide“ přidej kapitolu Observability/Grafana a tento tahák.
+- Do "Deployment Guide" přidej kapitolu Observability/Grafana a tento tahák.
 
