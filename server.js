@@ -40,7 +40,7 @@ app.post("/command", (req, res) => {
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`✨ DMX Backend server running on http://localhost:${PORT}`);
+  console.log(`[dmx] Backend server running on http://localhost:${PORT}`);
 });
 
 // WebSocket server

@@ -103,8 +103,8 @@ const renderSkeletonGrid = (
       <div
         key={`skeleton-${index}`}
         className={cn(
-          'h-28 animate-pulse rounded-2xl border border-dashed border-muted/40',
-          appearanceStyles.button
+          appearanceStyles.button,
+          'h-28 animate-pulse rounded-2xl border border-dashed border-muted/40'
         )}
       />
     ))}
@@ -485,16 +485,14 @@ export function CustomLayoutRenderer({
               aria-selected={isSelected}
               aria-label={getBlockSummary(block)}
               data-block-id={block.id}
-              data-selected={isSelected}
+              data-selected={isSelected ? 'true' : undefined}
               data-highlighted={highlightedBlockId === block.id ? 'true' : undefined}
               onClick={onBlockSelect ? (event) => onBlockSelect(block.id, event) : undefined}
               onMouseEnter={() => handleHoverChange(block.id)}
               onMouseLeave={() => handleHoverChange(null)}
               className={cn(
-                'group relative w-full text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-                appearanceStyles.button,
-                highlightedBlockId === block.id && 'ring-primary/40 bg-primary/5',
-                isSelected && 'ring-2 ring-primary/70 ring-offset-2 ring-offset-background shadow-lg'
+                'group relative w-full text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[selected=true]:shadow-lg data-[selected=true]:border-primary/60 data-[selected=true]:bg-primary/5 data-[highlighted=true]:border-primary/40 data-[highlighted=true]:bg-primary/10',
+                appearanceStyles.button
               )}
               style={blockStyle}
               title={getBlockSummary(block)}

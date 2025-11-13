@@ -1,5 +1,6 @@
 :: filepath: c:\Users\atrep\Desktop\DMX 2\dmx-512-controller\start-all.bat
 @echo off
+chcp 65001 >nul
 echo Starting DMX 512 Controller...
 echo.
 

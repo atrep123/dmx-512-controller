@@ -19,7 +19,7 @@
     "clean:cache": "rimraf node_modules/.vite",
     "clean:ports": "npx kill-port 3000 3001 4173 5173 8080",
     "frontend:dev": "vite",
-    "backend:start": "node server.js 2>nul || echo Backend not available",
+    "backend:start": "node scripts/run-backend.mjs",
     "desktop:backend": "node scripts/build-server-exe.mjs",
     "desktop:dev": "npm run build && npm run --prefix desktop dev",
     "desktop:build": "npm run build && npm run desktop:backend && npm run --prefix desktop build",

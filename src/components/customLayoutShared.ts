@@ -16,18 +16,18 @@ export type AppearanceStyles = {
 export const appearancePresets: Record<AppearancePreset, AppearanceStyles> = {
   soft: {
     wrapper: 'gap-3',
-    cardBase: 'rounded-2xl border border-border/30 bg-background/90 p-4 shadow-sm',
+    cardBase: 'rounded-2xl border border-border/25 bg-background/95 p-4 shadow-sm',
     button:
-      'rounded-2xl bg-background/70 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ring-1 ring-inset ring-border/35',
-    overlay: 'bg-background/90',
+      'rounded-2xl border border-border/10 bg-background/80 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:border-border/40',
+    overlay: 'bg-background/95 shadow-sm',
     metaText: 'text-foreground/70',
     badgeClass: 'border-foreground/30 text-foreground',
   },
   flat: {
-    wrapper: 'gap-3 rounded-3xl bg-muted/30 p-3',
-    cardBase: 'rounded-2xl border border-border/40 bg-background/95 p-4',
+    wrapper: 'gap-3 rounded-3xl bg-muted/40 p-3',
+    cardBase: 'rounded-2xl border border-border/30 bg-background p-4',
     button:
-      'rounded-xl bg-background transition hover:-translate-y-0.5 ring-1 ring-inset ring-border/40 hover:ring-primary/50',
+      'rounded-2xl border border-transparent bg-transparent transition hover:-translate-y-0.5 hover:border-border/50 hover:bg-background/80',
     overlay: 'bg-background/95 border border-border/40',
     metaText: 'text-muted-foreground',
     badgeClass: 'border-border text-foreground',
@@ -36,17 +36,17 @@ export const appearancePresets: Record<AppearancePreset, AppearanceStyles> = {
     wrapper: 'gap-3 rounded-3xl bg-white/5 p-3 backdrop-blur',
     cardBase: 'rounded-2xl border border-white/20 bg-white/10 p-4 text-white shadow-lg backdrop-blur',
     button:
-      'rounded-2xl bg-white/10 backdrop-blur transition hover:bg-white/20 ring-1 ring-inset ring-white/20 data-[selected=true]:ring-primary/70',
+      'rounded-2xl border border-white/20 bg-white/10 backdrop-blur transition hover:bg-white/20 hover:border-white/40',
     overlay: 'bg-white/80 backdrop-blur shadow',
     metaText: 'text-white/80 drop-shadow',
     badgeClass: 'border-white/50 text-white',
   },
   custom: {
     wrapper: 'gap-3',
-    cardBase: 'rounded-2xl border border-border/30 bg-background/90 p-4 shadow-sm',
+    cardBase: 'rounded-2xl border border-border/25 bg-background/95 p-4 shadow-sm',
     button:
-      'rounded-2xl bg-background/70 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ring-1 ring-inset ring-border/35',
-    overlay: 'bg-background/90',
+      'rounded-2xl border border-border/15 bg-background/80 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:border-border/40',
+    overlay: 'bg-background/95 shadow-sm',
     metaText: 'text-foreground/70',
     badgeClass: 'border-foreground/30 text-foreground',
   },

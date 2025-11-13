@@ -1,17 +1,9 @@
-﻿import { useMemo, useState, useCallback, useEffect, useRef, type ChangeEvent } from 'react'
+﻿import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import {
-  PlusCircle,
-  Trash,
-  DotsSixVertical,
-  ArrowCounterClockwise,
-  ArrowClockwise,
-  CopySimple,
-  UploadSimple,
-} from '@phosphor-icons/react'
+import { PlusCircle, Trash, DotsSixVertical, ArrowCounterClockwise, ArrowClockwise } from '@phosphor-icons/react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -25,12 +17,6 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { CustomLayoutRenderer } from '@/components/CustomLayoutRenderer'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useCanvasPreferences } from '@/hooks/useCanvasPreferences'
-import { useCustomBlockPalette } from '@/hooks/useCustomBlockPalette'
-import { BLOCK_KIND_LABELS, defaultBlockPalette } from '@/components/customLayoutShared'
-import type { AppearancePreset } from '@/components/customLayoutShared'
-import { CUSTOM_BLOCK_KIND_ORDER } from '@/config/customBlocks'
-import { toast } from 'sonner'
 
 const isLayoutEqual = (a: CustomLayout | null, b: CustomLayout | null) => {
   if (a === b) return true
@@ -41,10 +27,6 @@ const isLayoutEqual = (a: CustomLayout | null, b: CustomLayout | null) => {
     return false
   }
 }
-
-const BUILDER_CANVAS_PREFS_KEY = 'custom-builder-canvas-prefs'
-const BUILDER_BLOCK_PALETTE_KEY = 'custom-builder-block-palette'
-const BUILDER_APPEARANCE_OPTIONS: AppearancePreset[] = ['soft', 'flat', 'glass', 'custom']
 import type {
   Effect,
   Fixture,
@@ -113,10 +95,8 @@ export default function CustomPageBuilder({
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [modifier, setModifier] = useState<'none' | 'duplicate' | 'delete' | 'multi'>('none')
-  const [blockFilter, setBlockFilter] = useState('')
   const undoStackRef = useRef<CustomLayout[]>([])
   const redoStackRef = useRef<CustomLayout[]>([])
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [historyLengths, setHistoryLengths] = useState({ undo: 0, redo: 0 })
   const GRID_MAX_ROWS = 128
   const syncHistoryLengths = useCallback(() => {
@@ -161,89 +141,55 @@ export default function CustomPageBuilder({
   useEffect(() => {
     syncHistoryLengths()
   }, [syncHistoryLengths])
-  const {
-    appearance: builderAppearance,
-    setAppearance: setBuilderAppearance,
-    showGuides: showBuilderGuides,
-    setShowGuides: setShowBuilderGuides,
-    showSummary: showBuilderSummary,
-    setShowSummary: setShowBuilderSummary,
-    resetPreferences: resetBuilderCanvasPrefs,
-  } = useCanvasPreferences(
-    BUILDER_CANVAS_PREFS_KEY,
-    { appearance: 'soft', showGuides: true, showSummary: false },
-    { allowedAppearances: BUILDER_APPEARANCE_OPTIONS }
-  )
-  const {
-    palette: builderPalette,
-    overrides: builderPaletteOverrides,
-    setPaletteEntry: setBuilderPaletteEntry,
-    resetPalette: resetBuilderPalette,
-  } = useCustomBlockPalette(BUILDER_BLOCK_PALETTE_KEY, defaultBlockPalette)
-  const hasBuilderPaletteOverrides = Object.keys(builderPaletteOverrides).length > 0
-  const isCanvasPrefsDirty = builderAppearance !== 'soft' || !showBuilderGuides || showBuilderSummary
   const availableBlocks: Array<{
     kind: CustomBlockKind
     title: string
     description: string
     configHint: string
-  }> = useMemo(
-    () => [
-      {
-        kind: 'master-dimmer',
-        title: 'Master dimmer',
-        description: 'Jednoduch├Ż slidery nebo kole─Źko pro ovl├íd├ín├ş celkov├ę intenzity se zobrazen├şm procent.',
-        configHint: 'Napoj├ş┼í na useKV("master-dimmer") a helper setMasterDimmerScale ÔÇô viz LiveControlView.',
-      },
-      {
-        kind: 'scene-button',
-        title: 'Sc├ęnick├ę tla─Ź├ştko',
-        description: 'Spust├ş/preview konkr├ętn├ş sc├ęnu jedn├şm klikem, ide├íln├ş pro dotykov├ę ovl├íd├ín├ş.',
-        configHint: `Vyber ID sc├ęny ze seznamu ScenesView (fixtures: ${fixtures.length}).`,
-      },
-      {
-        kind: 'effect-toggle',
-        title: 'P┼Öep├şna─Ź efektu',
-        description: 'Toggle/on/off pro chase, rainbow nebo custom effect.',
-        configHint: `Napojuj na effectId z aktu├íln├şch efekt┼» (${effects.length} polo┼żek).`,
-      },
-      {
-        kind: 'fixture-slider',
-        title: 'Slider kan├ílu',
-        description: 'P┼Ö├şm├ę ┼Ö├şzen├ş konkr├ętn├şho DMX kan├ílu (nap┼Ö. dimmer, barva, iris).',
-        configHint: 'Vyber fixture + channelId, hodnoty se zapisuj├ş p┼Öes setFixtures Ôçĺ persistShowSnapshot.',
-      },
-      {
-        kind: 'motor-pad',
-        title: 'Motorick├Ż pad',
-        description: '2D pad/joystick pro sm─Ťrov├ín├ş stepper motoru nebo pan/tilt pohybu.',
-        configHint: `Vyu┼żij stepperMotors (${stepperMotors.length}) a metody v MotorsView.`,
-      },
-      {
-        kind: 'servo-knob',
-        title: 'Servo knob',
-        description: 'Mal├Ż kruhov├Ż ovlada─Ź pro servo ├║hel, s mo┼żnost├ş uk├ízat c├şlovou hodnotu.',
-        configHint: `Serva k dispozici: ${servos.length}. Hodnoty zapisuj p┼Öes setServos.`,
-      },
-      {
-        kind: 'markdown-note',
-        title: 'Pozn├ímka/Markdown',
-        description: 'Statick├Ż blok s instrukcemi, QR k├│dem nebo rozcestn├şkem.',
-        configHint: 'Ulo┼żen├Ż text se bude renderovat p┼Öes markdown renderer ÔÇô vhodn├ę pro ops handover.',
-      },
-    ],
-    [effects.length, fixtures.length, servos.length, stepperMotors.length]
-  )
-  const filteredBlocks = useMemo(() => {
-    const query = blockFilter.trim().toLowerCase()
-    if (!query) {
-      return availableBlocks
-    }
-    return availableBlocks.filter((block) => {
-      const haystack = `${block.kind} ${block.title} ${block.description} ${block.configHint}`.toLowerCase()
-      return haystack.includes(query)
-    })
-  }, [availableBlocks, blockFilter])
+  }> = [
+    {
+      kind: 'master-dimmer',
+      title: 'Master dimmer',
+      description: 'Jednoduch├Ż slidery nebo kole─Źko pro ovl├íd├ín├ş celkov├ę intenzity se zobrazen├şm procent.',
+      configHint: 'Napoj├ş┼í na useKV("master-dimmer") a helper setMasterDimmerScale ÔÇô viz LiveControlView.',
+    },
+    {
+      kind: 'scene-button',
+      title: 'Sc├ęnick├ę tla─Ź├ştko',
+      description: 'Spust├ş/preview konkr├ętn├ş sc├ęnu jedn├şm klikem, ide├íln├ş pro dotykov├ę ovl├íd├ín├ş.',
+      configHint: 'Vyber ID sc├ęny ze seznamu ScenesView (fixtures: ' + fixtures.length + ').',
+    },
+    {
+      kind: 'effect-toggle',
+      title: 'P┼Öep├şna─Ź efektu',
+      description: 'Toggle/on/off pro chase, rainbow nebo custom effect.',
+      configHint: 'Napojuj na effectId z aktu├íln├şch efekt┼» (' + effects.length + ' polo┼żek).',
+    },
+    {
+      kind: 'fixture-slider',
+      title: 'Slider kan├ílu',
+      description: 'P┼Ö├şm├ę ┼Ö├şzen├ş konkr├ętn├şho DMX kan├ílu (nap┼Ö. dimmer, barva, iris).',
+      configHint: 'Vyber fixture + channelId, hodnoty se zapisuj├ş p┼Öes setFixtures Ôçĺ persistShowSnapshot.',
+    },
+    {
+      kind: 'motor-pad',
+      title: 'Motorick├Ż pad',
+      description: '2D pad/joystick pro sm─Ťrov├ín├ş stepper motoru nebo pan/tilt pohybu.',
+      configHint: 'Vyu┼żij stepperMotors (' + stepperMotors.length + ') a metody v MotorsView.',
+    },
+    {
+      kind: 'servo-knob',
+      title: 'Servo knob',
+      description: 'Mal├Ż kruhov├Ż ovlada─Ź pro servo ├║hel, s mo┼żnost├ş uk├ízat c├şlovou hodnotu.',
+      configHint: 'Serva k dispozici: ' + servos.length + '. Hodnoty zapisuj p┼Öes setServos.',
+    },
+    {
+      kind: 'markdown-note',
+      title: 'Pozn├ímka/Markdown',
+      description: 'Statick├Ż blok s instrukcemi, QR k├│dem nebo rozcestn├şkem.',
+      configHint: 'Ulo┼żen├Ż text se bude renderovat p┼Öes markdown renderer ÔÇô vhodn├ę pro ops handover.',
+    },
+  ]
 
   const blocks = useMemo(() => customLayout?.blocks ?? [], [customLayout])
   useEffect(() => {
@@ -294,10 +240,7 @@ export default function CustomPageBuilder({
   }
 
   const layoutPreview = ensureLayoutBase(customLayout)
-  const gridBackgroundStyle = useMemo<React.CSSProperties | undefined>(() => {
-    if (!showBuilderGuides) {
-      return undefined
-    }
+  const gridBackgroundStyle = useMemo(() => {
     const base = layoutPreview.grid
     const colCount = base?.columns ?? 12
     const gapRem = base?.gap ?? 1
@@ -311,93 +254,9 @@ export default function CustomPageBuilder({
       `,
       backgroundSize: `${cell}px ${cell}px`,
     } as React.CSSProperties
-  }, [layoutPreview.grid, showBuilderGuides])
+  }, [layoutPreview.grid])
   const selectionIds = getSelectionIds()
   const selectionCount = selectionIds.length
-  const handleCopyLayoutJson = useCallback(async () => {
-    if (!customLayout) {
-      toast.warning('Zat├şm nen├ş co exportovat.')
-      return
-    }
-    if (typeof window === 'undefined') {
-      toast.error('Schr├ínka nen├ş dostupn├í')
-      return
-    }
-    const payload = JSON.stringify(customLayout, null, 2)
-    try {
-      if (window.navigator?.clipboard?.writeText) {
-        await window.navigator.clipboard.writeText(payload)
-      } else {
-        const textarea = window.document.createElement('textarea')
-        textarea.value = payload
-        textarea.style.position = 'fixed'
-        textarea.style.opacity = '0'
-        window.document.body.appendChild(textarea)
-        textarea.focus()
-        textarea.select()
-        window.document.execCommand('copy')
-        window.document.body.removeChild(textarea)
-      }
-      toast.success('Layout zkop├şrov├ín do schr├ínky')
-    } catch (error) {
-      console.error('custom_layout_copy_failed', error)
-      toast.error('Nepoda┼Öilo se kop├şrovat JSON')
-    }
-  }, [customLayout])
-  const handleLayoutFileChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0]
-      if (!file) {
-        return
-      }
-      const reader = new FileReader()
-      reader.onload = () => {
-        try {
-          const raw = typeof reader.result === 'string' ? reader.result : ''
-          const parsed = JSON.parse(raw) as Partial<CustomLayout>
-          if (!parsed || !Array.isArray(parsed.blocks)) {
-            throw new Error('invalid_layout_payload')
-          }
-          applyLayoutUpdate(() => ({
-            id: typeof parsed.id === 'string' ? parsed.id : 'custom-layout',
-            name: typeof parsed.name === 'string' ? parsed.name : 'Importovan├ş layout',
-            grid: {
-              columns: clampValue(
-                typeof parsed.grid?.columns === 'number' ? parsed.grid.columns : layoutPreview.grid?.columns ?? 12,
-                4,
-                24
-              ),
-              rowHeight:
-                typeof parsed.grid?.rowHeight === 'number'
-                  ? Math.max(0.25, parsed.grid.rowHeight)
-                  : layoutPreview.grid?.rowHeight ?? 1,
-              gap:
-                typeof parsed.grid?.gap === 'number'
-                  ? Math.max(0, parsed.grid.gap)
-                  : layoutPreview.grid?.gap ?? 1,
-            },
-            blocks: parsed.blocks,
-            updatedAt: Date.now(),
-          }))
-          toast.success('Layout importov├ín')
-        } catch (error) {
-          console.error('custom_layout_import_failed', error)
-          toast.error('Soubor neobsahuje platn├ş layout')
-        } finally {
-          event.target.value = ''
-        }
-      }
-      reader.onerror = () => {
-        toast.error('Soubor se nepoda┼Öilo na─Ź├şt')
-        event.target.value = ''
-      }
-      reader.readAsText(file)
-    },
-    [applyLayoutUpdate, clampValue, layoutPreview.grid]
-  )
-  const triggerLayoutImport = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
 
   const createDefaultBlock = (kind: CustomBlockKind): CustomBlock => {
     const uuid = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `block-${Date.now()}`
@@ -897,165 +756,33 @@ export default function CustomPageBuilder({
                 handleSelectBlock(blockId, 'replace')
               }
             }}
-            showGridGuides={showBuilderGuides}
-            showGridSummary={showBuilderSummary}
-            appearance={builderAppearance}
-            blockPalette={builderPalette}
-            actions={{
-              onDuplicate: (block) => handleDuplicateBlock(block.id),
-              onRemove: (block) => handleRemoveBlock(block.id),
-            }}
           />
         </div>
         <p className="text-xs text-muted-foreground">
           Tip: Ctrl/Cmd + D klonuje vybran├Ż blok, Delete jej odebere. Alt + ┼íipky m─Ťn├ş velikost, samotn├ę ┼íipky posouvaj├ş v├Żb─Ťr (Shift = v─Ťt┼í├ş krok).
         </p>
       </Card>
-      <Card className="p-6 space-y-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold">Vzhled a export</h3>
-            <p className="text-xs text-muted-foreground">Vylad├ş p├şedvolby rendereru a pracuj s JSON snapshoty.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="ghost" onClick={resetBuilderCanvasPrefs} disabled={!isCanvasPrefsDirty}>
-              Reset pl├ítna
-            </Button>
-            <Button size="sm" variant="ghost" onClick={resetBuilderPalette} disabled={!hasBuilderPaletteOverrides}>
-              Reset palety
-            </Button>
-          </div>
-        </div>
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Styl block rendereru</p>
-          <div className="flex flex-wrap gap-2">
-            {BUILDER_APPEARANCE_OPTIONS.map((option) => (
-              <Button
-                key={option}
-                size="sm"
-                variant={builderAppearance === option ? 'default' : 'outline'}
-                onClick={() => setBuilderAppearance(option)}
-              >
-                {option}
-              </Button>
-            ))}
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="flex items-center justify-between rounded-xl border bg-muted/30 p-3">
-            <div className="pr-4">
-              <p className="text-sm font-semibold">Pomocn├ę ┼Ź├íry</p>
-              <p className="text-xs text-muted-foreground">Vykresl├ş horizont├ílni i vertik├ílni m┼Ö├şku pro p┼Öesn├ş zarovn├ín├ş.</p>
-            </div>
-            <Switch checked={showBuilderGuides} onCheckedChange={setShowBuilderGuides} />
-          </div>
-          <div className="flex items-center justify-between rounded-xl border bg-muted/30 p-3">
-            <div className="pr-4">
-              <p className="text-sm font-semibold">Souhrn m├Ö├şky</p>
-              <p className="text-xs text-muted-foreground">Zobraz├ş metriky layoutu nad rendererem.</p>
-            </div>
-            <Switch checked={showBuilderSummary} onCheckedChange={setShowBuilderSummary} />
-          </div>
-        </div>
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold">Barevn├á paleta blok┼»</p>
-              <p className="text-xs text-muted-foreground">Gradienty pro jednotliv├ę bloky (Tailwind utility).</p>
-            </div>
-            <Badge variant={hasBuilderPaletteOverrides ? 'default' : 'outline'}>
-              {hasBuilderPaletteOverrides ? 'Vlastn├ş paleta' : 'V├şchoz├ş'}
-            </Badge>
-          </div>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            {CUSTOM_BLOCK_KIND_ORDER.map((kind) => (
-              <div key={kind} className="space-y-1 rounded-lg border bg-muted/20 p-3">
-                <Label
-                  htmlFor={`palette-${kind}`}
-                  className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
-                >
-                  {BLOCK_KIND_LABELS[kind] ?? kind}
-                </Label>
-                <Input
-                  id={`palette-${kind}`}
-                  value={builderPaletteOverrides[kind] ?? ''}
-                  onChange={(event) => setBuilderPaletteEntry(kind, event.target.value)}
-                  placeholder={defaultBlockPalette[kind] ?? 'bg-gradient-to-b from-primary/40'}
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  Aktu├ílne:{' '}
-                  <span className="font-mono text-[10px]">{builderPalette[kind] ?? 'inherit'}</span>
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <Separator />
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-2"
-            onClick={() => {
-              void handleCopyLayoutJson()
-            }}
-          >
-            <CopySimple size={16} />
-            Kop├şrovat JSON
-          </Button>
-          <Button size="sm" variant="outline" className="gap-2" onClick={triggerLayoutImport}>
-            <UploadSimple size={16} />
-            Import JSON
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={handleLayoutFileChange}
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Exportuje se aktu├ílne zvolen├ş <code>customLayout</code>. Import p┼Öep├ş┼í layout v─Ťetn├ě gridu a ulo┼ż├ş krok do historie pro
-          undo/redo.
-        </p>
-      </Card>
       <Card className="p-6">
         <h3 className="text-base font-semibold mb-4">Dostupn├ę bloky</h3>
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <Input
-            value={blockFilter}
-            onChange={(event) => setBlockFilter(event.target.value)}
-            placeholder="Hledej podle n├ízvu, workflow nebo popisu..."
-            className="w-full md:w-80"
-          />
-          <Badge variant="outline">Nalezeno: {filteredBlocks.length}</Badge>
-        </div>
-        {filteredBlocks.length === 0 ? (
-          <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground">
-            ┼Ї├ídn├ę bloky neodpov├şdaj├ş filtru.
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {filteredBlocks.map((block) => (
-              <div key={block.kind} className="rounded-lg border p-4 flex flex-col gap-2">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">{block.kind}</p>
-                <p className="text-sm font-semibold mt-1">{block.title}</p>
-                <p className="text-sm text-muted-foreground mt-1">{block.description}</p>
-                <p className="text-xs text-muted-foreground mt-3">
-                  <span className="font-medium">Workflow:</span> {block.configHint}
-                </p>
-                <div className="flex items-center justify-between pt-2">
-                  <Badge variant="outline">Blok┼»: {blockStats[block.kind]}</Badge>
-                  <Button size="sm" variant="outline" onClick={() => handleAddBlock(block.kind)} className="gap-2">
-                    <PlusCircle size={16} />
-                    P┼Öidat
-                  </Button>
-                </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {availableBlocks.map((block) => (
+            <div key={block.kind} className="rounded-lg border p-4 flex flex-col gap-2">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{block.kind}</p>
+              <p className="text-sm font-semibold mt-1">{block.title}</p>
+              <p className="text-sm text-muted-foreground mt-1">{block.description}</p>
+              <p className="text-xs text-muted-foreground mt-3">
+                <span className="font-medium">Workflow:</span> {block.configHint}
+              </p>
+              <div className="flex items-center justify-between pt-2">
+                <Badge variant="outline">Blok┼»: {blockStats[block.kind]}</Badge>
+                <Button size="sm" variant="outline" onClick={() => handleAddBlock(block.kind)} className="gap-2">
+                  <PlusCircle size={16} />
+                  P┼Öidat
+                </Button>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
         <p className="text-sm text-muted-foreground mt-6">
           Bloky p┼Öid├í┼í jedn├şm klikem a pot├ę je m┼»┼że┼í p┼Öetahovat n├ş┼że ÔÇô konfigurace se ukl├íd├í do{' '}
           <code className="mx-1 text-xs">customLayout</code> v show snapshotu.

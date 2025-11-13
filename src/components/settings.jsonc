@@ -1,0 +1,113 @@
+{
+  // Automatic package installation and error resolution
+  "npm.autoDetect": "on",
+  "npm.packageManager": "auto",
+  "npm.enableRunFromFolder": true,
+  "npm.scriptExplorerAction": "run",
+
+  // ULTIMATE AUTOMATION - Maximum Professional Setup
+  // Aggressive Auto-Save & Auto-Format
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 100,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Maximum IntelliSense & AI Power
+  "editor.suggestSelection": "first",
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "editor.suggest.localityBonus": true,
+  "editor.suggest.shareSuggestSelections": true,
+  "editor.suggest.showMethods": true,
+  "editor.suggest.preview": true,
+  "editor.inlineSuggest.enabled": true,
+  "github.copilot.enable": {
+    "*": true
+  },
+
+  // WSL Integration - Maximum Performance
+  "remote.WSL.fileWatcher.polling": false,
+  "remote.WSL.useShellEnvironment": true,
+  "remote.WSL2.connectionMethod": "localhost",
+  "remote.WSL.server.connectThroughLocalhost": true,
+  "remote.extensionKind": {
+    "ms-vscode.vscode-typescript-next": ["workspace"],
+    "esbenp.prettier-vscode": ["workspace"],
+    "ms-vscode.vscode-eslint": ["workspace"],
+    "bradlc.vscode-tailwindcss": ["workspace"]
+  },
+
+  // WSL Terminal Integration
+  "terminal.integrated.profiles.windows": {
+    "WSL Ubuntu": {
+      "path": "wsl.exe",
+      "args": ["-d", "Ubuntu-22.04"],
+      "icon": "terminal-ubuntu"
+    },
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "WSL Ubuntu",
+  "terminal.integrated.enablePersistentSessions": true,
+  "terminal.integrated.inheritEnv": false,
+
+  // WSL Git Integration
+  "git.path": "wsl",
+  "git.useIntegratedTerminal": true,
+  "git.terminalAuthentication": true,
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.autorefresh": true,
+
+  // WSL Node.js Integration
+  "eslint.runtime": "node",
+  "eslint.nodePath": "/usr/bin/node",
+  "typescript.npm": "/usr/bin/npm",
+  "npm.packageManager": "pnpm",
+
+  // WSL Performance Optimizations
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "/mnt/c/Windows/**": true,
+    "/mnt/c/Program Files/**": true,
+    "/mnt/c/Users/**/AppData/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "/mnt/c/Windows": true,
+    "/mnt/c/Program Files": true
+  },
+
+  // WSL Remote Development
+  "remote.autoForwardPorts": true,
+  "remote.portsAttributes": {
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "openBrowser"
+    },
+    "3000": {
+      "label": "React Dev Server",
+      "onAutoForward": "openBrowser"
+    },
+    "8080": {
+      "label": "Backend Server",
+      "onAutoForward": "silent"
+    }
+  }
+
+  // ...existing code...
+}

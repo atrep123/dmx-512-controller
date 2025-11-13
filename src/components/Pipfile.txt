@@ -1,0 +1,104 @@
+# Codex configuration file
+
+# For more information, visit: https://docs.codex.so
+
+[general]
+# The default language to use for new files
+default_language = "typescript"
+
+# The default formatter to use for new files
+default_formatter = "prettier"
+
+# The default linter to use for new files
+default_linter = "eslint"
+
+[editor]
+# The font size to use in the editor
+font_size = 14
+
+# Whether to show line numbers in the editor
+show_line_numbers = true
+
+# Whether to show the editor ruler
+show_ruler = true
+
+# The editor theme to use
+theme = "one-dark-pro"
+
+[terminal]
+# Whether to use the integrated terminal
+use_integrated_terminal = true
+
+# The shell to use for the integrated terminal
+shell = "bash"
+
+[git]
+# Whether to enable Git integration
+enabled = true
+
+# The path to the Git executable
+path = "/usr/bin/git"
+
+[wsl]
+# WSL Integration
+enabled = true
+distribution = "Ubuntu-22.04"
+mount_windows_drives = true
+use_wsl_node = true
+use_wsl_git = true
+
+[performance]
+# Whether to enable performance optimizations
+enabled = true
+
+# The number of CPU cores to allocate to Codex
+cpu_cores = 2
+
+# The amount of RAM to allocate to Codex (in MB)
+ram_size = 2048
+
+# Whether to enable GPU acceleration
+gpu_acceleration = true
+
+# The GPU to use for acceleration
+gpu = "0"
+
+# The performance mode to use in WSL
+wsl_performance_mode = true
+
+# Whether to prefer Linux tools over Windows tools
+prefer_linux_tools = true
+
+[paths]
+# The path to the Codex installation directory
+codex_path = "/usr/local/codex"
+
+# The path to the Codex data directory
+data_path = "/var/lib/codex"
+
+# The path to the Codex logs directory
+logs_path = "/var/log/codex"
+
+# The path to the Codex configuration file
+config_path = "/etc/codex/config.toml"
+
+# The path to the Codex project root in WSL
+wsl_project_root = "/mnt/c/Users/atrep/Desktop/DMX4"
+
+# The path to the Linux temporary directory in WSL
+linux_temp_dir = "/tmp/codex"
+
+# Whether to enable automatic updates
+auto_update = true
+
+# The channel to use for updates
+update_channel = "stable"
+
+# The frequency of update checks (in hours)
+update_interval = 24
+
+# Whether to enable telemetry
+telemetry = true
+
+# Whether to enable crash reporting
+crash_reporting = true

@@ -1,0 +1,20 @@
+[wsl2]
+# Limits VM memory to use no more than 4 GB
+memory=4GB
+
+# Sets the VM to use two virtual processors
+processors=2
+
+# Sets amount of swap storage space to 2GB
+swap=2GB
+
+# Turn off default connection to bind WSL 2 localhost to Windows localhost
+localhostforwarding=true
+
+# Enable experimental features
+[experimental]
+autoMemoryReclaim=gradual
+networkingMode=mirrored
+dnsTunneling=true
+firewall=true
+autoProxy=true

@@ -47,6 +47,7 @@ Předpoklady: Node 20+, npm, Python 3.11/3.12, Git (pnpm volitelně).
    ```bash
    uvicorn server.app:app --host 0.0.0.0 --port 8080 --reload
    ```
+   případně `npm run backend:start`, který spustí stejný příkaz s hot-reloadem (skript si sám najde Python podle proměnné `PYTHON`, `py` nebo `python3`).
    Konfigurace běží přes proměnné `DMX_*` (viz `server/config.py`).
 3. **Start frontendu**
    ```bash
