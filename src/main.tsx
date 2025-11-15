@@ -1,18 +1,18 @@
-import { createRoot } from 'react-dom/client'
+import "@github/spark/spark";
+import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
-import "./lib/setupSparkKvMock"
-import "@github/spark/spark"
+import "./lib/setupSparkKvMock";
 
-import App from './App.tsx'
-import { ErrorFallback } from './ErrorFallback.tsx'
-import { ThemeProvider } from './components/ThemeProvider'
-import { I18nProvider } from './lib/i18n'
+import App from "./App.tsx";
+import { ErrorFallback } from "./ErrorFallback.tsx";
+import { ThemeProvider } from "./components/ThemeProvider";
+import { I18nProvider } from "./lib/i18n";
 
-import "./main.css"
-import "./styles/theme.css"
-import "./index.css"
+import "./index.css";
+import "./main.css";
+import "./styles/theme.css";
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <I18nProvider>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -20,4 +20,4 @@ createRoot(document.getElementById('root')!).render(
       </ErrorBoundary>
     </I18nProvider>
   </ThemeProvider>
-)
+);

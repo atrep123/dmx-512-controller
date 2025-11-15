@@ -595,7 +595,15 @@ async def post_command(request: Request, context: AppContext = Depends(get_conte
             # best-effort: fallback to immediate patch if fade engine missing
             typ = "dmx.patch"
         else:
-            fe.add_fade(universe=universe, patch=payload.get("patch", []), duration_ms=duration_ms, now_ms=now_ms, get_current=get_current, easing=easing)
+            fe.add_fade(
+                universe=universe,
+                patch=payload.get("patch", []),
+                duration_ms=duration_ms,
+                now_ms=now_ms,
+                get_current=get_current,
+                easing=easing,
+                metrics=context.core,
+            )
             context.core.inc_cmd("rest", typ, True)
             return {"ack": payload.get("id"), "accepted": True, "ts": int(time.time() * 1000)}
 
@@ -888,7 +896,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     return int(snap.get(ch, 0))
                 fe = getattr(context, "_fade_engine", None)
                 if fe is not None:
-                    fe.add_fade(universe=universe, patch=data.get("patch", []), duration_ms=duration_ms, now_ms=now_ms, get_current=get_current, easing=easing)
+                    fe.add_fade(
+                        universe=universe,
+                        patch=data.get("patch", []),
+                        duration_ms=duration_ms,
+                        now_ms=now_ms,
+                        get_current=get_current,
+                        easing=easing,
+                        metrics=context.core,
+                    )
                     ack = {"ack": data.get("id"), "accepted": True, "ts": int(time.time() * 1000)}
                     await websocket.send_text(json.dumps(ack))
                     context.core.inc_cmd("ws", typ, True)

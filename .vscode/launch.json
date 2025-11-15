@@ -17,6 +17,34 @@
       "envFile": "infra/.env.example",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
+    },
+    {
+      "name": "DMX Server (WSL)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "server.app:app",
+        "--reload",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080"
+      ],
+      "envFile": "infra/.env.example",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "python": "/usr/bin/python3"
+    },
+    {
+      "name": "Vite Dev Server (WSL)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/vite",
+      "args": ["--host", "0.0.0.0"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "runtimeExecutable": "/usr/bin/node"
     }
   ]
 }

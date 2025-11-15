@@ -120,13 +120,22 @@ class FadeEngine:
         interval = 1.0 / max(1, int(self.tick_hz))
         try:
             while True:
-                start = time.perf_counter()
+                loop_start = time.monotonic()
                 now_ms = int(time.time() * 1000)
                 # Gather deltas per universe
                 for uni, lst in list(self.tasks.items()):
                     if not lst:
+                        # drop empty buckets so gauges can reset
+                        self.tasks.pop(uni, None)
+                        if metrics is not None and hasattr(metrics, "set_fade_active"):
+                            try:
+                                metrics.set_fade_active(uni, 0)
+                                if hasattr(metrics, "set_fade_jobs_active"):
+                                    metrics.set_fade_jobs_active(uni, 0)
+                            except Exception:
+                                pass
                         continue
-                    u_start = time.perf_counter()
+                    u_start = time.monotonic()
                     deltas: Dict[int, int] = {}
                     remaining: List[FadeTask] = []
                     done_completed_channels = 0
@@ -148,7 +157,10 @@ class FadeEngine:
                             remaining.append(ft)
                         else:
                             done_completed_channels += len(channels)
-                    self.tasks[uni] = remaining
+                    if remaining:
+                        self.tasks[uni] = remaining
+                    else:
+                        self.tasks.pop(uni, None)
                     # metrics: active count
                     if metrics is not None and hasattr(metrics, "set_fade_active"):
                         try:
@@ -178,7 +190,7 @@ class FadeEngine:
                     # metrics: per-universe tick
                     if metrics is not None and hasattr(metrics, "inc_fade_tick"):
                         try:
-                            elapsed_ms = int((time.perf_counter() - u_start) * 1000)
+                            elapsed_ms = int((time.monotonic() - u_start) * 1000)
                             metrics.inc_fade_tick(uni, elapsed_ms)
                         except Exception:
                             pass
@@ -188,7 +200,7 @@ class FadeEngine:
                             metrics.inc_fades_cancelled(uni, "done", int(done_completed_channels))
                         except Exception:
                             pass
-                dur = time.perf_counter() - start
+                dur = time.monotonic() - loop_start
                 if callable(metrics):
                     try:
                         metrics()

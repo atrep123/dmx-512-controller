@@ -26,5 +26,6 @@
     "**/.git": true,
     "**/package-lock.json": true
   },
-  "chatgpt.openOnStartup": true
+  "chatgpt.openOnStartup": true,
+  "chatgpt.runCodexInWindowsSubsystemForLinux": true
 }

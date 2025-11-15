@@ -4,14 +4,14 @@ import { defineConfig, PluginOption } from "vite";
 
 import sparkPlugin from "@github/spark/spark-vite-plugin";
 import createIconImportProxy from "@github/spark/vitePhosphorIconProxyPlugin";
-import { resolve } from "path";
 import { realpathSync } from "node:fs";
+import { resolve } from "path";
 
 const projectRoot = realpathSync(
   process.env.PROJECT_ROOT || import.meta.dirname
 );
 const baseHref = process.env.PUBLIC_URL || "/";
-const serverPort = Number(process.env.PORT || 5173);
+const serverPort = Number(process.env.PORT || 3000);
 
 if (process.cwd() !== projectRoot) {
   process.chdir(projectRoot);
@@ -36,7 +36,18 @@ export default defineConfig({
     hmr: {
       overlay: true,
     },
-    // No proxy configuration to avoid errors
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/ws": {
+        target: "ws://localhost:8080",
+        ws: true,
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     port: 4173,
